@@ -102,36 +102,43 @@ export async function deletePost(id: string) {
 }
 
 export async function updatePost(id: string, formData: FormData) {
-  const title = formData.get('title') as string;
-  const slug = formData.get('slug') as string;
-  const content = formData.get('content') as string;
-  const excerpt = formData.get('excerpt') as string;
-  const image = formData.get('image') as string;
-  const categoryId = formData.get('categoryId') as string;
-  const published = formData.get('published') === 'on';
-  const tags = formData.getAll('tags') as string[];
+  try {
+    const tags = formData.getAll('tags') as string[];
+    formData.set('tagIds', JSON.stringify(tags));
+    formData.set('published', formData.get('published') === 'on' ? 'true' : 'false');
 
-  await prisma.post.update({
-    where: { id },
-    data: {
-      title,
-      slug,
-      content,
-      excerpt,
-      image,
-      published,
-      categoryId: categoryId || null,
-      tags: {
-        set: [], // Disconnect all existing tags
-        connect: tags.map(tagId => ({ id: tagId })), // Connect new tags
+    const validation = validateFormData(PostSchema, formData);
+    if (!validation.success) {
+      throw new Error(validation.error);
+    }
+
+    const { title, slug, content, excerpt, image, published, categoryId, tagIds } = validation.data;
+
+    await prisma.post.update({
+      where: { id },
+      data: {
+        title,
+        slug,
+        content,
+        excerpt: excerpt || null,
+        image: image || null,
+        published,
+        categoryId: categoryId || null,
+        tags: {
+          set: [],
+          connect: tagIds && tagIds.length > 0 ? tagIds.map(tagId => ({ id: tagId })) : [],
+        },
       },
-    },
-  });
+    });
 
-  revalidatePath('/blog');
-  revalidatePath(`/blog/${slug}`);
-  revalidatePath('/admin/posts');
-  redirect('/admin/posts');
+    revalidatePath('/blog');
+    revalidatePath(`/blog/${slug}`);
+    revalidatePath('/admin/posts');
+    redirect('/admin/posts');
+  } catch (error) {
+    console.error('Error updating post:', error);
+    throw error;
+  }
 }
 
 // Projects
@@ -140,27 +147,35 @@ export async function getProjects() {
 }
 
 export async function createProject(formData: FormData) {
-  const title = formData.get('title') as string;
-  const slug = formData.get('slug') as string;
-  const description = formData.get('description') as string;
-  const content = formData.get('content') as string;
-  const techStack = formData.get('techStack') as string;
-  const image = formData.get('image') as string;
+  try {
+    const validation = validateFormData(ProjectSchema, formData);
+    if (!validation.success) {
+      throw new Error(validation.error);
+    }
 
-  await prisma.project.create({
-    data: {
-      title,
-      slug,
-      description,
-      content,
-      techStack, // In real app, parse this
-      image,
-    },
-  });
+    const { title, slug, description, content, techStack, image, demoUrl, githubUrl, status } = validation.data;
 
-  revalidatePath('/portfolio');
-  revalidatePath('/admin/projects');
-  redirect('/admin/projects');
+    await prisma.project.create({
+      data: {
+        title,
+        slug,
+        description,
+        content: content || null,
+        techStack: techStack || null,
+        image: image || null,
+        demoUrl: demoUrl || null,
+        githubUrl: githubUrl || null,
+        status: status || 'Completed',
+      },
+    });
+
+    revalidatePath('/portfolio');
+    revalidatePath('/admin/projects');
+    redirect('/admin/projects');
+  } catch (error) {
+    console.error('Error creating project:', error);
+    throw error;
+  }
 }
 
 export async function deleteProject(id: string) {
