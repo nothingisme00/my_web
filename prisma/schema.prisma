@@ -32,6 +32,10 @@ model Post {
   tags            Tag[]     @relation("PostTags")
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([published])
+  @@index([createdAt])
 }
 
 model Project {
@@ -48,6 +52,9 @@ model Project {
   views       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+  @@index([createdAt])
 }
 
 model Category {
@@ -58,6 +65,8 @@ model Category {
   posts       Post[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([slug])
 }
 
 model Tag {
@@ -67,6 +76,8 @@ model Tag {
   posts     Post[]   @relation("PostTags")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([slug])
 }
 
 model Media {

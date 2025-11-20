@@ -22,7 +22,7 @@ export default function AdminLayout({
     setIsSidebarOpen(false);
   }, [pathname]);
 
-  const NavLink = ({ href, icon: Icon, children }: { href: string; icon: any; children: React.ReactNode }) => {
+  const NavLink = ({ href, icon: Icon, children }: { href: string; icon: React.ComponentType<{ className?: string }>; children: React.ReactNode }) => {
     // Special case for dashboard: only active when exactly /admin
     const isActive = href === '/admin' 
       ? pathname === '/admin' 

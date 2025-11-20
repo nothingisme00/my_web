@@ -9,12 +9,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com',
       },
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
     ],
   },
+  poweredByHeader: false, // Security: Hide X-Powered-By header
+  compress: true, // Enable gzip compression
 };
 
 export default nextConfig;

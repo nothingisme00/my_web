@@ -6,6 +6,8 @@ import { notFound } from "next/navigation";
 import { incrementPostViews } from "@/lib/actions";
 import { Metadata } from "next";
 import Image from "next/image";
+import DOMPurify from 'dompurify';
+import { JSDOM } from 'jsdom';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -58,7 +60,7 @@ export async function generateStaticParams() {
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  
+
   const post = await prisma.post.findUnique({
     where: { slug },
     include: {
@@ -73,6 +75,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   // Increment view count
   await incrementPostViews(slug);
+
+  // Sanitize HTML content for SSR
+  const window = new JSDOM('').window;
+  const purify = DOMPurify(window);
+  const sanitizedContent = purify.sanitize(post.content);
 
   return (
     <div className="bg-white dark:bg-gray-900 py-24 sm:py-32 transition-colors duration-300 min-h-screen">
@@ -127,9 +134,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           </div>
         )}
 
-        <div 
-          className="prose prose-lg prose-blue dark:prose-invert mx-auto text-gray-600 dark:text-gray-300" 
-          dangerouslySetInnerHTML={{ __html: post.content }} 
+        <div
+          className="prose prose-lg prose-blue dark:prose-invert mx-auto text-gray-600 dark:text-gray-300"
+          dangerouslySetInnerHTML={{ __html: sanitizedContent }}
         />
 
         {post.tags && post.tags.length > 0 && (

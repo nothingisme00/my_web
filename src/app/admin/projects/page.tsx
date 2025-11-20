@@ -52,9 +52,11 @@ export default async function ProjectsAdminPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                        <Edit className="h-4 w-4" />
-                      </Button>
+                      <Link href={`/admin/projects/${project.id}/edit`}>
+                        <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </Link>
                       <form action={deleteProject.bind(null, project.id)}>
                         <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
                           <Trash2 className="h-4 w-4" />

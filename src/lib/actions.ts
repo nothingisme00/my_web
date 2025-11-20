@@ -1,21 +1,33 @@
 'use server';
 
-import { writeFile, unlink } from 'fs/promises';
+import { writeFile, unlink, mkdir } from 'fs/promises';
 import { join } from 'path';
+import { existsSync } from 'fs';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 
+// Types
+interface FormState {
+  error?: string;
+}
+
 // Auth
-export async function login(prevState: any, formData: FormData) {
+export async function login(prevState: FormState | null, formData: FormData): Promise<FormState> {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
 
   // Simple hardcoded check for demo purposes
   // In production, use bcrypt and check against database
   if (email === 'admin@example.com' && password === 'password') {
-    (await cookies()).set('auth_token', 'secret_token', { httpOnly: true });
+    (await cookies()).set('auth_token', 'secret_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
     redirect('/admin');
   } else {
     return { error: 'Invalid credentials' };
@@ -233,9 +245,37 @@ export async function getMedia() {
 
 export async function uploadMedia(formData: FormData) {
   const file = formData.get('file') as File;
-  
+
   if (!file) {
     throw new Error('No file uploaded');
+  }
+
+  // Validation: File size (max 5MB)
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+  if (file.size > MAX_FILE_SIZE) {
+    throw new Error('File size exceeds 5MB limit');
+  }
+
+  // Validation: MIME type
+  const ALLOWED_MIME_TYPES = [
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+    'image/svg+xml'
+  ];
+
+  if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+    throw new Error('Invalid file type. Only images (JPEG, PNG, GIF, WebP, SVG) are allowed');
+  }
+
+  // Validation: File extension
+  const fileExtension = file.name.split('.').pop()?.toLowerCase();
+  const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+
+  if (!fileExtension || !ALLOWED_EXTENSIONS.includes(fileExtension)) {
+    throw new Error('Invalid file extension');
   }
 
   const bytes = await file.arrayBuffer();
@@ -243,8 +283,14 @@ export async function uploadMedia(formData: FormData) {
 
   // Create unique filename
   const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-  const filename = file.name.replace(/\.[^/.]+$/, "") + '-' + uniqueSuffix + '.' + file.name.split('.').pop();
+  const filename = file.name.replace(/\.[^/.]+$/, "") + '-' + uniqueSuffix + '.' + fileExtension;
   const uploadDir = join(process.cwd(), 'public', 'uploads');
+
+  // Ensure upload directory exists
+  if (!existsSync(uploadDir)) {
+    await mkdir(uploadDir, { recursive: true });
+  }
+
   const filepath = join(uploadDir, filename);
 
   await writeFile(filepath, buffer);

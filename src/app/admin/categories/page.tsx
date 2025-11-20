@@ -2,9 +2,16 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { getCategories, deleteCategory } from '@/lib/actions';
 import { Plus, Trash2 } from 'lucide-react';
+import { Category } from '@prisma/client';
+
+type CategoryWithCount = Category & {
+  _count?: {
+    posts: number;
+  };
+};
 
 export default async function CategoriesAdminPage() {
-  const categories = await getCategories();
+  const categories = await getCategories() as CategoryWithCount[];
 
   return (
     <div>
@@ -53,7 +60,7 @@ export default async function CategoriesAdminPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                      {(category as any)._count?.posts || 0} posts
+                      {category._count?.posts || 0} posts
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

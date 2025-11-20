@@ -2,10 +2,14 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { getPosts, deletePost } from '@/lib/actions';
 import { Plus, Trash2, Edit } from 'lucide-react';
-import { Post } from '@prisma/client';
+import { Post, Category } from '@prisma/client';
+
+type PostWithCategory = Post & {
+  category: Category | null;
+};
 
 export default async function PostsAdminPage() {
-  const posts: Post[] = await getPosts();
+  const posts = await getPosts() as PostWithCategory[];
 
   return (
     <div>
@@ -49,7 +53,7 @@ export default async function PostsAdminPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                      {(post as any).category?.name || 'Uncategorized'}
+                      {post.category?.name || 'Uncategorized'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
