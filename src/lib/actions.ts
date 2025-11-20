@@ -7,6 +7,7 @@ import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
+import { validateFormData, LoginSchema, PostSchema, ProjectSchema, CategorySchema, TagSchema } from '@/lib/validations';
 
 // Types
 interface FormState {
@@ -15,8 +16,13 @@ interface FormState {
 
 // Auth
 export async function login(prevState: FormState | null, formData: FormData): Promise<FormState> {
-  const email = formData.get('email') as string;
-  const password = formData.get('password') as string;
+  // Validate input
+  const validation = validateFormData(LoginSchema, formData);
+  if (!validation.success) {
+    return { error: validation.error };
+  }
+
+  const { email, password } = validation.data;
 
   // Simple hardcoded check for demo purposes
   // In production, use bcrypt and check against database
@@ -51,33 +57,42 @@ export async function getPosts() {
 }
 
 export async function createPost(formData: FormData) {
-  const title = formData.get('title') as string;
-  const slug = formData.get('slug') as string;
-  const content = formData.get('content') as string;
-  const excerpt = formData.get('excerpt') as string;
-  const image = formData.get('image') as string;
-  const categoryId = formData.get('categoryId') as string;
-  const published = formData.get('published') === 'on';
-  const tags = formData.getAll('tags') as string[];
+  try {
+    // Prepare data with tag IDs
+    const tags = formData.getAll('tags') as string[];
+    formData.set('tagIds', JSON.stringify(tags));
+    formData.set('published', formData.get('published') === 'on' ? 'true' : 'false');
 
-  await prisma.post.create({
-    data: {
-      title,
-      slug,
-      content,
-      excerpt,
-      image,
-      published,
-      categoryId: categoryId || null,
-      tags: {
-        connect: tags.map(tagId => ({ id: tagId })),
+    // Validate input
+    const validation = validateFormData(PostSchema, formData);
+    if (!validation.success) {
+      throw new Error(validation.error);
+    }
+
+    const { title, slug, content, excerpt, image, published, categoryId, tagIds } = validation.data;
+
+    await prisma.post.create({
+      data: {
+        title,
+        slug,
+        content,
+        excerpt: excerpt || null,
+        image: image || null,
+        published,
+        categoryId: categoryId || null,
+        tags: tagIds && tagIds.length > 0 ? {
+          connect: tagIds.map(tagId => ({ id: tagId })),
+        } : undefined,
       },
-    },
-  });
+    });
 
-  revalidatePath('/blog');
-  revalidatePath('/admin/posts');
-  redirect('/admin/posts');
+    revalidatePath('/blog');
+    revalidatePath('/admin/posts');
+    redirect('/admin/posts');
+  } catch (error) {
+    console.error('Error creating post:', error);
+    throw error;
+  }
 }
 
 export async function deletePost(id: string) {
