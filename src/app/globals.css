@@ -30,11 +30,20 @@ body {
 
 /* Smooth Animations & Hover Effects */
 @layer utilities {
+  /* GPU acceleration for transform and opacity */
+  .gpu-accelerated {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+
   .hover-lift {
     transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+    will-change: transform, box-shadow;
   }
   .hover-lift:hover {
-    transform: translateY(-2px);
+    transform: translateY(-2px) translateZ(0);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
   .dark .hover-lift:hover {
@@ -43,13 +52,15 @@ body {
 
   .hover-scale {
     transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
   }
   .hover-scale:hover {
-    transform: scale(1.02);
+    transform: scale(1.02) translateZ(0);
   }
 
   .hover-glow {
     transition: box-shadow 0.3s ease;
+    will-change: box-shadow;
   }
   .hover-glow:hover {
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
@@ -66,6 +77,19 @@ body {
   .animate-slide-down {
     animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .hover-lift,
+    .hover-scale,
+    .hover-glow,
+    .animate-fade-in,
+    .animate-slide-up,
+    .animate-slide-down {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
 }
 
 @keyframes fadeIn {
@@ -80,22 +104,22 @@ body {
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(20px) translateZ(0);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) translateZ(0);
   }
 }
 
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-10px) translateZ(0);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) translateZ(0);
   }
 }
 

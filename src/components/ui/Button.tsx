@@ -1,3 +1,5 @@
+'use client';
+
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { ButtonHTMLAttributes, forwardRef } from 'react';

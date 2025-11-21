@@ -82,7 +82,7 @@ export default function PostForm({ categories, tags, initialData }: PostFormProp
                 id="excerpt"
                 rows={3}
                 defaultValue={initialData?.excerpt || ''}
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-gray-900 dark:text-white transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:shadow-sm hover:border-gray-400 dark:hover:border-gray-600 resize-y"
                 placeholder="Brief summary of the post"
               />
             </div>
@@ -128,9 +128,9 @@ export default function PostForm({ categories, tags, initialData }: PostFormProp
                         name="tags"
                         value={tag.id}
                         defaultChecked={initialData?.tags.some(t => t.id === tag.id)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
+                        className="rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-all duration-150 dark:border-gray-600 dark:bg-gray-800"
                       />
-                      <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                      <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-150">
                         {tag.name}
                       </span>
                     </label>
@@ -142,14 +142,14 @@ export default function PostForm({ categories, tags, initialData }: PostFormProp
               </div>
 
               <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label className="flex items-center gap-2 cursor-pointer group">
                   <input
                     type="checkbox"
                     name="published"
                     defaultChecked={initialData?.published ?? true}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 w-4 h-4"
+                    className="rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-all duration-150 dark:border-gray-600 dark:bg-gray-800 w-4 h-4"
                   />
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">Publish immediately</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-150">Publish immediately</span>
                 </label>
               </div>
 

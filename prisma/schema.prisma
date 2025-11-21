@@ -25,6 +25,9 @@ model Post {
   image           String?
   published       Boolean   @default(false)
   views           Int       @default(0)
+  readingTime     Int       @default(5) // in minutes
+  author          String    @default("DevAditya")
+  publishedAt     DateTime?
   metaDescription String?
   metaKeywords    String?
   categoryId      String?
@@ -36,6 +39,7 @@ model Post {
   @@index([slug])
   @@index([published])
   @@index([createdAt])
+  @@index([publishedAt])
 }
 
 model Project {

@@ -8,6 +8,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { validateFormData, LoginSchema, PostSchema, ProjectSchema, CategorySchema, TagSchema } from '@/lib/validations';
+import { calculateReadingTime } from '@/lib/utils';
 
 // Types
 interface FormState {
@@ -71,6 +72,9 @@ export async function createPost(formData: FormData) {
 
     const { title, slug, content, excerpt, image, published, categoryId, tagIds } = validation.data;
 
+    // Calculate reading time
+    const readingTime = calculateReadingTime(content);
+
     await prisma.post.create({
       data: {
         title,
@@ -79,6 +83,8 @@ export async function createPost(formData: FormData) {
         excerpt: excerpt || null,
         image: image || null,
         published,
+        readingTime,
+        publishedAt: published ? new Date() : null,
         categoryId: categoryId || null,
         tags: tagIds && tagIds.length > 0 ? {
           connect: tagIds.map(tagId => ({ id: tagId })),
@@ -114,6 +120,13 @@ export async function updatePost(id: string, formData: FormData) {
 
     const { title, slug, content, excerpt, image, published, categoryId, tagIds } = validation.data;
 
+    // Calculate reading time
+    const readingTime = calculateReadingTime(content);
+
+    // Get current post to check if publishedAt should be set
+    const currentPost = await prisma.post.findUnique({ where: { id } });
+    const shouldSetPublishedAt = published && !currentPost?.publishedAt;
+
     await prisma.post.update({
       where: { id },
       data: {
@@ -123,6 +136,8 @@ export async function updatePost(id: string, formData: FormData) {
         excerpt: excerpt || null,
         image: image || null,
         published,
+        readingTime,
+        publishedAt: shouldSetPublishedAt ? new Date() : undefined,
         categoryId: categoryId || null,
         tags: {
           set: [],
@@ -441,6 +456,181 @@ export async function incrementProjectViews(slug: string) {
     data: {
       views: {
         increment: 1,
+      },
+    },
+  });
+}
+
+// Enhanced Blog Functions
+
+/**
+ * Get featured posts for homepage (most viewed or latest)
+ */
+export async function getFeaturedPosts(limit: number = 6) {
+  return await prisma.post.findMany({
+    where: { published: true },
+    orderBy: [
+      { views: 'desc' },
+      { publishedAt: 'desc' },
+      { createdAt: 'desc' },
+    ],
+    take: limit,
+    include: {
+      category: true,
+      tags: true,
+    },
+  });
+}
+
+/**
+ * Get posts by category
+ */
+export async function getPostsByCategory(categorySlug: string, limit?: number) {
+  const category = await prisma.category.findUnique({
+    where: { slug: categorySlug },
+  });
+
+  if (!category) return [];
+
+  return await prisma.post.findMany({
+    where: {
+      published: true,
+      categoryId: category.id,
+    },
+    orderBy: { publishedAt: 'desc' },
+    take: limit,
+    include: {
+      category: true,
+      tags: true,
+    },
+  });
+}
+
+/**
+ * Get posts by tag
+ */
+export async function getPostsByTag(tagSlug: string, limit?: number) {
+  const tag = await prisma.tag.findUnique({
+    where: { slug: tagSlug },
+  });
+
+  if (!tag) return [];
+
+  return await prisma.post.findMany({
+    where: {
+      published: true,
+      tags: {
+        some: {
+          id: tag.id,
+        },
+      },
+    },
+    orderBy: { publishedAt: 'desc' },
+    take: limit,
+    include: {
+      category: true,
+      tags: true,
+    },
+  });
+}
+
+/**
+ * Get related posts based on category and tags
+ */
+export async function getRelatedPosts(postId: string, categoryId?: string | null, limit: number = 3) {
+  const currentPost = await prisma.post.findUnique({
+    where: { id: postId },
+    include: { tags: true },
+  });
+
+  if (!currentPost) return [];
+
+  const tagIds = currentPost.tags.map(tag => tag.id);
+
+  // Find posts with same category or shared tags
+  const relatedPosts = await prisma.post.findMany({
+    where: {
+      published: true,
+      id: { not: postId },
+      OR: [
+        // Same category
+        categoryId ? { categoryId } : {},
+        // Has shared tags
+        tagIds.length > 0
+          ? {
+              tags: {
+                some: {
+                  id: { in: tagIds },
+                },
+              },
+            }
+          : {},
+      ],
+    },
+    orderBy: [
+      { views: 'desc' },
+      { publishedAt: 'desc' },
+    ],
+    take: limit,
+    include: {
+      category: true,
+      tags: true,
+    },
+  });
+
+  return relatedPosts;
+}
+
+/**
+ * Get published posts only
+ */
+export async function getPublishedPosts() {
+  return await prisma.post.findMany({
+    where: { published: true },
+    orderBy: { publishedAt: 'desc' },
+    include: {
+      category: true,
+      tags: true,
+    },
+  });
+}
+
+/**
+ * Get single post by slug with related data
+ */
+export async function getPostBySlug(slug: string) {
+  return await prisma.post.findUnique({
+    where: { slug },
+    include: {
+      category: true,
+      tags: true,
+    },
+  });
+}
+
+/**
+ * Get category by slug with post count
+ */
+export async function getCategoryBySlug(slug: string) {
+  return await prisma.category.findUnique({
+    where: { slug },
+    include: {
+      _count: {
+        select: { posts: true },
+      },
+    },
+  });
+}
+
+/**
+ * Get tag by slug with post count
+ */
+export async function getTagBySlug(slug: string) {
+  return await prisma.tag.findUnique({
+    where: { slug },
+    include: {
+      _count: {
+        select: { posts: true },
       },
     },
   });
