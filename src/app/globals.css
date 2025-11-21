@@ -78,6 +78,20 @@ body {
     animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  /* Grid background pattern */
+  .bg-grid-pattern {
+    background-image:
+      linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .dark .bg-grid-pattern {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  }
+
   /* Reduced motion support */
   @media (prefers-reduced-motion: reduce) {
     .hover-lift,

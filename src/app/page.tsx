@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { ArrowRight, Clock, Eye } from "lucide-react";
+import { ArrowRight, Clock, Eye, Sparkles, BookOpen } from "lucide-react";
 import { getFeaturedPosts, getCategories } from "@/lib/actions";
 import { formatDate, formatViewCount } from "@/lib/utils";
 import { Prisma } from "@prisma/client";
+import { HeroCarousel } from "@/components/home/HeroCarousel";
 
 type PostWithRelations = Prisma.PostGetPayload<{
   include: {
@@ -21,24 +22,84 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
-      {/* Minimal Hero Section */}
-      <section className="border-b border-gray-100 dark:border-gray-800 bg-gradient-to-b from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-900">
-        <div className="mx-auto max-w-5xl px-6 py-16 lg:px-8 lg:py-20">
-          <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl lg:text-6xl">
-              DevAditya
-            </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Personal blog tentang web development, programming, dan teknologi
-            </p>
-            <div className="pt-4">
-              <Link
-                href="#articles"
-                className="inline-flex items-center text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 group"
-              >
-                Explore Articles
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
+      {/* Split Hero Section with Carousel */}
+      <section className="relative overflow-hidden border-b border-gray-100 dark:border-gray-800">
+        {/* Animated Background Pattern */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-white to-purple-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-blue-950/20">
+          <div className="absolute inset-0 bg-grid-pattern opacity-[0.02] dark:opacity-[0.03]" />
+        </div>
+
+        <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Left Side - Text Content */}
+            <div className="space-y-8 animate-fade-in">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 dark:bg-blue-900/30 px-4 py-2 text-sm font-medium text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/20 animate-slide-down">
+                <Sparkles className="h-4 w-4" />
+                Welcome to my blog
+              </div>
+
+              {/* Main Heading with Gradient */}
+              <div className="space-y-4">
+                <h1 className="text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
+                  <span className="block text-gray-900 dark:text-white animate-slide-up">
+                    DevAditya
+                  </span>
+                  <span className="block mt-2 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                    Web Developer
+                  </span>
+                </h1>
+                <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
+                  Sharing knowledge about modern web development, programming best practices, and the latest in technology.
+                </p>
+              </div>
+
+              {/* Tech Stack Pills */}
+              <div className="flex flex-wrap gap-2 animate-slide-up" style={{ animationDelay: '0.3s' }}>
+                {['Next.js', 'React', 'TypeScript', 'Tailwind CSS'].map((tech, index) => (
+                  <span
+                    key={tech}
+                    className="inline-flex items-center rounded-md bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
+                    style={{ animationDelay: `${0.4 + index * 0.05}s` }}
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-wrap gap-4 animate-slide-up" style={{ animationDelay: '0.5s' }}>
+                <Link
+                  href="/blog"
+                  className="inline-flex items-center gap-2 rounded-lg bg-blue-600 dark:bg-blue-500 px-6 py-3 text-sm font-semibold text-white shadow-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-all duration-200 hover-lift"
+                >
+                  <BookOpen className="h-4 w-4" />
+                  Browse Articles
+                </Link>
+                <Link
+                  href="/about"
+                  className="inline-flex items-center gap-2 rounded-lg bg-white dark:bg-gray-800 px-6 py-3 text-sm font-semibold text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 hover-lift"
+                >
+                  About Me
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Right Side - Latest Posts Carousel */}
+            <div className="relative pb-12 lg:pb-0 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">
+                  Latest Articles
+                </h3>
+                <Link
+                  href="/blog"
+                  className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                >
+                  View all
+                </Link>
+              </div>
+              <HeroCarousel posts={allPosts.slice(0, 3)} />
             </div>
           </div>
         </div>
