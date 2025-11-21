@@ -52,14 +52,14 @@ export function HeroCarousel({ posts }: HeroCarouselProps) {
     >
       {/* Carousel Content */}
       <Link href={`/blog/${currentPost.slug}`} className="group block h-full">
-        <div className="relative h-full rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800/50 overflow-hidden hover:border-blue-200 dark:hover:border-blue-900/50 hover:shadow-xl transition-all duration-300 hover-lift">
+        <div className="relative h-full rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800/50 overflow-hidden hover:border-blue-200 dark:hover:border-blue-900/50 hover:shadow-xl transition-all duration-300 ease-out hover-lift">
           {/* Image */}
           {currentPost.image && (
             <div className="relative h-48 overflow-hidden bg-gray-100 dark:bg-gray-800">
               <img
                 src={currentPost.image}
                 alt={currentPost.title}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
             </div>
@@ -75,7 +75,7 @@ export function HeroCarousel({ posts }: HeroCarouselProps) {
             )}
 
             {/* Title */}
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 leading-tight">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 ease-out line-clamp-2 leading-tight">
               {currentPost.title}
             </h3>
 
@@ -107,9 +107,9 @@ export function HeroCarousel({ posts }: HeroCarouselProps) {
 
             {/* Read More Link */}
             <div className="pt-2">
-              <span className="inline-flex items-center text-sm font-medium text-blue-600 dark:text-blue-400 group-hover:gap-2 transition-all">
+              <span className="inline-flex items-center text-sm font-medium text-blue-600 dark:text-blue-400 group-hover:gap-2 transition-all duration-200 ease-out">
                 Read article
-                <ChevronRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
+                <ChevronRight className="h-4 w-4 ml-1 transition-transform duration-200 ease-out group-hover:translate-x-1" />
               </span>
             </div>
           </div>
@@ -123,7 +123,7 @@ export function HeroCarousel({ posts }: HeroCarouselProps) {
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
-              className={`transition-all duration-300 ${
+              className={`transition-all duration-300 ease-out ${
                 index === currentIndex
                   ? 'w-8 h-2 bg-blue-600 dark:bg-blue-400'
                   : 'w-2 h-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'

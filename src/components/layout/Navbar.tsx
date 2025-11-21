@@ -40,10 +40,10 @@ export function Navbar() {
         {/* Logo */}
         <div className="flex-shrink-0">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold text-lg w-8 h-8 flex items-center justify-center rounded-lg group-hover:bg-blue-600 dark:group-hover:bg-blue-500 transition-colors duration-200">
+            <div className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold text-lg w-8 h-8 flex items-center justify-center rounded-lg group-hover:bg-blue-600 dark:group-hover:bg-blue-500 transition-all duration-200 ease-out group-hover:scale-105">
               D
             </div>
-            <span className="font-bold text-lg tracking-tight text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 hidden sm:block">DevAditya</span>
+            <span className="font-bold text-lg tracking-tight text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-all duration-200 ease-out hidden sm:block">DevAditya</span>
           </Link>
         </div>
 
@@ -54,7 +54,7 @@ export function Navbar() {
               key={item.name}
               href={item.href}
               className={clsx(
-                'px-4 py-2 text-sm font-medium rounded-full transition-all duration-200',
+                'px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 ease-out',
                 pathname === item.href
                   ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
                   : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800/50'
@@ -67,10 +67,10 @@ export function Navbar() {
 
         {/* Right Side (Socials/CTA) */}
         <div className="hidden md:flex items-center gap-3">
-          <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors duration-200">
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white transition-all duration-200 ease-out hover:scale-110">
             <Github className="w-5 h-5" />
           </a>
-          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
+          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200 ease-out hover:scale-110">
             <Linkedin className="w-5 h-5" />
           </a>
           <div className="h-4 w-px bg-gray-200 dark:bg-gray-700 mx-1"></div>
@@ -84,7 +84,7 @@ export function Navbar() {
         <div className="flex items-center md:hidden">
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="inline-flex items-center justify-center p-2 rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-colors duration-200"
+            className="inline-flex items-center justify-center p-2 rounded-full text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-all duration-200 ease-out"
           >
             <span className="sr-only">Open main menu</span>
             {isOpen ? (
@@ -105,7 +105,7 @@ export function Navbar() {
                 key={item.name}
                 href={item.href}
                 className={clsx(
-                  'block px-4 py-3 rounded-xl text-base font-medium transition-colors duration-200',
+                  'block px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 ease-out',
                   pathname === item.href
                     ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
                     : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-white'

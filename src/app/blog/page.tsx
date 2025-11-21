@@ -36,7 +36,7 @@ export default async function BlogPage() {
               <div className="space-y-8">
                 {posts.map((post) => (
                   <Link key={post.id} href={`/blog/${post.slug}`} className="group block">
-                    <article className="grid md:grid-cols-3 gap-6 pb-8 border-b border-gray-100 dark:border-gray-800 hover:border-blue-100 dark:hover:border-blue-900/30 transition-colors">
+                    <article className="grid md:grid-cols-3 gap-6 pb-8 border-b border-gray-100 dark:border-gray-800 hover:border-blue-100 dark:hover:border-blue-900/30 transition-all duration-300 ease-out">
                       {/* Image */}
                       {post.image && (
                         <div className="md:col-span-1">
@@ -44,7 +44,7 @@ export default async function BlogPage() {
                             <img
                               src={post.image}
                               alt={post.title}
-                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                              className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                             />
                           </div>
                         </div>
@@ -60,7 +60,7 @@ export default async function BlogPage() {
                         )}
 
                         {/* Title */}
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-3 leading-tight">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 ease-out mb-3 leading-tight">
                           {post.title}
                         </h2>
 
@@ -129,7 +129,7 @@ export default async function BlogPage() {
                       <Link
                         key={category.id}
                         href={`/blog/category/${category.slug}`}
-                        className="flex items-center justify-between py-2 px-3 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-all group"
+                        className="flex items-center justify-between py-2 px-3 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200 ease-out group"
                       >
                         <span className="font-medium">{category.name}</span>
                         <span className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400">
@@ -152,7 +152,7 @@ export default async function BlogPage() {
                       <Link
                         key={tag.id}
                         href={`/blog/tag/${tag.slug}`}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200 ease-out hover:scale-105"
                       >
                         #{tag.name}
                         <span className="text-gray-500 dark:text-gray-400">
