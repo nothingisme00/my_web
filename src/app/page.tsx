@@ -47,7 +47,7 @@ export default async function Home() {
                 <span className="block mt-2 animate-slide-up" style={{ animationDelay: '0.1s' }}>
                   <TypewriterText
                     words={['Learning', 'Creative', 'Tech', 'Art']}
-                    className="bg-gradient-to-r from-gray-700 to-gray-900 dark:from-gray-200 dark:to-white bg-clip-text text-transparent"
+                    className="text-blue-600 dark:text-blue-400"
                   />
                 </span>
                 <span className="block mt-1 bg-gradient-to-r from-gray-700 to-gray-900 dark:from-gray-200 dark:to-white bg-clip-text text-transparent animate-slide-up" style={{ animationDelay: '0.15s' }}>
