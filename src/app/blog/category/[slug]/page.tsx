@@ -12,14 +12,15 @@ type PostWithRelations = Prisma.PostGetPayload<{
   }
 }>;
 
-export default async function CategoryPage({ params }: { params: { slug: string } }) {
-  const category = await getCategoryBySlug(params.slug);
+export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const category = await getCategoryBySlug(slug);
 
   if (!category) {
     notFound();
   }
 
-  const posts = await getPostsByCategory(params.slug) as PostWithRelations[];
+  const posts = await getPostsByCategory(slug) as PostWithRelations[];
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 py-16 lg:py-20">
