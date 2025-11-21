@@ -30,8 +30,8 @@ export default async function Home() {
           <div className="absolute inset-0 bg-grid-pattern opacity-[0.03] dark:opacity-[0.05]" />
         </div>
 
-        <div className="relative mx-auto max-w-4xl px-6 py-24 lg:px-8 lg:py-32 text-center">
-          <div className="space-y-8 animate-fade-in">
+        <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
+          <div className="max-w-2xl space-y-8 animate-fade-in">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 rounded-full bg-blue-100 dark:bg-blue-900/30 px-4 py-2 text-sm font-medium text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/20 animate-slide-down">
               <Sparkles className="h-4 w-4" />
@@ -39,28 +39,28 @@ export default async function Home() {
             </div>
 
             {/* Main Heading with Gradient */}
-            <div className="space-y-6">
-              <h1 className="text-6xl font-bold tracking-tight sm:text-7xl lg:text-8xl">
+            <div className="space-y-4">
+              <h1 className="text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
                 <span className="block text-gray-900 dark:text-white animate-slide-up">
                   DevAditya
                 </span>
-                <span className="block mt-3 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                <span className="block mt-2 animate-slide-up" style={{ animationDelay: '0.1s' }}>
                   <TypewriterText
                     words={['Learning', 'Creative', 'Tech', 'Art']}
                     className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent"
                   />
                 </span>
-                <span className="block mt-2 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent animate-slide-up" style={{ animationDelay: '0.15s' }}>
+                <span className="block mt-1 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent animate-slide-up" style={{ animationDelay: '0.15s' }}>
                   Enthusiast
                 </span>
               </h1>
-              <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-2xl mx-auto animate-slide-up" style={{ animationDelay: '0.2s' }}>
+              <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
                 Sharing experiences and interesting things I want you to know
               </p>
             </div>
 
             {/* Tech Stack Pills */}
-            <div className="flex flex-wrap justify-center gap-2 animate-slide-up" style={{ animationDelay: '0.3s' }}>
+            <div className="flex flex-wrap gap-2 animate-slide-up" style={{ animationDelay: '0.3s' }}>
               {['Next.js', 'React', 'TypeScript', 'Tailwind CSS'].map((tech, index) => (
                 <span
                   key={tech}
@@ -73,7 +73,7 @@ export default async function Home() {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-wrap justify-center gap-4 animate-slide-up" style={{ animationDelay: '0.5s' }}>
+            <div className="flex flex-wrap gap-4 animate-slide-up" style={{ animationDelay: '0.5s' }}>
               <Link
                 href="/blog"
                 className="inline-flex items-center gap-2 rounded-lg bg-blue-600 dark:bg-blue-500 px-6 py-3 text-sm font-semibold text-white shadow-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-all duration-200 hover-lift"
