@@ -39,22 +39,23 @@ export default async function Home() {
             </div>
 
             {/* Main Heading with Gradient */}
-            <div className="space-y-4">
-              <h1 className="text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
-                <span className="block text-gray-900 dark:text-white animate-slide-up">
-                  It's me, Fattah
-                </span>
-                <span className="block mt-2 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                  <TypewriterText
-                    words={['Learning', 'Creative', 'Tech', 'Art']}
-                    className="text-blue-600 dark:text-blue-400"
-                  />
-                </span>
-                <span className="block mt-1 bg-gradient-to-r from-gray-700 to-gray-900 dark:from-gray-200 dark:to-white bg-clip-text text-transparent animate-slide-up" style={{ animationDelay: '0.15s' }}>
-                  Enthusiast
-                </span>
+            <div className="space-y-2">
+              <p className="text-lg text-gray-600 dark:text-gray-400 animate-slide-up">
+                Hi! It's me
+              </p>
+              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-gray-900 dark:text-white animate-slide-up" style={{ animationDelay: '0.05s' }}>
+                Alfattah Atalarais<span className="font-normal text-gray-500 dark:text-gray-400">, i'm a</span>
               </h1>
-              <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
+              <div className="text-3xl font-bold sm:text-4xl lg:text-5xl animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                <TypewriterText
+                  words={['Learning', 'Creative', 'Tech', 'Art']}
+                  className="text-blue-600 dark:text-blue-400"
+                />
+              </div>
+              <p className="text-3xl font-bold sm:text-4xl lg:text-5xl text-gray-900 dark:text-white animate-slide-up" style={{ animationDelay: '0.15s' }}>
+                Enthusiast
+              </p>
+              <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed animate-slide-up mt-4" style={{ animationDelay: '0.2s' }}>
                 Sharing experiences and interesting things I want you to know
               </p>
             </div>
