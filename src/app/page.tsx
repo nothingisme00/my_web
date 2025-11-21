@@ -25,7 +25,7 @@ export default async function Home() {
       {/* Split Hero Section with Carousel */}
       <section className="relative overflow-hidden border-b border-gray-100 dark:border-gray-800">
         {/* Animated Background Pattern */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-white to-purple-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-blue-950/20">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-white to-purple-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
           <div className="absolute inset-0 bg-grid-pattern opacity-[0.02] dark:opacity-[0.03]" />
         </div>
 
