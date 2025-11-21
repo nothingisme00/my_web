@@ -32,14 +32,14 @@ export default function AdminLayout({
       <Link
         href={href}
         className={clsx(
-          'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
+          'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
           isActive
-            ? 'bg-blue-600 text-white'
-            : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+            ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/20'
+            : 'text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-1'
         )}
       >
-        <Icon className="h-5 w-5" />
-        {children}
+        <Icon className={clsx('h-5 w-5 transition-transform', isActive && 'scale-110')} />
+        <span className="font-medium">{children}</span>
       </Link>
     );
   };
