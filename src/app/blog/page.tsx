@@ -54,13 +54,9 @@ export default async function BlogPage() {
                       <div className={`flex flex-col ${post.image ? 'md:col-span-2' : 'md:col-span-3'}`}>
                         {/* Category */}
                         {post.category && (
-                          <Link
-                            href={`/blog/category/${post.category.slug}`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center w-fit rounded-md bg-blue-50 dark:bg-blue-900/30 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors mb-3"
-                          >
+                          <span className="inline-flex items-center w-fit rounded-md bg-blue-50 dark:bg-blue-900/30 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-400 mb-3">
                             {post.category.name}
-                          </Link>
+                          </span>
                         )}
 
                         {/* Title */}
@@ -98,14 +94,12 @@ export default async function BlogPage() {
                         {post.tags.length > 0 && (
                           <div className="flex flex-wrap gap-2 mt-4">
                             {post.tags.slice(0, 4).map((tag) => (
-                              <Link
+                              <span
                                 key={tag.id}
-                                href={`/blog/tag/${tag.slug}`}
-                                onClick={(e) => e.stopPropagation()}
-                                className="text-xs text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                className="text-xs text-gray-600 dark:text-gray-400"
                               >
                                 #{tag.name}
-                              </Link>
+                              </span>
                             ))}
                           </div>
                         )}
