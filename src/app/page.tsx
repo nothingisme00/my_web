@@ -30,8 +30,9 @@ export default async function Home() {
           <div className="absolute inset-0 bg-grid-pattern opacity-[0.03] dark:opacity-[0.05]" />
         </div>
 
-        {/* Geometric Shapes - Right Side */}
+        {/* Geometric Shapes - Entire Hero */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none hidden lg:block">
+          {/* === RIGHT SIDE === */}
           {/* Large circle outline */}
           <div
             className="absolute top-20 right-[10%] w-40 h-40 rounded-full border border-gray-300/20 dark:border-gray-600/20"
@@ -52,6 +53,11 @@ export default async function Home() {
             className="absolute top-72 right-[15%] w-2 h-2 rounded-full bg-gray-500/30 dark:bg-gray-400/30"
             style={{ animation: 'float 18s ease-in-out infinite', animationDelay: '-12s' }}
           />
+          {/* Extra circle right bottom */}
+          <div
+            className="absolute bottom-24 right-[5%] w-20 h-20 rounded-full border border-gray-400/15 dark:border-gray-500/15"
+            style={{ animation: 'float 21s ease-in-out infinite', animationDelay: '-4s' }}
+          />
           {/* Rotated square large */}
           <div
             className="absolute top-36 right-[20%] w-28 h-28 border border-gray-400/15 dark:border-gray-500/15 rotate-45"
@@ -67,40 +73,122 @@ export default async function Home() {
             className="absolute top-80 right-[12%] w-16 h-8 border border-gray-300/20 dark:border-gray-600/20 rotate-[-8deg]"
             style={{ animation: 'float 19s ease-in-out infinite', animationDelay: '-7s' }}
           />
-          {/* Line 1 */}
+
+          {/* === LEFT SIDE === */}
+          {/* Large circle left */}
           <div
-            className="absolute top-56 right-[25%] w-32 h-[1px] bg-gradient-to-r from-transparent via-gray-400/25 to-transparent dark:via-gray-500/25 rotate-[20deg]"
+            className="absolute top-16 left-[8%] w-32 h-32 rounded-full border border-gray-300/15 dark:border-gray-600/15"
+            style={{ animation: 'float 23s ease-in-out infinite', animationDelay: '-2s' }}
           />
-          {/* Line 2 */}
+          {/* Medium circle left */}
           <div
-            className="absolute top-44 right-[5%] w-20 h-[1px] bg-gradient-to-r from-transparent via-blue-400/20 to-transparent dark:via-blue-500/20 rotate-[-15deg]"
+            className="absolute bottom-32 left-[5%] w-20 h-20 rounded-full border border-blue-400/10 dark:border-blue-500/10"
+            style={{ animation: 'float 19s ease-in-out infinite', animationDelay: '-9s' }}
           />
-          {/* Line 3 */}
+          {/* Small filled circle left */}
           <div
-            className="absolute top-88 right-[28%] w-16 h-[1px] bg-gradient-to-r from-transparent via-gray-500/20 to-transparent dark:via-gray-400/20 rotate-[45deg]"
+            className="absolute top-40 left-[15%] w-3 h-3 rounded-full bg-gray-500/20 dark:bg-gray-400/20"
+            style={{ animation: 'float 16s ease-in-out infinite', animationDelay: '-6s' }}
           />
-          {/* Dots pattern 1 */}
+          {/* Tiny circle left bottom */}
+          <div
+            className="absolute bottom-48 left-[12%] w-2 h-2 rounded-full bg-blue-400/25 dark:bg-blue-500/25"
+            style={{ animation: 'float 14s ease-in-out infinite', animationDelay: '-11s' }}
+          />
+          {/* Square left */}
+          <div
+            className="absolute top-56 left-[3%] w-16 h-16 border border-gray-400/10 dark:border-gray-500/10 rotate-[30deg]"
+            style={{ animation: 'float 20s ease-in-out infinite', animationDelay: '-8s' }}
+          />
+          {/* Rectangle left */}
+          <div
+            className="absolute bottom-40 left-[18%] w-12 h-6 border border-blue-300/15 dark:border-blue-600/15 rotate-[-12deg]"
+            style={{ animation: 'float 18s ease-in-out infinite', animationDelay: '-3s' }}
+          />
+
+          {/* === CENTER/TOP === */}
+          {/* Circle top center */}
+          <div
+            className="absolute top-8 left-[45%] w-16 h-16 rounded-full border border-gray-300/10 dark:border-gray-600/10"
+            style={{ animation: 'float 24s ease-in-out infinite', animationDelay: '-15s' }}
+          />
+          {/* Small circle top */}
+          <div
+            className="absolute top-24 left-[55%] w-3 h-3 rounded-full bg-gray-400/20 dark:bg-gray-500/20"
+            style={{ animation: 'float 17s ease-in-out infinite', animationDelay: '-7s' }}
+          />
+
+          {/* === BOTTOM === */}
+          {/* Circle bottom center */}
+          <div
+            className="absolute bottom-16 left-[40%] w-24 h-24 rounded-full border border-gray-400/10 dark:border-gray-500/10"
+            style={{ animation: 'float 21s ease-in-out infinite', animationDelay: '-13s' }}
+          />
+          {/* Small circle bottom */}
+          <div
+            className="absolute bottom-28 left-[60%] w-4 h-4 rounded-full bg-blue-400/15 dark:bg-blue-500/15"
+            style={{ animation: 'float 16s ease-in-out infinite', animationDelay: '-5s' }}
+          />
+
+          {/* === LINES === */}
+          <div className="absolute top-56 right-[25%] w-32 h-[1px] bg-gradient-to-r from-transparent via-gray-400/25 to-transparent dark:via-gray-500/25 rotate-[20deg]" />
+          <div className="absolute top-44 right-[5%] w-20 h-[1px] bg-gradient-to-r from-transparent via-blue-400/20 to-transparent dark:via-blue-500/20 rotate-[-15deg]" />
+          <div className="absolute top-88 right-[28%] w-16 h-[1px] bg-gradient-to-r from-transparent via-gray-500/20 to-transparent dark:via-gray-400/20 rotate-[45deg]" />
+          <div className="absolute top-32 left-[10%] w-24 h-[1px] bg-gradient-to-r from-transparent via-gray-400/15 to-transparent dark:via-gray-500/15 rotate-[-25deg]" />
+          <div className="absolute bottom-36 left-[8%] w-20 h-[1px] bg-gradient-to-r from-transparent via-blue-400/15 to-transparent dark:via-blue-500/15 rotate-[35deg]" />
+          <div className="absolute bottom-20 right-[40%] w-28 h-[1px] bg-gradient-to-r from-transparent via-gray-400/15 to-transparent dark:via-gray-500/15 rotate-[-10deg]" />
+
+          {/* === DOTS === */}
           <div className="absolute top-28 right-[32%] flex gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-gray-400/25 dark:bg-gray-500/25" />
             <div className="w-1.5 h-1.5 rounded-full bg-gray-400/35 dark:bg-gray-500/35" />
             <div className="w-1.5 h-1.5 rounded-full bg-gray-400/25 dark:bg-gray-500/25" />
           </div>
-          {/* Dots pattern 2 */}
           <div className="absolute top-60 right-[6%] flex flex-col gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-blue-400/20 dark:bg-blue-500/20" />
             <div className="w-1.5 h-1.5 rounded-full bg-blue-400/30 dark:bg-blue-500/30" />
             <div className="w-1.5 h-1.5 rounded-full bg-blue-400/20 dark:bg-blue-500/20" />
           </div>
-          {/* Plus sign */}
+          <div className="absolute bottom-44 left-[6%] flex gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-gray-400/20 dark:bg-gray-500/20" />
+            <div className="w-1.5 h-1.5 rounded-full bg-gray-400/25 dark:bg-gray-500/25" />
+            <div className="w-1.5 h-1.5 rounded-full bg-gray-400/20 dark:bg-gray-500/20" />
+          </div>
+          <div className="absolute top-48 left-[20%] flex flex-col gap-1.5">
+            <div className="w-1 h-1 rounded-full bg-blue-400/15 dark:bg-blue-500/15" />
+            <div className="w-1 h-1 rounded-full bg-blue-400/25 dark:bg-blue-500/25" />
+          </div>
+          <div className="absolute bottom-32 right-[35%] flex gap-1.5">
+            <div className="w-1 h-1 rounded-full bg-gray-500/20 dark:bg-gray-400/20" />
+            <div className="w-1 h-1 rounded-full bg-gray-500/25 dark:bg-gray-400/25" />
+            <div className="w-1 h-1 rounded-full bg-gray-500/20 dark:bg-gray-400/20" />
+          </div>
+
+          {/* === PLUS & CROSS === */}
           <div className="absolute top-52 right-[38%]">
             <div className="w-4 h-[1px] bg-gray-400/25 dark:bg-gray-500/25" />
             <div className="w-[1px] h-4 bg-gray-400/25 dark:bg-gray-500/25 -mt-2 ml-[7px]" />
           </div>
-          {/* Cross */}
           <div className="absolute top-76 right-[22%] rotate-45">
             <div className="w-3 h-[1px] bg-blue-400/20 dark:bg-blue-500/20" />
             <div className="w-[1px] h-3 bg-blue-400/20 dark:bg-blue-500/20 -mt-1.5 ml-[5px]" />
           </div>
+          <div className="absolute bottom-52 left-[15%]">
+            <div className="w-3 h-[1px] bg-gray-400/20 dark:bg-gray-500/20" />
+            <div className="w-[1px] h-3 bg-gray-400/20 dark:bg-gray-500/20 -mt-1.5 ml-[5px]" />
+          </div>
+          <div className="absolute top-20 left-[25%] rotate-45">
+            <div className="w-2.5 h-[1px] bg-blue-400/15 dark:bg-blue-500/15" />
+            <div className="w-[1px] h-2.5 bg-blue-400/15 dark:bg-blue-500/15 -mt-1 ml-[4px]" />
+          </div>
+
+          {/* === TRIANGLES (using borders) === */}
+          <div className="absolute top-64 left-[7%] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[14px] border-b-gray-400/15 dark:border-b-gray-500/15 rotate-[15deg]"
+            style={{ animation: 'float 22s ease-in-out infinite', animationDelay: '-6s' }}
+          />
+          <div className="absolute bottom-48 right-[8%] w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[10px] border-b-blue-400/15 dark:border-b-blue-500/15 rotate-[-20deg]"
+            style={{ animation: 'float 18s ease-in-out infinite', animationDelay: '-14s' }}
+          />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
