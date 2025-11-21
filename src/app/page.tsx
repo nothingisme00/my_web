@@ -32,29 +32,74 @@ export default async function Home() {
 
         {/* Geometric Shapes - Right Side */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none hidden lg:block">
-          {/* Circle outline */}
+          {/* Large circle outline */}
           <div
-            className="absolute top-24 right-[12%] w-32 h-32 rounded-full border border-gray-300/30 dark:border-gray-600/30"
-            style={{ animation: 'float 20s ease-in-out infinite' }}
+            className="absolute top-20 right-[10%] w-40 h-40 rounded-full border border-gray-300/20 dark:border-gray-600/20"
+            style={{ animation: 'float 25s ease-in-out infinite' }}
           />
-          {/* Rotated square */}
+          {/* Medium circle */}
           <div
-            className="absolute top-48 right-[22%] w-20 h-20 border border-blue-400/20 dark:border-blue-500/20 rotate-45"
-            style={{ animation: 'float 15s ease-in-out infinite', animationDelay: '-5s' }}
+            className="absolute top-48 right-[30%] w-24 h-24 rounded-full border border-blue-400/15 dark:border-blue-500/15"
+            style={{ animation: 'float 20s ease-in-out infinite', animationDelay: '-8s' }}
           />
-          {/* Small circle */}
+          {/* Small filled circle */}
           <div
-            className="absolute top-36 right-[8%] w-4 h-4 rounded-full bg-blue-500/20 dark:bg-blue-400/20"
+            className="absolute top-32 right-[8%] w-4 h-4 rounded-full bg-blue-500/25 dark:bg-blue-400/25"
+            style={{ animation: 'float 15s ease-in-out infinite', animationDelay: '-3s' }}
           />
-          {/* Line */}
+          {/* Tiny circle */}
           <div
-            className="absolute top-64 right-[18%] w-24 h-[1px] bg-gradient-to-r from-transparent via-gray-400/30 to-transparent dark:via-gray-500/30 rotate-12"
+            className="absolute top-72 right-[15%] w-2 h-2 rounded-full bg-gray-500/30 dark:bg-gray-400/30"
+            style={{ animation: 'float 18s ease-in-out infinite', animationDelay: '-12s' }}
           />
-          {/* Dots */}
-          <div className="absolute top-40 right-[28%] flex gap-2">
-            <div className="w-2 h-2 rounded-full bg-gray-400/20 dark:bg-gray-500/20" />
-            <div className="w-2 h-2 rounded-full bg-gray-400/30 dark:bg-gray-500/30" />
-            <div className="w-2 h-2 rounded-full bg-gray-400/20 dark:bg-gray-500/20" />
+          {/* Rotated square large */}
+          <div
+            className="absolute top-36 right-[20%] w-28 h-28 border border-gray-400/15 dark:border-gray-500/15 rotate-45"
+            style={{ animation: 'float 22s ease-in-out infinite', animationDelay: '-5s' }}
+          />
+          {/* Rotated square small */}
+          <div
+            className="absolute top-64 right-[35%] w-12 h-12 border border-blue-300/20 dark:border-blue-600/20 rotate-12"
+            style={{ animation: 'float 17s ease-in-out infinite', animationDelay: '-10s' }}
+          />
+          {/* Rectangle */}
+          <div
+            className="absolute top-80 right-[12%] w-16 h-8 border border-gray-300/20 dark:border-gray-600/20 rotate-[-8deg]"
+            style={{ animation: 'float 19s ease-in-out infinite', animationDelay: '-7s' }}
+          />
+          {/* Line 1 */}
+          <div
+            className="absolute top-56 right-[25%] w-32 h-[1px] bg-gradient-to-r from-transparent via-gray-400/25 to-transparent dark:via-gray-500/25 rotate-[20deg]"
+          />
+          {/* Line 2 */}
+          <div
+            className="absolute top-44 right-[5%] w-20 h-[1px] bg-gradient-to-r from-transparent via-blue-400/20 to-transparent dark:via-blue-500/20 rotate-[-15deg]"
+          />
+          {/* Line 3 */}
+          <div
+            className="absolute top-88 right-[28%] w-16 h-[1px] bg-gradient-to-r from-transparent via-gray-500/20 to-transparent dark:via-gray-400/20 rotate-[45deg]"
+          />
+          {/* Dots pattern 1 */}
+          <div className="absolute top-28 right-[32%] flex gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-gray-400/25 dark:bg-gray-500/25" />
+            <div className="w-1.5 h-1.5 rounded-full bg-gray-400/35 dark:bg-gray-500/35" />
+            <div className="w-1.5 h-1.5 rounded-full bg-gray-400/25 dark:bg-gray-500/25" />
+          </div>
+          {/* Dots pattern 2 */}
+          <div className="absolute top-60 right-[6%] flex flex-col gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-blue-400/20 dark:bg-blue-500/20" />
+            <div className="w-1.5 h-1.5 rounded-full bg-blue-400/30 dark:bg-blue-500/30" />
+            <div className="w-1.5 h-1.5 rounded-full bg-blue-400/20 dark:bg-blue-500/20" />
+          </div>
+          {/* Plus sign */}
+          <div className="absolute top-52 right-[38%]">
+            <div className="w-4 h-[1px] bg-gray-400/25 dark:bg-gray-500/25" />
+            <div className="w-[1px] h-4 bg-gray-400/25 dark:bg-gray-500/25 -mt-2 ml-[7px]" />
+          </div>
+          {/* Cross */}
+          <div className="absolute top-76 right-[22%] rotate-45">
+            <div className="w-3 h-[1px] bg-blue-400/20 dark:bg-blue-500/20" />
+            <div className="w-[1px] h-3 bg-blue-400/20 dark:bg-blue-500/20 -mt-1.5 ml-[5px]" />
           </div>
         </div>
 
