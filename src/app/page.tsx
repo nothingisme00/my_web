@@ -308,8 +308,8 @@ export default async function Home() {
           />
         </div>
 
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 py-12 sm:py-16 lg:px-8 lg:py-24">
-          <div className="max-w-3xl space-y-3 sm:space-y-4 animate-fade-in">
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 md:px-8 py-12 sm:py-16 md:py-20 lg:py-24 xl:py-28">
+          <div className="max-w-xl md:max-w-2xl lg:max-w-3xl space-y-3 sm:space-y-4 md:space-y-5 lg:space-y-6 animate-fade-in">
             {/* Badge */}
             <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full bg-blue-100 dark:bg-blue-900/30 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/20 animate-slide-down">
               <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -317,88 +317,88 @@ export default async function Home() {
             </div>
 
             {/* Main Heading */}
-            <div className="space-y-1 sm:space-y-2">
-              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 dark:text-white animate-slide-up">
+            <div className="space-y-0.5 sm:space-y-1 md:space-y-1.5 lg:space-y-2">
+              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-gray-900 dark:text-white animate-slide-up">
                 Alfattah Atalarais,
               </h1>
-              <div className="text-3xl font-bold sm:text-4xl md:text-5xl lg:text-6xl animate-slide-up" style={{ animationDelay: '0.1s' }}>
+              <div className="text-2xl font-bold sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl animate-slide-up" style={{ animationDelay: '0.1s' }}>
                 <span className="text-gray-900 dark:text-white">I'm a </span>
                 <TypewriterText
                   words={['Learning', 'Creative', 'Tech', 'Art']}
                   className="text-blue-600 dark:text-blue-400"
                 />
               </div>
-              <p className="text-3xl font-bold sm:text-4xl md:text-5xl lg:text-6xl text-gray-900 dark:text-white animate-slide-up" style={{ animationDelay: '0.15s' }}>
+              <p className="text-2xl font-bold sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-gray-900 dark:text-white animate-slide-up" style={{ animationDelay: '0.15s' }}>
                 Enthusiast
               </p>
-              <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 leading-relaxed animate-slide-up !mt-4 sm:!mt-6 max-w-lg" style={{ animationDelay: '0.2s' }}>
+              <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-300 leading-relaxed animate-slide-up !mt-3 sm:!mt-4 md:!mt-5 lg:!mt-6 max-w-md md:max-w-lg" style={{ animationDelay: '0.2s' }}>
                 Sharing experiences and interesting things I want you to know
               </p>
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 animate-slide-up" style={{ animationDelay: '0.5s' }}>
+            <div className="flex flex-col sm:flex-row flex-wrap gap-2.5 sm:gap-3 md:gap-4 animate-slide-up" style={{ animationDelay: '0.5s' }}>
               <Link
                 href="/blog"
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 dark:bg-blue-500 px-5 sm:px-6 py-2.5 sm:py-3 text-sm font-semibold text-white shadow-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-all duration-200 hover-lift"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 dark:bg-blue-500 px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 text-xs sm:text-sm font-semibold text-white shadow-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-all duration-200 hover-lift"
               >
-                <BookOpen className="h-4 w-4" />
+                <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 Browse Articles
               </Link>
               <Link
                 href="/about"
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-white dark:bg-gray-800 px-5 sm:px-6 py-2.5 sm:py-3 text-sm font-semibold text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 shadow-sm transition-all duration-200 hover-lift"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-white dark:bg-gray-800 px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 text-xs sm:text-sm font-semibold text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 shadow-sm transition-all duration-200 hover-lift"
               >
                 About Me
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </Link>
             </div>
 
             {/* Status Indicators */}
-            <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-6 pt-4 animate-slide-up" style={{ animationDelay: '0.6s' }}>
-              <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-4 md:gap-6 pt-2 sm:pt-3 md:pt-4 animate-slide-up" style={{ animationDelay: '0.6s' }}>
+              <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />
                 <span>Based in Indonesia</span>
               </div>
-              <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />
                 <span>Open for collaboration</span>
               </div>
             </div>
           </div>
 
-          {/* Social Links - Right Bottom (hidden on mobile) */}
-          <div className="hidden sm:flex absolute bottom-16 right-6 lg:right-8 gap-4 animate-fade-in" style={{ animationDelay: '0.8s' }}>
+          {/* Social Links - Right Bottom */}
+          <div className="hidden md:flex absolute bottom-12 md:bottom-14 lg:bottom-16 right-6 md:right-8 gap-3 md:gap-4 animate-fade-in" style={{ animationDelay: '0.8s' }}>
             <a
               href="https://github.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+              className="p-1.5 md:p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
             >
-              <Github className="h-5 w-5" />
+              <Github className="h-4 w-4 md:h-5 md:w-5" />
             </a>
             <a
               href="https://linkedin.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+              className="p-1.5 md:p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
             >
-              <Linkedin className="h-5 w-5" />
+              <Linkedin className="h-4 w-4 md:h-5 md:w-5" />
             </a>
             <a
               href="mailto:hello@example.com"
-              className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+              className="p-1.5 md:p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
             >
-              <Mail className="h-5 w-5" />
+              <Mail className="h-4 w-4 md:h-5 md:w-5" />
             </a>
           </div>
         </div>
 
-        {/* Scroll Indicator - hidden on very small screens */}
-        <div className="hidden sm:flex absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 flex-col items-center gap-1.5 sm:gap-2 animate-fade-in" style={{ animationDelay: '1s' }}>
-          <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Scroll to explore</span>
+        {/* Scroll Indicator */}
+        <div className="hidden md:flex absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 flex-col items-center gap-1.5 md:gap-2 animate-fade-in" style={{ animationDelay: '1s' }}>
+          <span className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400">Scroll to explore</span>
           <a href="#articles" className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-            <ChevronDown className="h-5 w-5 sm:h-6 sm:w-6" style={{ animation: 'bounce-slow 2s ease-in-out infinite' }} />
+            <ChevronDown className="h-5 w-5 md:h-6 md:w-6" style={{ animation: 'bounce-slow 2s ease-in-out infinite' }} />
           </a>
         </div>
       </section>
