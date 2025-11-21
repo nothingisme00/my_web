@@ -111,6 +111,26 @@ export default function ProjectForm({ initialData }: ProjectFormProps) {
                 helperText="Direct link to project screenshot"
               />
 
+              <Input
+                label="Demo URL"
+                name="demoUrl"
+                id="demoUrl"
+                type="url"
+                defaultValue={initialData?.demoUrl || ''}
+                placeholder="https://demo.example.com"
+                helperText="Live demo link"
+              />
+
+              <Input
+                label="GitHub URL"
+                name="githubUrl"
+                id="githubUrl"
+                type="url"
+                defaultValue={initialData?.githubUrl || ''}
+                placeholder="https://github.com/..."
+                helperText="Source code repository"
+              />
+
               <div className="pt-2">
                 <SubmitButton isEditing={isEditing} />
               </div>

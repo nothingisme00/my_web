@@ -270,7 +270,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                         <img
                           src={relatedPost.image}
                           alt={relatedPost.title}
-                          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-103"
+                          className="w-full h-full object-cover img-zoom"
                         />
                       </div>
                     )}

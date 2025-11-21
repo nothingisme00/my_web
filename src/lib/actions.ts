@@ -254,6 +254,28 @@ export async function deleteCategory(id: string) {
   revalidatePath('/admin/categories');
 }
 
+export async function getCategoryById(id: string) {
+  return await prisma.category.findUnique({ where: { id } });
+}
+
+export async function updateCategory(id: string, formData: FormData) {
+  const validation = validateFormData(CategorySchema, formData);
+  if (!validation.success) {
+    throw new Error(validation.error);
+  }
+
+  const { name, slug, description } = validation.data;
+
+  await prisma.category.update({
+    where: { id },
+    data: { name, slug, description: description || null },
+  });
+
+  revalidatePath('/admin/categories');
+  revalidatePath('/blog');
+  redirect('/admin/categories');
+}
+
 // Tags
 export async function getTags() {
   return await prisma.tag.findMany({ 
@@ -279,6 +301,28 @@ export async function createTag(formData: FormData) {
 export async function deleteTag(id: string) {
   await prisma.tag.delete({ where: { id } });
   revalidatePath('/admin/tags');
+}
+
+export async function getTagById(id: string) {
+  return await prisma.tag.findUnique({ where: { id } });
+}
+
+export async function updateTag(id: string, formData: FormData) {
+  const validation = validateFormData(TagSchema, formData);
+  if (!validation.success) {
+    throw new Error(validation.error);
+  }
+
+  const { name, slug } = validation.data;
+
+  await prisma.tag.update({
+    where: { id },
+    data: { name, slug },
+  });
+
+  revalidatePath('/admin/tags');
+  revalidatePath('/blog');
+  redirect('/admin/tags');
 }
 
 // Media
@@ -415,6 +459,7 @@ export async function updateSettings(formData: FormData) {
     'site_name',
     'site_bio',
     'owner_name',
+    'contact_email',
     'social_github',
     'social_linkedin',
     'social_twitter',
@@ -435,7 +480,8 @@ export async function updateSettings(formData: FormData) {
   }
 
   revalidatePath('/admin/settings');
-  redirect('/admin/settings');
+  revalidatePath('/');
+  return { success: true };
 }
 
 // Analytics
@@ -634,4 +680,74 @@ export async function getTagBySlug(slug: string) {
       },
     },
   });
+}
+
+// Gallery
+export async function getGalleryPhotos() {
+  return await prisma.galleryPhoto.findMany({
+    orderBy: { createdAt: 'desc' },
+  });
+}
+
+export async function getGalleryCategories() {
+  const photos = await prisma.galleryPhoto.findMany({
+    select: { category: true },
+    distinct: ['category'],
+  });
+  return photos.map(p => p.category).filter((c): c is string => c !== null);
+}
+
+export async function createGalleryPhoto(formData: FormData) {
+  const title = formData.get('title') as string;
+  const description = formData.get('description') as string;
+  const category = formData.get('category') as string;
+  const takenAt = formData.get('takenAt') as string;
+  const file = formData.get('file') as File;
+
+  if (!file || !title) {
+    return { error: 'Title and file are required' };
+  }
+
+  // Save file to public/gallery
+  const uploadDir = join(process.cwd(), 'public', 'gallery');
+  if (!existsSync(uploadDir)) {
+    await mkdir(uploadDir, { recursive: true });
+  }
+
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+  const filename = `${Date.now()}-${file.name.replace(/\s/g, '-')}`;
+  const filepath = join(uploadDir, filename);
+  await writeFile(filepath, buffer);
+
+  await prisma.galleryPhoto.create({
+    data: {
+      title,
+      description: description || null,
+      filename,
+      category: category || null,
+      takenAt: takenAt ? new Date(takenAt) : null,
+    },
+  });
+
+  revalidatePath('/admin/gallery');
+  revalidatePath('/gallery');
+  redirect('/admin/gallery');
+}
+
+export async function deleteGalleryPhoto(id: string) {
+  const photo = await prisma.galleryPhoto.findUnique({ where: { id } });
+
+  if (photo) {
+    const filepath = join(process.cwd(), 'public', 'gallery', photo.filename);
+    try {
+      await unlink(filepath);
+    } catch (error) {
+      console.error('Error deleting file:', error);
+    }
+
+    await prisma.galleryPhoto.delete({ where: { id } });
+    revalidatePath('/admin/gallery');
+    revalidatePath('/gallery');
+  }
 }

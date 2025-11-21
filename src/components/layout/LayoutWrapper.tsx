@@ -2,11 +2,16 @@
 
 import { usePathname } from 'next/navigation';
 import { Navbar } from '@/components/layout/Navbar';
-import { Footer } from '@/components/layout/Footer';
 import { ThemeProvider } from '@/components/theme-provider';
 import { ToastProvider } from '@/components/providers/ToastProvider';
 
-export function LayoutWrapper({ children }: { children: React.ReactNode }) {
+interface LayoutWrapperProps {
+  children: React.ReactNode;
+  settings?: Record<string, string>;
+  footer?: React.ReactNode;
+}
+
+export function LayoutWrapper({ children, settings, footer }: LayoutWrapperProps) {
   const pathname = usePathname();
 
   // Check if current page is CMS or login
@@ -15,9 +20,9 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       {/* Only show Navbar/Footer for public pages */}
-      {!isCMSPage && <Navbar />}
+      {!isCMSPage && <Navbar settings={settings} />}
       <main className={isCMSPage ? '' : 'flex-grow pt-24'}>{children}</main>
-      {!isCMSPage && <Footer />}
+      {!isCMSPage && footer}
       <ToastProvider />
     </ThemeProvider>
   );

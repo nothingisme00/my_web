@@ -1,10 +1,45 @@
-import { getSettings, updateSettings } from '@/lib/actions';
+'use client';
+
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { Save, User, Share2, Search } from 'lucide-react';
+import { Save, User, Share2, Search, Check } from 'lucide-react';
 
-export default async function SettingsPage() {
-  const settings = await getSettings();
+export default function SettingsPage() {
+  const [settings, setSettings] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        setSettings(data);
+        setIsLoading(false);
+      });
+  }, []);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setIsSaving(true);
+    setSaved(false);
+
+    const formData = new FormData(e.currentTarget);
+
+    await fetch('/api/settings', {
+      method: 'POST',
+      body: formData,
+    });
+
+    setIsSaving(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
+  }
+
+  if (isLoading) {
+    return <div className="text-center py-12 text-gray-500">Loading...</div>;
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -15,7 +50,7 @@ export default async function SettingsPage() {
         </p>
       </div>
 
-      <form action={updateSettings} className="space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-8">
         {/* Profile Section */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3 mb-6">
@@ -62,6 +97,16 @@ export default async function SettingsPage() {
               defaultValue={settings.owner_name || ''}
               placeholder="John Doe"
               helperText="Your full name"
+            />
+
+            <Input
+              label="Contact Email"
+              name="contact_email"
+              id="contact_email"
+              type="email"
+              defaultValue={settings.contact_email || ''}
+              placeholder="hello@example.com"
+              helperText="Your public contact email"
             />
           </div>
         </div>
@@ -159,10 +204,15 @@ export default async function SettingsPage() {
         </div>
 
         {/* Save Button */}
-        <div className="flex justify-end">
-          <Button type="submit" className="gap-2 px-8">
+        <div className="flex justify-end items-center gap-4">
+          {saved && (
+            <span className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm">
+              <Check className="h-4 w-4" /> Settings saved!
+            </span>
+          )}
+          <Button type="submit" disabled={isSaving} className="gap-2 px-8">
             <Save className="h-4 w-4" />
-            Save Settings
+            {isSaving ? 'Saving...' : 'Save Settings'}
           </Button>
         </div>
       </form>

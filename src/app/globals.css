@@ -49,6 +49,17 @@ body {
     perspective: 1000px;
   }
 
+  /* Smooth image zoom animation */
+  .img-zoom {
+    transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+  }
+
+  .img-zoom:hover,
+  .group:hover .img-zoom {
+    transform: scale(1.05);
+  }
+
   .hover-lift {
     transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
     will-change: transform, box-shadow;

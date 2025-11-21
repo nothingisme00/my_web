@@ -1,7 +1,7 @@
 "use client"
 
 import Link from 'next/link';
-import { LayoutDashboard, FileText, Briefcase, LogOut, FolderOpen, Tags, Image, Settings, Menu, X } from 'lucide-react';
+import { LayoutDashboard, FileText, Briefcase, LogOut, FolderOpen, Tags, Image, Settings, Menu, X, Camera, UserCircle } from 'lucide-react';
 import { logout } from '@/lib/actions';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Breadcrumbs } from '@/components/admin/Breadcrumbs';
@@ -104,6 +104,12 @@ export default function AdminLayout({
           </NavLink>
           <NavLink href="/admin/media" icon={Image}>
             Media Library
+          </NavLink>
+          <NavLink href="/admin/gallery" icon={Camera}>
+            Gallery
+          </NavLink>
+          <NavLink href="/admin/about" icon={UserCircle}>
+            About Page
           </NavLink>
           <NavLink href="/admin/settings" icon={Settings}>
             Settings
