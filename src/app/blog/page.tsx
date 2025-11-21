@@ -44,7 +44,7 @@ export default async function BlogPage() {
                             <img
                               src={post.image}
                               alt={post.title}
-                              className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                              className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-103"
                             />
                           </div>
                         </div>

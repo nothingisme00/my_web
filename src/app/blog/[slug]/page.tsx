@@ -104,23 +104,26 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       {/* Header */}
       <div className="border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
         <div className="mx-auto max-w-4xl px-6 py-8 lg:px-8">
-          <Link
-            href="/blog"
-            className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-6"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Blog
-          </Link>
-
-          {/* Category */}
-          {post.category && (
+          {/* Breadcrumb and Category */}
+          <div className="flex items-center justify-between mb-6">
             <Link
-              href={`/blog/category/${post.category.slug}`}
-              className="inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-900/30 px-3 py-1 text-xs font-medium text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors mb-4"
+              href="/blog"
+              className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
-              {post.category.name}
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Blog
             </Link>
-          )}
+
+            {/* Category */}
+            {post.category && (
+              <Link
+                href={`/blog/category/${post.category.slug}`}
+                className="inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-900/30 px-3 py-1 text-xs font-medium text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all duration-200 ease-out"
+              >
+                {post.category.name}
+              </Link>
+            )}
+          </div>
 
           {/* Title */}
           <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
@@ -267,7 +270,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                         <img
                           src={relatedPost.image}
                           alt={relatedPost.title}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-103"
                         />
                       </div>
                     )}
