@@ -31,7 +31,7 @@ export default async function Home() {
         </div>
 
         <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
-          <div className="max-w-2xl space-y-8 animate-fade-in">
+          <div className="max-w-3xl space-y-4 animate-fade-in">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 rounded-full bg-blue-100 dark:bg-blue-900/30 px-4 py-2 text-sm font-medium text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/20 animate-slide-down">
               <Sparkles className="h-4 w-4" />
@@ -40,35 +40,22 @@ export default async function Home() {
 
             {/* Main Heading */}
             <div className="space-y-1">
-              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-gray-900 dark:text-white animate-slide-up">
-                Alfattah Atalarais
+              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl text-gray-900 dark:text-white animate-slide-up">
+                Alfattah Atalarais,
               </h1>
-              <div className="text-3xl font-bold sm:text-4xl lg:text-5xl animate-slide-up" style={{ animationDelay: '0.1s' }}>
+              <div className="text-4xl font-bold sm:text-5xl lg:text-6xl animate-slide-up" style={{ animationDelay: '0.1s' }}>
                 <span className="text-gray-900 dark:text-white">I'm a </span>
                 <TypewriterText
                   words={['Learning', 'Creative', 'Tech', 'Art']}
                   className="text-blue-600 dark:text-blue-400"
                 />
               </div>
-              <p className="text-3xl font-bold sm:text-4xl lg:text-5xl text-gray-900 dark:text-white animate-slide-up" style={{ animationDelay: '0.15s' }}>
+              <p className="text-4xl font-bold sm:text-5xl lg:text-6xl text-gray-900 dark:text-white animate-slide-up" style={{ animationDelay: '0.15s' }}>
                 Enthusiast
               </p>
-              <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed animate-slide-up !mt-4" style={{ animationDelay: '0.2s' }}>
+              <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed animate-slide-up !mt-6" style={{ animationDelay: '0.2s' }}>
                 Sharing experiences and interesting things I want you to know
               </p>
-            </div>
-
-            {/* Tech Stack Pills */}
-            <div className="flex flex-wrap gap-2 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-              {['Next.js', 'React', 'TypeScript', 'Tailwind CSS'].map((tech, index) => (
-                <span
-                  key={tech}
-                  className="inline-flex items-center rounded-md bg-white dark:bg-gray-800 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 shadow-sm"
-                  style={{ animationDelay: `${0.4 + index * 0.05}s` }}
-                >
-                  {tech}
-                </span>
-              ))}
             </div>
 
             {/* CTA Buttons */}
