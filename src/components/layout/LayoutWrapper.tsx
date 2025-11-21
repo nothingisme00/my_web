@@ -16,7 +16,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       {/* Only show Navbar/Footer for public pages */}
       {!isCMSPage && <Navbar />}
-      <main className={isCMSPage ? '' : 'flex-grow'}>{children}</main>
+      <main className={isCMSPage ? '' : 'flex-grow pt-24'}>{children}</main>
       {!isCMSPage && <Footer />}
       <ToastProvider />
     </ThemeProvider>
