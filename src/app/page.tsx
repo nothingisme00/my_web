@@ -24,7 +24,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {/* Hero Section - Full Width Centered */}
-      <section className="relative overflow-hidden border-b border-gray-200 dark:border-gray-800 min-h-[80vh] flex flex-col justify-center">
+      <section className="relative overflow-hidden border-b border-gray-200 dark:border-gray-800">
         {/* Animated Background Pattern */}
         <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
           <div className="absolute inset-0 bg-grid-pattern opacity-[0.03] dark:opacity-[0.05]" />
