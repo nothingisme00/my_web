@@ -57,7 +57,7 @@ export default async function Home() {
                   </span>
                 </h1>
                 <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
-                  Berbagi pengalaman dan hal menarik yang ingin kalian tahu
+                  Sharing experiences and interesting things I want you to know
                 </p>
               </div>
 
