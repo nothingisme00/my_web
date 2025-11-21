@@ -31,11 +31,11 @@ export default async function AboutPage() {
                 {/* Profile Avatar */}
                 <div className="aspect-square rounded-xl overflow-hidden mb-6 bg-gradient-to-br from-blue-500 to-blue-600">
                   <div className="w-full h-full flex items-center justify-center text-white text-6xl font-bold">
-                    D
+                    F
                   </div>
                 </div>
 
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">DevAditya</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Fattah</h2>
                 <p className="text-blue-600 dark:text-blue-400 font-medium mb-6">Learning Enthusiast</p>
 
                 <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300 mb-8">

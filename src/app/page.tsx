@@ -42,7 +42,7 @@ export default async function Home() {
             <div className="space-y-4">
               <h1 className="text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
                 <span className="block text-gray-900 dark:text-white animate-slide-up">
-                  DevAditya
+                  It's me, Fattah
                 </span>
                 <span className="block mt-2 animate-slide-up" style={{ animationDelay: '0.1s' }}>
                   <TypewriterText
