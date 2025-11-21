@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Clock, Eye, Sparkles, BookOpen } from "lucide-react";
+import { ArrowRight, Clock, Eye, Sparkles, BookOpen, ChevronDown } from "lucide-react";
 import { getFeaturedPosts, getCategories } from "@/lib/actions";
 import { formatDate, formatViewCount } from "@/lib/utils";
 import { Prisma } from "@prisma/client";
@@ -24,10 +24,26 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {/* Hero Section - Full Width Centered */}
-      <section className="relative overflow-hidden border-b border-gray-200 dark:border-gray-800">
+      <section className="relative overflow-hidden border-b border-gray-200 dark:border-gray-800 min-h-[80vh] flex flex-col justify-center">
         {/* Animated Background Pattern */}
         <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
           <div className="absolute inset-0 bg-grid-pattern opacity-[0.03] dark:opacity-[0.05]" />
+        </div>
+
+        {/* Floating Shapes */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div
+            className="absolute top-20 right-[15%] w-64 h-64 rounded-full bg-blue-500/5 dark:bg-blue-400/5 blur-3xl"
+            style={{ animation: 'float 20s ease-in-out infinite' }}
+          />
+          <div
+            className="absolute bottom-32 right-[25%] w-48 h-48 rounded-full bg-purple-500/5 dark:bg-purple-400/5 blur-3xl"
+            style={{ animation: 'float 15s ease-in-out infinite', animationDelay: '-5s' }}
+          />
+          <div
+            className="absolute top-1/3 right-[10%] w-32 h-32 rounded-full bg-cyan-500/5 dark:bg-cyan-400/5 blur-2xl"
+            style={{ animation: 'float 18s ease-in-out infinite', animationDelay: '-10s' }}
+          />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
@@ -76,6 +92,14 @@ export default async function Home() {
               </Link>
             </div>
           </div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-fade-in" style={{ animationDelay: '1s' }}>
+          <span className="text-xs text-gray-500 dark:text-gray-400">Scroll to explore</span>
+          <a href="#articles" className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+            <ChevronDown className="h-6 w-6" style={{ animation: 'bounce-slow 2s ease-in-out infinite' }} />
+          </a>
         </div>
       </section>
 
