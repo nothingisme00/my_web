@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Clock, Eye, Sparkles, BookOpen, ChevronDown } from "lucide-react";
+import { ArrowRight, Clock, Eye, Sparkles, BookOpen, ChevronDown, Github, Linkedin, Mail, MapPin } from "lucide-react";
 import { getFeaturedPosts, getCategories } from "@/lib/actions";
 import { formatDate, formatViewCount } from "@/lib/utils";
 import { Prisma } from "@prisma/client";
@@ -30,20 +30,32 @@ export default async function Home() {
           <div className="absolute inset-0 bg-grid-pattern opacity-[0.03] dark:opacity-[0.05]" />
         </div>
 
-        {/* Floating Shapes */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Geometric Shapes - Right Side */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none hidden lg:block">
+          {/* Circle outline */}
           <div
-            className="absolute top-20 right-[15%] w-64 h-64 rounded-full bg-blue-500/5 dark:bg-blue-400/5 blur-3xl"
+            className="absolute top-24 right-[12%] w-32 h-32 rounded-full border border-gray-300/30 dark:border-gray-600/30"
             style={{ animation: 'float 20s ease-in-out infinite' }}
           />
+          {/* Rotated square */}
           <div
-            className="absolute bottom-32 right-[25%] w-48 h-48 rounded-full bg-purple-500/5 dark:bg-purple-400/5 blur-3xl"
+            className="absolute top-48 right-[22%] w-20 h-20 border border-blue-400/20 dark:border-blue-500/20 rotate-45"
             style={{ animation: 'float 15s ease-in-out infinite', animationDelay: '-5s' }}
           />
+          {/* Small circle */}
           <div
-            className="absolute top-1/3 right-[10%] w-32 h-32 rounded-full bg-cyan-500/5 dark:bg-cyan-400/5 blur-2xl"
-            style={{ animation: 'float 18s ease-in-out infinite', animationDelay: '-10s' }}
+            className="absolute top-36 right-[8%] w-4 h-4 rounded-full bg-blue-500/20 dark:bg-blue-400/20"
           />
+          {/* Line */}
+          <div
+            className="absolute top-64 right-[18%] w-24 h-[1px] bg-gradient-to-r from-transparent via-gray-400/30 to-transparent dark:via-gray-500/30 rotate-12"
+          />
+          {/* Dots */}
+          <div className="absolute top-40 right-[28%] flex gap-2">
+            <div className="w-2 h-2 rounded-full bg-gray-400/20 dark:bg-gray-500/20" />
+            <div className="w-2 h-2 rounded-full bg-gray-400/30 dark:bg-gray-500/30" />
+            <div className="w-2 h-2 rounded-full bg-gray-400/20 dark:bg-gray-500/20" />
+          </div>
         </div>
 
         <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
@@ -91,6 +103,44 @@ export default async function Home() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
+
+            {/* Status Indicators */}
+            <div className="flex flex-wrap gap-6 pt-4 animate-slide-up" style={{ animationDelay: '0.6s' }}>
+              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                <MapPin className="h-4 w-4" />
+                <span>Based in Indonesia</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                <Sparkles className="h-4 w-4" />
+                <span>Open for collaboration</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Social Links - Right Bottom */}
+          <div className="absolute bottom-16 right-6 lg:right-8 flex gap-4 animate-fade-in" style={{ animationDelay: '0.8s' }}>
+            <a
+              href="https://github.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+            >
+              <Github className="h-5 w-5" />
+            </a>
+            <a
+              href="https://linkedin.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+            >
+              <Linkedin className="h-5 w-5" />
+            </a>
+            <a
+              href="mailto:hello@example.com"
+              className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+            >
+              <Mail className="h-5 w-5" />
+            </a>
           </div>
         </div>
 
