@@ -12,8 +12,8 @@ interface TypewriterTextProps {
 
 export function TypewriterText({
   words,
-  typingSpeed = 100,
-  deletingSpeed = 50,
+  typingSpeed = 80,
+  deletingSpeed = 40,
   pauseDuration = 3000,
   className = '',
 }: TypewriterTextProps) {
@@ -21,13 +21,16 @@ export function TypewriterText({
   const [currentText, setCurrentText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [showCursor, setShowCursor] = useState(true);
+
+  // Find the longest word for fixed width
+  const longestWord = words.reduce((a, b) => a.length > b.length ? a : b, '');
 
   useEffect(() => {
     const currentWord = words[currentWordIndex];
 
     const handleTyping = () => {
       if (isPaused) {
-        // Pause phase - wait before deleting
         const pauseTimer = setTimeout(() => {
           setIsPaused(false);
           setIsDeleting(true);
@@ -36,25 +39,21 @@ export function TypewriterText({
       }
 
       if (!isDeleting) {
-        // Typing phase
         if (currentText.length < currentWord.length) {
           const typingTimer = setTimeout(() => {
             setCurrentText(currentWord.substring(0, currentText.length + 1));
           }, typingSpeed);
           return () => clearTimeout(typingTimer);
         } else {
-          // Finished typing, start pause
           setIsPaused(true);
         }
       } else {
-        // Deleting phase
         if (currentText.length > 0) {
           const deletingTimer = setTimeout(() => {
             setCurrentText(currentWord.substring(0, currentText.length - 1));
           }, deletingSpeed);
           return () => clearTimeout(deletingTimer);
         } else {
-          // Finished deleting, move to next word
           setIsDeleting(false);
           setCurrentWordIndex((prev) => (prev + 1) % words.length);
         }
@@ -65,10 +64,25 @@ export function TypewriterText({
     return cleanup;
   }, [currentText, isDeleting, isPaused, currentWordIndex, words, typingSpeed, deletingSpeed, pauseDuration]);
 
+  // Cursor blink effect
+  useEffect(() => {
+    const cursorInterval = setInterval(() => {
+      setShowCursor(prev => !prev);
+    }, 530);
+    return () => clearInterval(cursorInterval);
+  }, []);
+
   return (
-    <span className={className}>
-      {currentText}
-      <span className="animate-pulse">|</span>
+    <span className={`inline-block ${className}`} style={{ minWidth: `${longestWord.length}ch` }}>
+      <span className="transition-opacity duration-150 ease-out">
+        {currentText}
+      </span>
+      <span
+        className={`transition-opacity duration-100 ${showCursor ? 'opacity-100' : 'opacity-0'}`}
+        style={{ marginLeft: '2px' }}
+      >
+        |
+      </span>
     </span>
   );
 }

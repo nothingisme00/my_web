@@ -50,10 +50,10 @@ export default async function Home() {
                     <TypewriterText
                       words={['Learning', 'Creative', 'Tech', 'Art']}
                       className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent"
-                    />{' '}
-                    <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
-                      Enthusiast
-                    </span>
+                    />
+                  </span>
+                  <span className="block mt-1 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent animate-slide-up" style={{ animationDelay: '0.15s' }}>
+                    Enthusiast
                   </span>
                 </h1>
                 <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
