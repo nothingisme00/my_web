@@ -19,7 +19,7 @@ export default async function AboutPage() {
             Tentang Saya
           </h1>
           <p className="text-xl leading-8 text-gray-600 dark:text-gray-300">
-            Saya adalah seorang Full Stack Developer dengan passion dalam menciptakan pengalaman web yang beautiful dan performant.
+            Saya adalah seorang Learning Enthusiast dengan passion dalam menciptakan pengalaman web yang beautiful dan performant.
           </p>
         </div>
 
@@ -36,7 +36,7 @@ export default async function AboutPage() {
                 </div>
 
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">DevAditya</h2>
-                <p className="text-blue-600 dark:text-blue-400 font-medium mb-6">Full Stack Developer</p>
+                <p className="text-blue-600 dark:text-blue-400 font-medium mb-6">Learning Enthusiast</p>
 
                 <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300 mb-8">
                   <div className="flex items-center gap-3">
@@ -87,7 +87,7 @@ export default async function AboutPage() {
                 </p>
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                   Saya passionate tentang clean code, best practices, dan selalu belajar teknologi baru.
-                  Melalui blog ini, saya berbagi pengetahuan dan pengalaman saya dalam dunia web development.
+                  Melalui blog ini, saya berbagi pengalaman dan hal-hal menarik yang ingin kalian tahu.
                 </p>
               </div>
             </section>

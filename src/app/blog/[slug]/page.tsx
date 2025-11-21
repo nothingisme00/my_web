@@ -242,7 +242,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   {post.author}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Full Stack Developer passionate about creating beautiful web experiences and sharing knowledge through writing.
+                  Learning Enthusiast passionate about creating beautiful web experiences and sharing knowledge through writing.
                 </p>
                 <Link
                   href="/about"

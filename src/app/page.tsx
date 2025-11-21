@@ -46,11 +46,11 @@ export default async function Home() {
                     DevAditya
                   </span>
                   <span className="block mt-2 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                    Web Developer
+                    Learning Enthusiast
                   </span>
                 </h1>
                 <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
-                  Sharing knowledge about modern web development, programming best practices, and the latest in technology.
+                  Berbagi pengalaman dan hal menarik yang ingin kalian tahu
                 </p>
               </div>
 
