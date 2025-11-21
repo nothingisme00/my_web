@@ -47,10 +47,10 @@ export default async function Home() {
                 <span className="block mt-2 animate-slide-up" style={{ animationDelay: '0.1s' }}>
                   <TypewriterText
                     words={['Learning', 'Creative', 'Tech', 'Art']}
-                    className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent"
+                    className="bg-gradient-to-r from-gray-700 to-gray-900 dark:from-gray-200 dark:to-white bg-clip-text text-transparent"
                   />
                 </span>
-                <span className="block mt-1 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent animate-slide-up" style={{ animationDelay: '0.15s' }}>
+                <span className="block mt-1 bg-gradient-to-r from-gray-700 to-gray-900 dark:from-gray-200 dark:to-white bg-clip-text text-transparent animate-slide-up" style={{ animationDelay: '0.15s' }}>
                   Enthusiast
                 </span>
               </h1>
