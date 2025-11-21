@@ -4,6 +4,7 @@ import { getFeaturedPosts, getCategories } from "@/lib/actions";
 import { formatDate, formatViewCount } from "@/lib/utils";
 import { Prisma } from "@prisma/client";
 import { HeroCarousel } from "@/components/home/HeroCarousel";
+import { TypewriterText } from "@/components/home/TypewriterText";
 
 type PostWithRelations = Prisma.PostGetPayload<{
   include: {
@@ -45,8 +46,14 @@ export default async function Home() {
                   <span className="block text-gray-900 dark:text-white animate-slide-up">
                     DevAditya
                   </span>
-                  <span className="block mt-2 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                    Learning Enthusiast
+                  <span className="block mt-2 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                    <TypewriterText
+                      words={['Learning', 'Creative', 'Tech', 'Art']}
+                      className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent"
+                    />{' '}
+                    <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
+                      Enthusiast
+                    </span>
                   </span>
                 </h1>
                 <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed animate-slide-up" style={{ animationDelay: '0.2s' }}>
