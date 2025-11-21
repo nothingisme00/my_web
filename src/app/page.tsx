@@ -35,18 +35,16 @@ export default async function Home() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 rounded-full bg-blue-100 dark:bg-blue-900/30 px-4 py-2 text-sm font-medium text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/20 animate-slide-down">
               <Sparkles className="h-4 w-4" />
-              Welcome to my blog
+              Hi! It's me
             </div>
 
-            {/* Main Heading with Gradient */}
-            <div className="space-y-2">
-              <p className="text-lg text-gray-600 dark:text-gray-400 animate-slide-up">
-                Hi! It's me
-              </p>
-              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-gray-900 dark:text-white animate-slide-up" style={{ animationDelay: '0.05s' }}>
-                Alfattah Atalarais<span className="font-normal text-gray-500 dark:text-gray-400">, i'm a</span>
+            {/* Main Heading */}
+            <div className="space-y-1">
+              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-gray-900 dark:text-white animate-slide-up">
+                Alfattah Atalarais
               </h1>
               <div className="text-3xl font-bold sm:text-4xl lg:text-5xl animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                <span className="text-gray-900 dark:text-white">I'm a </span>
                 <TypewriterText
                   words={['Learning', 'Creative', 'Tech', 'Art']}
                   className="text-blue-600 dark:text-blue-400"
@@ -55,7 +53,7 @@ export default async function Home() {
               <p className="text-3xl font-bold sm:text-4xl lg:text-5xl text-gray-900 dark:text-white animate-slide-up" style={{ animationDelay: '0.15s' }}>
                 Enthusiast
               </p>
-              <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed animate-slide-up mt-4" style={{ animationDelay: '0.2s' }}>
+              <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed animate-slide-up !mt-4" style={{ animationDelay: '0.2s' }}>
                 Sharing experiences and interesting things I want you to know
               </p>
             </div>
