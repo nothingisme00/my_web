@@ -9,7 +9,15 @@
       "Bash(npx prisma migrate dev:*)",
       "Bash(npx prisma db push:*)",
       "Bash(npx prisma generate)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(npm outdated:*)",
+      "Bash(npx prisma migrate:*)",
+      "Bash(npm audit:*)",
+      "Bash(dir /s /b *.sql 2)",
+      "Bash(nul)",
+      "Bash(mysql:*)",
+      "Bash(npm run db:seed:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

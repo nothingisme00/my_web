@@ -43,7 +43,7 @@ export function QuotesCarousel() {
           setTimeout(() => setIsAnimating(false), 600);
         }, 400);
       }
-    }, 7000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [isAnimating]);

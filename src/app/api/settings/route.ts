@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
+import { requireAuth } from '@/lib/auth';
 
 export async function GET() {
   const settings = await prisma.settings.findMany();
@@ -14,34 +15,50 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const formData = await request.formData();
+  try {
+    // Require authentication
+    await requireAuth(request);
 
-  const settingsToUpdate = [
-    'site_name',
-    'site_bio',
-    'owner_name',
-    'contact_email',
-    'social_github',
-    'social_linkedin',
-    'social_twitter',
-    'social_instagram',
-    'seo_description',
-    'seo_keywords',
-  ];
+    const formData = await request.formData();
 
-  for (const key of settingsToUpdate) {
-    const value = formData.get(key) as string;
-    if (value !== null) {
-      await prisma.settings.upsert({
-        where: { key },
-        update: { value },
-        create: { key, value },
-      });
+    const settingsToUpdate = [
+      'site_name',
+      'site_bio',
+      'owner_name',
+      'contact_email',
+      'social_github',
+      'social_linkedin',
+      'social_twitter',
+      'social_instagram',
+      'seo_description',
+      'seo_keywords',
+    ];
+
+    for (const key of settingsToUpdate) {
+      const value = formData.get(key) as string;
+      if (value !== null) {
+        await prisma.settings.upsert({
+          where: { key },
+          update: { value },
+          create: { key, value },
+        });
+      }
     }
+
+    revalidatePath('/admin/settings');
+    revalidatePath('/');
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    if (error instanceof Error && error.message === 'Unauthorized') {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
-
-  revalidatePath('/admin/settings');
-  revalidatePath('/');
-
-  return NextResponse.json({ success: true });
 }

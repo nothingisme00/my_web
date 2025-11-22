@@ -20,15 +20,15 @@ model Post {
   id              String    @id @default(cuid())
   title           String
   slug            String    @unique
-  content         String
-  excerpt         String?
+  content         String    @db.Text
+  excerpt         String?   @db.Text
   image           String?
   published       Boolean   @default(false)
   views           Int       @default(0)
   readingTime     Int       @default(5) // in minutes
   author          String    @default("Alfattah")
   publishedAt     DateTime?
-  metaDescription String?
+  metaDescription String?   @db.Text
   metaKeywords    String?
   categoryId      String?
   category        Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
@@ -40,14 +40,17 @@ model Post {
   @@index([published])
   @@index([createdAt])
   @@index([publishedAt])
+  @@index([categoryId])
+  @@index([published, publishedAt])
+  @@index([published, views])
 }
 
 model Project {
   id          String   @id @default(cuid())
   title       String
   slug        String   @unique
-  description String
-  content     String?
+  description String   @db.Text
+  content     String?  @db.Text
   image       String?
   demoUrl     String?
   githubUrl   String?
@@ -59,6 +62,7 @@ model Project {
 
   @@index([slug])
   @@index([createdAt])
+  @@index([views])
 }
 
 model Category {
@@ -92,6 +96,8 @@ model Media {
   size         Int
   url          String
   createdAt    DateTime @default(now())
+
+  @@index([createdAt])
 }
 
 model Settings {

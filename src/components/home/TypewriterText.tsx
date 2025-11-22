@@ -12,9 +12,9 @@ interface TypewriterTextProps {
 
 export function TypewriterText({
   words,
-  typingSpeed = 80,
-  deletingSpeed = 40,
-  pauseDuration = 3000,
+  typingSpeed = 50,
+  deletingSpeed = 25,
+  pauseDuration = 2000,
   className = '',
 }: TypewriterTextProps) {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);

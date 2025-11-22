@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
+import { requireAuth } from '@/lib/auth';
 
 export async function GET() {
   const setting = await prisma.settings.findUnique({
@@ -19,16 +20,32 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const data = await request.json();
+  try {
+    // Require authentication
+    await requireAuth(request);
 
-  await prisma.settings.upsert({
-    where: { key: 'about_page_content' },
-    update: { value: JSON.stringify(data) },
-    create: { key: 'about_page_content', value: JSON.stringify(data) },
-  });
+    const data = await request.json();
 
-  revalidatePath('/about');
-  revalidatePath('/admin/about');
+    await prisma.settings.upsert({
+      where: { key: 'about_page_content' },
+      update: { value: JSON.stringify(data) },
+      create: { key: 'about_page_content', value: JSON.stringify(data) },
+    });
 
-  return NextResponse.json({ success: true });
+    revalidatePath('/about');
+    revalidatePath('/admin/about');
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    if (error instanceof Error && error.message === 'Unauthorized') {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
 }

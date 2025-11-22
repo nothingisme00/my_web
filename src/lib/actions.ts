@@ -9,6 +9,9 @@ import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { validateFormData, LoginSchema, PostSchema, ProjectSchema, CategorySchema, TagSchema } from '@/lib/validations';
 import { calculateReadingTime } from '@/lib/utils';
+import { verifyPassword, generateToken } from '@/lib/auth';
+import { loginLimiter, RATE_LIMITS } from '@/lib/rate-limit';
+import { logAuthAttempt, logError } from '@/lib/logger';
 
 // Types
 interface FormState {
@@ -25,19 +28,59 @@ export async function login(prevState: FormState | null, formData: FormData): Pr
 
   const { email, password } = validation.data;
 
-  // Simple hardcoded check for demo purposes
-  // In production, use bcrypt and check against database
-  if (email === 'admin@example.com' && password === 'password') {
-    (await cookies()).set('auth_token', 'secret_token', {
+  // Rate limiting: 5 attempts per 15 minutes per email
+  const rateLimitResult = loginLimiter.check(
+    email,
+    RATE_LIMITS.LOGIN.limit,
+    RATE_LIMITS.LOGIN.windowMs
+  );
+
+  if (!rateLimitResult.success) {
+    const minutesLeft = Math.ceil((rateLimitResult.resetTime - Date.now()) / 60000);
+    return {
+      error: `Too many login attempts. Please try again in ${minutesLeft} minute${minutesLeft > 1 ? 's' : ''}.`,
+    };
+  }
+
+  try {
+    // Find user in database
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      logAuthAttempt(email, false);
+      return { error: 'Invalid email or password' };
+    }
+
+    // Verify password
+    const isPasswordValid = await verifyPassword(password, user.password);
+
+    if (!isPasswordValid) {
+      logAuthAttempt(email, false);
+      return { error: 'Invalid email or password' };
+    }
+
+    // Successful login - reset rate limit for this email
+    loginLimiter.reset(email);
+    logAuthAttempt(email, true);
+
+    // Generate JWT token
+    const token = await generateToken(user.id, user.email);
+
+    // Set secure cookie
+    (await cookies()).set('auth_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
+
     redirect('/admin');
-  } else {
-    return { error: 'Invalid credentials' };
+  } catch (error) {
+    logError(error as Error, { context: 'login', email });
+    return { error: 'An error occurred during login' };
   }
 }
 
