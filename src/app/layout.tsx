@@ -4,6 +4,7 @@ import "./globals.css";
 import { LayoutWrapper } from "@/components/layout/LayoutWrapper";
 import { Footer } from "@/components/layout/Footer";
 import { getSettings } from "@/lib/actions";
+import { ScrollToTop } from "@/components/blog/ScrollToTop";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,6 +31,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} min-h-screen flex flex-col`}>
+        <ScrollToTop />
         <LayoutWrapper settings={settings} footer={<Footer />}>
           {children}
         </LayoutWrapper>

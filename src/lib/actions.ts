@@ -59,9 +59,52 @@ export async function getPosts() {
 
 export async function createPost(formData: FormData) {
   try {
-    // Prepare data with tag IDs
-    const tags = formData.getAll('tags') as string[];
-    formData.set('tagIds', JSON.stringify(tags));
+    // Handle Category: Create new if provided
+    let categoryId = formData.get('categoryId') as string;
+    const newCategoryName = formData.get('newCategory') as string;
+
+    if (newCategoryName) {
+      const slug = newCategoryName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      
+      // Check if exists first
+      const existingCategory = await prisma.category.findUnique({ where: { slug } });
+      if (existingCategory) {
+        categoryId = existingCategory.id;
+      } else {
+        const newCategory = await prisma.category.create({
+          data: { name: newCategoryName, slug }
+        });
+        categoryId = newCategory.id;
+      }
+      formData.set('categoryId', categoryId);
+    }
+
+    // Handle Tags: Parse comma-separated string
+    const tagsInput = formData.get('tagsInput') as string;
+    const tagIds: string[] = [];
+
+    if (tagsInput) {
+      const tagNames = tagsInput.split(',').map(t => t.trim()).filter(t => t.length > 0);
+      
+      for (const tagName of tagNames) {
+        const slug = tagName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        
+        // Find or create tag
+        let tag = await prisma.tag.findUnique({ where: { slug } });
+        if (!tag) {
+          tag = await prisma.tag.create({ data: { name: tagName, slug } });
+        }
+        tagIds.push(tag.id);
+      }
+    }
+    
+    // Fallback to existing checkbox tags if any (legacy support or mixed usage)
+    const existingTags = formData.getAll('tags') as string[];
+    existingTags.forEach(id => {
+      if (!tagIds.includes(id)) tagIds.push(id);
+    });
+
+    formData.set('tagIds', JSON.stringify(tagIds));
     formData.set('published', formData.get('published') === 'on' ? 'true' : 'false');
 
     // Validate input
@@ -70,7 +113,7 @@ export async function createPost(formData: FormData) {
       throw new Error(validation.error);
     }
 
-    const { title, slug, content, excerpt, image, published, categoryId, tagIds } = validation.data;
+    const { title, slug, content, excerpt, image, published } = validation.data;
 
     // Calculate reading time
     const readingTime = calculateReadingTime(content);
@@ -86,7 +129,7 @@ export async function createPost(formData: FormData) {
         readingTime,
         publishedAt: published ? new Date() : null,
         categoryId: categoryId || null,
-        tags: tagIds && tagIds.length > 0 ? {
+        tags: tagIds.length > 0 ? {
           connect: tagIds.map(tagId => ({ id: tagId })),
         } : undefined,
       },
@@ -109,8 +152,50 @@ export async function deletePost(id: string) {
 
 export async function updatePost(id: string, formData: FormData) {
   try {
-    const tags = formData.getAll('tags') as string[];
-    formData.set('tagIds', JSON.stringify(tags));
+    // Handle Category: Create new if provided
+    let categoryId = formData.get('categoryId') as string;
+    const newCategoryName = formData.get('newCategory') as string;
+
+    if (newCategoryName) {
+      const slug = newCategoryName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      
+      const existingCategory = await prisma.category.findUnique({ where: { slug } });
+      if (existingCategory) {
+        categoryId = existingCategory.id;
+      } else {
+        const newCategory = await prisma.category.create({
+          data: { name: newCategoryName, slug }
+        });
+        categoryId = newCategory.id;
+      }
+      formData.set('categoryId', categoryId);
+    }
+
+    // Handle Tags: Parse comma-separated string
+    const tagsInput = formData.get('tagsInput') as string;
+    const tagIds: string[] = [];
+
+    if (tagsInput) {
+      const tagNames = tagsInput.split(',').map(t => t.trim()).filter(t => t.length > 0);
+      
+      for (const tagName of tagNames) {
+        const slug = tagName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        
+        let tag = await prisma.tag.findUnique({ where: { slug } });
+        if (!tag) {
+          tag = await prisma.tag.create({ data: { name: tagName, slug } });
+        }
+        tagIds.push(tag.id);
+      }
+    }
+
+    // Fallback to existing checkbox tags
+    const existingTags = formData.getAll('tags') as string[];
+    existingTags.forEach(id => {
+      if (!tagIds.includes(id)) tagIds.push(id);
+    });
+
+    formData.set('tagIds', JSON.stringify(tagIds));
     formData.set('published', formData.get('published') === 'on' ? 'true' : 'false');
 
     const validation = validateFormData(PostSchema, formData);
@@ -118,7 +203,7 @@ export async function updatePost(id: string, formData: FormData) {
       throw new Error(validation.error);
     }
 
-    const { title, slug, content, excerpt, image, published, categoryId, tagIds } = validation.data;
+    const { title, slug, content, excerpt, image, published } = validation.data;
 
     // Calculate reading time
     const readingTime = calculateReadingTime(content);
@@ -141,7 +226,7 @@ export async function updatePost(id: string, formData: FormData) {
         categoryId: categoryId || null,
         tags: {
           set: [],
-          connect: tagIds && tagIds.length > 0 ? tagIds.map(tagId => ({ id: tagId })) : [],
+          connect: tagIds.length > 0 ? tagIds.map(tagId => ({ id: tagId })) : [],
         },
       },
     });
@@ -630,9 +715,15 @@ export async function getRelatedPosts(postId: string, categoryId?: string | null
 /**
  * Get published posts only
  */
-export async function getPublishedPosts() {
+export async function getPublishedPosts(query?: string) {
   return await prisma.post.findMany({
-    where: { published: true },
+    where: { 
+      published: true,
+      OR: query ? [
+        { title: { contains: query } }, // Case insensitive by default in SQLite/Postgres usually, but depends on DB. Prisma handles it well.
+        { excerpt: { contains: query } }
+      ] : undefined
+    },
     orderBy: { publishedAt: 'desc' },
     include: {
       category: true,

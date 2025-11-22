@@ -96,12 +96,13 @@ export default function AdminLayout({
           <NavLink href="/admin/projects" icon={Briefcase}>
             Projects
           </NavLink>
-          <NavLink href="/admin/categories" icon={FolderOpen}>
+          {/* Categories and Tags are now managed inline in Post form */}
+          {/* <NavLink href="/admin/categories" icon={FolderOpen}>
             Categories
           </NavLink>
           <NavLink href="/admin/tags" icon={Tags}>
             Tags
-          </NavLink>
+          </NavLink> */}
           <NavLink href="/admin/media" icon={Image}>
             Media Library
           </NavLink>

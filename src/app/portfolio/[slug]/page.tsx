@@ -6,8 +6,10 @@ import { notFound } from "next/navigation";
 import { incrementProjectViews } from "@/lib/actions";
 import { Metadata } from "next";
 import Image from "next/image";
-import DOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
+import DOMPurify from 'isomorphic-dompurify';
+
+// Enable ISR - revalidate every hour
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -71,10 +73,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
   const techStackArray = project.techStack ? project.techStack.split(',').map(t => t.trim()) : [];
 
-  // Sanitize HTML content for SSR
-  const window = new JSDOM('').window;
-  const purify = DOMPurify(window);
-  const sanitizedContent = project.content ? purify.sanitize(project.content) : '';
+  // Sanitize HTML content (optimized for SSR)
+  const sanitizedContent = project.content ? DOMPurify.sanitize(project.content) : '';
 
   return (
     <div className="bg-white dark:bg-gray-900 py-24 sm:py-32 transition-colors duration-300 min-h-screen">

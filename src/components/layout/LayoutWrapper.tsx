@@ -22,9 +22,13 @@ export function LayoutWrapper({ children, settings, footer }: LayoutWrapperProps
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       {/* Only show Navbar/Footer for public pages */}
       {!isCMSPage && <Navbar settings={settings} />}
-      <PageTransition>
-        <main className={isCMSPage ? '' : 'flex-grow pt-24'}>{children}</main>
-      </PageTransition>
+      {isCMSPage ? (
+        <main>{children}</main>
+      ) : (
+        <PageTransition>
+          <main className="flex-grow pt-24">{children}</main>
+        </PageTransition>
+      )}
       {!isCMSPage && footer}
       <ToastProvider />
     </ThemeProvider>

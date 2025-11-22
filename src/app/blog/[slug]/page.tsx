@@ -7,14 +7,12 @@ import { formatDate, formatViewCount } from "@/lib/utils";
 import { ShareButtons } from "@/components/blog/ShareButtons";
 import { Metadata } from "next";
 import Image from "next/image";
-import DOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
+import DOMPurify from 'isomorphic-dompurify';
 import { Prisma } from "@prisma/client";
-import dynamic from 'next/dynamic';
+import { ReadingProgress } from '@/components/blog/ReadingProgress';
 
-// Dynamic import untuk client-only components
-const ReadingProgress = dynamic(() => import('@/components/blog/ReadingProgress').then(mod => ({ default: mod.ReadingProgress })), { ssr: false });
-const ScrollToTop = dynamic(() => import('@/components/blog/ScrollToTop').then(mod => ({ default: mod.ScrollToTop })), { ssr: false });
+// Enable ISR - revalidate every hour
+export const revalidate = 3600;
 
 type PostWithRelations = Prisma.PostGetPayload<{
   include: {
@@ -97,17 +95,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   // Get related posts
   const relatedPosts = await getRelatedPosts(post.id, post.categoryId, 3) as PostWithRelations[];
 
-  // Sanitize HTML content for SSR
-  const window = new JSDOM('').window;
-  const purify = DOMPurify(window);
-  const sanitizedContent = purify.sanitize(post.content);
+  // Sanitize HTML content (optimized for SSR)
+  const sanitizedContent = DOMPurify.sanitize(post.content);
 
   const postUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/blog/${post.slug}`;
 
   return (
     <>
       <ReadingProgress />
-      <ScrollToTop />
       <div className="bg-white dark:bg-gray-900 transition-colors duration-300 min-h-screen">
       {/* Header */}
       <div className="border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">

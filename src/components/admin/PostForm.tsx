@@ -33,6 +33,7 @@ function SubmitButton({ isEditing }: { isEditing: boolean }) {
 
 export default function PostForm({ categories, tags, initialData }: PostFormProps) {
   const [content, setContent] = useState(initialData?.content || '');
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
 
   const categoryOptions = [
     { value: '', label: 'Select a category' },
@@ -101,12 +102,34 @@ export default function PostForm({ categories, tags, initialData }: PostFormProp
           {/* Sidebar */}
           <div className="space-y-6">
             <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-6">
-              <Select
-                label="Category"
-                name="categoryId"
-                options={categoryOptions}
-                defaultValue={initialData?.categoryId || ''}
-              />
+              
+              {/* Category Selection */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
+                  <button
+                    type="button"
+                    onClick={() => setIsCreatingCategory(!isCreatingCategory)}
+                    className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                  >
+                    {isCreatingCategory ? 'Select Existing' : 'Create New'}
+                  </button>
+                </div>
+                
+                {isCreatingCategory ? (
+                  <Input
+                    name="newCategory"
+                    placeholder="Enter new category name"
+                    autoFocus
+                  />
+                ) : (
+                  <Select
+                    name="categoryId"
+                    options={categoryOptions}
+                    defaultValue={initialData?.categoryId || ''}
+                  />
+                )}
+              </div>
 
               <Input
                 label="Image URL"
@@ -118,27 +141,15 @@ export default function PostForm({ categories, tags, initialData }: PostFormProp
                 helperText="Direct link to image (Unsplash, etc)"
               />
 
+              {/* Tags Input */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tags</label>
-                <div className="space-y-2 max-h-48 overflow-y-auto p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/50">
-                  {tags.map(tag => (
-                    <label key={tag.id} className="flex items-center gap-2 cursor-pointer group">
-                      <input
-                        type="checkbox"
-                        name="tags"
-                        value={tag.id}
-                        defaultChecked={initialData?.tags.some(t => t.id === tag.id)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-all duration-150 dark:border-gray-600 dark:bg-gray-800"
-                      />
-                      <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-150">
-                        {tag.name}
-                      </span>
-                    </label>
-                  ))}
-                  {tags.length === 0 && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 italic">No tags available. Create some first.</p>
-                  )}
-                </div>
+                <Input
+                  name="tagsInput"
+                  placeholder="React, Next.js, Tutorial (comma separated)"
+                  defaultValue={initialData?.tags.map(t => t.name).join(', ') || ''}
+                  helperText="Separate tags with commas. New tags will be created automatically."
+                />
               </div>
 
               <div className="pt-4 border-t border-gray-200 dark:border-gray-700">

@@ -1,35 +1,30 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useSpring } from 'framer-motion';
 
 export function ReadingProgress() {
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const { scrollYProgress } = useScroll();
 
-  useEffect(() => {
-    const calculateScrollProgress = () => {
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      const scrollTop = window.scrollY;
-
-      const totalDocScrollLength = documentHeight - windowHeight;
-      const scrollPosition = Math.min((scrollTop / totalDocScrollLength) * 100, 100);
-
-      setScrollProgress(scrollPosition);
-    };
-
-    window.addEventListener('scroll', calculateScrollProgress);
-    calculateScrollProgress(); // Initial calculation
-
-    return () => window.removeEventListener('scroll', calculateScrollProgress);
-  }, []);
+  // Smooth out the progress value
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
 
   return (
-    <motion.div
-      className="fixed top-0 left-0 right-0 h-1 bg-blue-600 origin-left z-50"
-      style={{ width: `${scrollProgress}%` }}
-      initial={{ width: 0 }}
-      transition={{ ease: "easeOut", duration: 0.1 }}
-    />
+    <>
+      {/* Background track */}
+      <div className="fixed top-0 left-0 right-0 h-1 bg-gray-200 dark:bg-gray-800 z-50" />
+      
+      {/* Progress bar - minimalist solid color with subtle shadow */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 origin-left z-50 bg-blue-600 dark:bg-blue-400 shadow-sm"
+        style={{ 
+          scaleX,
+          boxShadow: '0 1px 3px rgba(59, 130, 246, 0.3)'
+        }}
+      />
+    </>
   );
 }
