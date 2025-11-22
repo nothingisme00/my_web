@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { Navbar } from '@/components/layout/Navbar';
 import { ThemeProvider } from '@/components/theme-provider';
 import { ToastProvider } from '@/components/providers/ToastProvider';
+import { PageTransition } from '@/components/transitions/PageTransition';
 
 interface LayoutWrapperProps {
   children: React.ReactNode;
@@ -21,7 +22,9 @@ export function LayoutWrapper({ children, settings, footer }: LayoutWrapperProps
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       {/* Only show Navbar/Footer for public pages */}
       {!isCMSPage && <Navbar settings={settings} />}
-      <main className={isCMSPage ? '' : 'flex-grow pt-24'}>{children}</main>
+      <PageTransition>
+        <main className={isCMSPage ? '' : 'flex-grow pt-24'}>{children}</main>
+      </PageTransition>
       {!isCMSPage && footer}
       <ToastProvider />
     </ThemeProvider>

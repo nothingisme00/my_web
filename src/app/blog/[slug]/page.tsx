@@ -10,6 +10,11 @@ import Image from "next/image";
 import DOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
 import { Prisma } from "@prisma/client";
+import dynamic from 'next/dynamic';
+
+// Dynamic import untuk client-only components
+const ReadingProgress = dynamic(() => import('@/components/blog/ReadingProgress').then(mod => ({ default: mod.ReadingProgress })), { ssr: false });
+const ScrollToTop = dynamic(() => import('@/components/blog/ScrollToTop').then(mod => ({ default: mod.ScrollToTop })), { ssr: false });
 
 type PostWithRelations = Prisma.PostGetPayload<{
   include: {
@@ -100,7 +105,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const postUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/blog/${post.slug}`;
 
   return (
-    <div className="bg-white dark:bg-gray-900 transition-colors duration-300 min-h-screen">
+    <>
+      <ReadingProgress />
+      <ScrollToTop />
+      <div className="bg-white dark:bg-gray-900 transition-colors duration-300 min-h-screen">
       {/* Header */}
       <div className="border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
         <div className="mx-auto max-w-4xl px-6 py-8 lg:px-8">
@@ -312,5 +320,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         )}
       </div>
     </div>
+    </>
   );
 }

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { X, Calendar, Tag } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Calendar, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Photo {
   id: string;
@@ -21,49 +22,89 @@ interface GalleryGridProps {
 export default function GalleryGrid({ photos, categories }: GalleryGridProps) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
 
   const filteredPhotos = activeCategory
     ? photos.filter((p) => p.category === activeCategory)
     : photos;
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (!selectedPhoto) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedPhoto(null);
+      } else if (e.key === 'ArrowLeft') {
+        navigatePrev();
+      } else if (e.key === 'ArrowRight') {
+        navigateNext();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedPhoto, currentIndex]);
+
+  const navigateNext = () => {
+    const nextIndex = (currentIndex + 1) % filteredPhotos.length;
+    setCurrentIndex(nextIndex);
+    setSelectedPhoto(filteredPhotos[nextIndex]);
+  };
+
+  const navigatePrev = () => {
+    const prevIndex = (currentIndex - 1 + filteredPhotos.length) % filteredPhotos.length;
+    setCurrentIndex(prevIndex);
+    setSelectedPhoto(filteredPhotos[prevIndex]);
+  };
+
+  const openLightbox = (photo: Photo, index: number) => {
+    setSelectedPhoto(photo);
+    setCurrentIndex(index);
+  };
 
   return (
     <>
       {/* Category Filter */}
       {categories.length > 0 && (
         <div className="flex flex-wrap justify-center gap-2 mb-10">
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => setActiveCategory(null)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
               activeCategory === null
-                ? 'bg-blue-600 text-white'
+                ? 'bg-blue-600 text-white shadow-lg'
                 : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
             All
-          </button>
+          </motion.button>
           {categories.map((cat) => (
-            <button
+            <motion.button
               key={cat}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                 activeCategory === cat
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-blue-600 text-white shadow-lg'
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
               }`}
             >
               {cat}
-            </button>
+            </motion.button>
           ))}
         </div>
       )}
 
       {/* Masonry Grid */}
       <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
-        {filteredPhotos.map((photo) => (
+        {filteredPhotos.map((photo, index) => (
           <div
             key={photo.id}
             className="break-inside-avoid cursor-pointer group"
-            onClick={() => setSelectedPhoto(photo)}
+            onClick={() => openLightbox(photo, index)}
           >
             <div className="relative overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800">
               <img
@@ -91,54 +132,127 @@ export default function GalleryGrid({ photos, categories }: GalleryGridProps) {
       </div>
 
       {/* Lightbox Modal */}
-      {selectedPhoto && (
-        <div
-          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
-          onClick={() => setSelectedPhoto(null)}
-        >
-          <button
-            className="absolute top-4 right-4 p-2 text-white hover:bg-white/10 rounded-full transition-colors"
+      <AnimatePresence>
+        {selectedPhoto && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
             onClick={() => setSelectedPhoto(null)}
           >
-            <X className="h-6 w-6" />
-          </button>
+            {/* Close Button */}
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ delay: 0.1 }}
+              className="absolute top-4 right-4 p-3 text-white hover:bg-white/10 rounded-full transition-colors z-10"
+              onClick={() => setSelectedPhoto(null)}
+            >
+              <X className="h-6 w-6" />
+            </motion.button>
 
-          <div
-            className="max-w-5xl max-h-[90vh] flex flex-col"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <img
-              src={`/gallery/${selectedPhoto.filename}`}
-              alt={selectedPhoto.title}
-              className="max-h-[75vh] w-auto object-contain rounded-lg"
-            />
-            <div className="mt-4 text-white">
-              <h2 className="text-xl font-bold">{selectedPhoto.title}</h2>
-              {selectedPhoto.description && (
-                <p className="text-gray-300 mt-2">{selectedPhoto.description}</p>
-              )}
-              <div className="flex items-center gap-4 mt-3 text-sm text-gray-400">
-                {selectedPhoto.category && (
-                  <span className="inline-flex items-center gap-1">
-                    <Tag className="h-4 w-4" />
-                    {selectedPhoto.category}
-                  </span>
+            {/* Navigation Buttons */}
+            {filteredPhotos.length > 1 && (
+              <>
+                <motion.button
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ delay: 0.1 }}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 p-3 text-white hover:bg-white/10 rounded-full transition-colors z-10"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigatePrev();
+                  }}
+                >
+                  <ChevronLeft className="h-8 w-8" />
+                </motion.button>
+
+                <motion.button
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ delay: 0.1 }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-3 text-white hover:bg-white/10 rounded-full transition-colors z-10"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigateNext();
+                  }}
+                >
+                  <ChevronRight className="h-8 w-8" />
+                </motion.button>
+              </>
+            )}
+
+            {/* Photo Counter */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ delay: 0.1 }}
+              className="absolute top-4 left-4 text-white text-sm bg-black/50 px-3 py-1.5 rounded-full"
+            >
+              {currentIndex + 1} / {filteredPhotos.length}
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1.0] }}
+              className="max-w-6xl max-h-[90vh] flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={selectedPhoto.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.25 }}
+                  src={`/gallery/${selectedPhoto.filename}`}
+                  alt={selectedPhoto.title}
+                  className="max-h-[70vh] w-auto object-contain rounded-lg"
+                  draggable={false}
+                />
+              </AnimatePresence>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="mt-6 text-white max-w-3xl"
+              >
+                <h2 className="text-2xl font-bold">{selectedPhoto.title}</h2>
+                {selectedPhoto.description && (
+                  <p className="text-gray-300 mt-3 text-lg">{selectedPhoto.description}</p>
                 )}
-                {selectedPhoto.takenAt && (
-                  <span className="inline-flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    {new Date(selectedPhoto.takenAt).toLocaleDateString('id-ID', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+                <div className="flex items-center gap-6 mt-4 text-sm text-gray-400">
+                  {selectedPhoto.category && (
+                    <span className="inline-flex items-center gap-2">
+                      <Tag className="h-4 w-4" />
+                      {selectedPhoto.category}
+                    </span>
+                  )}
+                  {selectedPhoto.takenAt && (
+                    <span className="inline-flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      {new Date(selectedPhoto.takenAt).toLocaleDateString('id-ID', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </span>
+                  )}
+                </div>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

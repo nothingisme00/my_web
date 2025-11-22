@@ -3,6 +3,7 @@ import { getPublishedPosts } from "@/lib/actions";
 import { formatDate, formatViewCount } from "@/lib/utils";
 import { Clock, Eye, Search, BookOpen } from "lucide-react";
 import { Prisma } from "@prisma/client";
+import { BlogPostsGrid } from "@/components/blog/BlogPostsGrid";
 
 type PostWithRelations = Prisma.PostGetPayload<{
   include: {
@@ -53,131 +54,7 @@ export default async function BlogPage() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12 lg:py-16">
         {posts.length > 0 ? (
           <>
-            {/* Featured Post */}
-            {featuredPost && (
-              <section className="mb-16">
-                <Link href={`/blog/${featuredPost.slug}`} className="group block">
-                  <article className="grid lg:grid-cols-2 gap-8 p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-out">
-                    {/* Image */}
-                    {featuredPost.image && (
-                      <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800">
-                        <img
-                          src={featuredPost.image}
-                          alt={featuredPost.title}
-                          className="w-full h-full object-cover img-zoom"
-                        />
-                        <div className="absolute top-4 left-4">
-                          <span className="px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-medium">
-                            Featured
-                          </span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Content */}
-                    <div className="flex flex-col justify-center">
-                      {featuredPost.category && (
-                        <span className="inline-flex items-center w-fit rounded-md bg-blue-50 dark:bg-blue-900/30 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-400 mb-4">
-                          {featuredPost.category.name}
-                        </span>
-                      )}
-
-                      <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 mb-4 leading-tight">
-                        {featuredPost.title}
-                      </h2>
-
-                      <p className="text-gray-600 dark:text-gray-400 line-clamp-3 mb-6 text-lg">
-                        {featuredPost.excerpt || ""}
-                      </p>
-
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                        <time dateTime={featuredPost.publishedAt?.toISOString() || featuredPost.createdAt.toISOString()}>
-                          {formatDate(featuredPost.publishedAt || featuredPost.createdAt, 'id-ID')}
-                        </time>
-                        <span>·</span>
-                        <div className="flex items-center gap-1.5">
-                          <Clock className="h-4 w-4" />
-                          <span>{featuredPost.readingTime} min read</span>
-                        </div>
-                        {featuredPost.views > 0 && (
-                          <>
-                            <span>·</span>
-                            <div className="flex items-center gap-1.5">
-                              <Eye className="h-4 w-4" />
-                              <span>{formatViewCount(featuredPost.views)} views</span>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </article>
-                </Link>
-              </section>
-            )}
-
-            {/* Other Posts Grid */}
-            {otherPosts.length > 0 && (
-              <section>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-8">
-                  Artikel Lainnya
-                </h2>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {otherPosts.map((post) => (
-                    <Link key={post.id} href={`/blog/${post.slug}`} className="group block">
-                      <article className="flex flex-col h-full rounded-xl overflow-hidden bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out">
-                        {/* Image */}
-                        {post.image && (
-                          <div className="relative aspect-[16/10] overflow-hidden bg-gray-100 dark:bg-gray-800">
-                            <img
-                              src={post.image}
-                              alt={post.title}
-                              className="w-full h-full object-cover img-zoom"
-                            />
-                          </div>
-                        )}
-
-                        {/* Content */}
-                        <div className="flex flex-col flex-grow p-5">
-                          {post.category && (
-                            <span className="inline-flex items-center w-fit rounded-md bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-400 mb-3">
-                              {post.category.name}
-                            </span>
-                          )}
-
-                          <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 mb-2 leading-tight line-clamp-2">
-                            {post.title}
-                          </h3>
-
-                          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-4 flex-grow">
-                            {post.excerpt || ""}
-                          </p>
-
-                          <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-100 dark:border-gray-700">
-                            <time dateTime={post.publishedAt?.toISOString() || post.createdAt.toISOString()}>
-                              {formatDate(post.publishedAt || post.createdAt, 'id-ID')}
-                            </time>
-                            <span>·</span>
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              <span>{post.readingTime} min</span>
-                            </div>
-                            {post.views > 0 && (
-                              <>
-                                <span>·</span>
-                                <div className="flex items-center gap-1">
-                                  <Eye className="h-3 w-3" />
-                                  <span>{formatViewCount(post.views)}</span>
-                                </div>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </article>
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            )}
+            <BlogPostsGrid featuredPost={featuredPost} posts={otherPosts} />
           </>
         ) : (
           <div className="text-center py-20">

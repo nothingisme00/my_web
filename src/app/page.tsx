@@ -8,6 +8,8 @@ import { Prisma } from "@prisma/client";
 import { HeroCarousel } from "@/components/home/HeroCarousel";
 import { TypewriterText } from "@/components/home/TypewriterText";
 import { QuotesCarousel } from "@/components/home/QuotesCarousel";
+import { FeaturedPostCard } from "@/components/home/FeaturedPostCard";
+import { RecentPostsGrid } from "@/components/home/RecentPostsGrid";
 
 type PostWithRelations = Prisma.PostGetPayload<{
   include: {
@@ -231,59 +233,7 @@ export default async function Home() {
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Featured</h2>
               </div>
 
-              {/* Large Featured Post */}
-              <Link href={`/blog/${featuredPost.slug}`} className="group">
-                <article className="grid lg:grid-cols-2 gap-8 lg:gap-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-8 lg:p-10 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-
-                  {/* Image */}
-                  {featuredPost.image && (
-                    <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800">
-                      <img
-                        src={featuredPost.image}
-                        alt={featuredPost.title}
-                        className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-103"
-                      />
-                    </div>
-                  )}
-
-                  {/* Content */}
-                  <div className="flex flex-col justify-center space-y-4">
-                    {featuredPost.category && (
-                      <span className="inline-flex items-center w-fit rounded-full bg-blue-50 dark:bg-blue-900/30 px-3 py-1 text-xs font-medium text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/20">
-                        {featuredPost.category.name}
-                      </span>
-                    )}
-
-                    <h3 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
-                      {featuredPost.title}
-                    </h3>
-
-                    <p className="text-lg text-gray-600 dark:text-gray-300 line-clamp-3">
-                      {featuredPost.excerpt || ""}
-                    </p>
-
-                    <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 pt-2">
-                      <time dateTime={featuredPost.publishedAt?.toISOString() || featuredPost.createdAt.toISOString()}>
-                        {formatDate(featuredPost.publishedAt || featuredPost.createdAt, 'id-ID')}
-                      </time>
-                      <span>·</span>
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        <span>{featuredPost.readingTime} min read</span>
-                      </div>
-                      {featuredPost.views > 0 && (
-                        <>
-                          <span>·</span>
-                          <div className="flex items-center gap-1">
-                            <Eye className="h-4 w-4" />
-                            <span>{formatViewCount(featuredPost.views)} views</span>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </article>
-              </Link>
+              <FeaturedPostCard post={featuredPost} />
             </div>
           )}
 
@@ -300,53 +250,7 @@ export default async function Home() {
                 </Link>
               </div>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {recentPosts.map((post) => (
-                  <Link key={post.id} href={`/blog/${post.slug}`} className="group">
-                    <article className="flex flex-col h-full bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-xl p-4 border border-gray-200/50 dark:border-gray-700/50 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                      {/* Image */}
-                      {post.image && (
-                        <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800 mb-4">
-                          <img
-                            src={post.image}
-                            alt={post.title}
-                            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-103"
-                          />
-                        </div>
-                      )}
-
-                      {/* Category */}
-                      {post.category && (
-                        <span className="inline-flex items-center w-fit rounded-md bg-gray-100 dark:bg-gray-800 px-2 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 mb-3">
-                          {post.category.name}
-                        </span>
-                      )}
-
-                      {/* Title */}
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2 leading-tight">
-                        {post.title}
-                      </h3>
-
-                      {/* Excerpt */}
-                      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-4 flex-grow">
-                        {post.excerpt || ""}
-                      </p>
-
-                      {/* Meta */}
-                      <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
-                        <time dateTime={post.publishedAt?.toISOString() || post.createdAt.toISOString()}>
-                          {formatDate(post.publishedAt || post.createdAt, 'id-ID')}
-                        </time>
-                        <span>·</span>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          <span>{post.readingTime} min</span>
-                        </div>
-                      </div>
-                    </article>
-                  </Link>
-                ))}
-              </div>
+              <RecentPostsGrid posts={recentPosts} />
             </div>
           )}
 
