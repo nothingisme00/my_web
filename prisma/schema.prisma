@@ -107,7 +107,7 @@ model Media {
 model Settings {
   id        String   @id @default(cuid())
   key       String   @unique
-  value     String
+  value     String   @db.Text
   updatedAt DateTime @updatedAt
 }
 

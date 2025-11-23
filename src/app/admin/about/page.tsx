@@ -80,15 +80,32 @@ export default function AdminAboutPage() {
     setIsSaving(true);
     setSaved(false);
 
-    await fetch('/api/about', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
+    try {
+      const response = await fetch('/api/about', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
 
-    setIsSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('Save failed:', error);
+        alert(`Failed to save: ${error.error || 'Unknown error'}`);
+        setIsSaving(false);
+        return;
+      }
+
+      const result = await response.json();
+      console.log('Save successful:', result);
+
+      setIsSaving(false);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (error) {
+      console.error('Error saving data:', error);
+      alert('Error saving data. Please check console for details.');
+      setIsSaving(false);
+    }
   }
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
