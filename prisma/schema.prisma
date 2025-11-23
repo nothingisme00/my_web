@@ -25,6 +25,10 @@ model Post {
   image           String?
   published       Boolean   @default(false)
   views           Int       @default(0)
+  reactionsLove   Int       @default(0)
+  reactionsLike   Int       @default(0)
+  reactionsWow    Int       @default(0)
+  reactionsFire   Int       @default(0)
   readingTime     Int       @default(5) // in minutes
   author          String    @default("Alfattah")
   publishedAt     DateTime?

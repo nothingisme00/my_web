@@ -17,7 +17,12 @@
       "Bash(nul)",
       "Bash(mysql:*)",
       "Bash(npm run db:seed:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(findstr:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npx prisma studio:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)"
     ],
     "deny": [],
     "ask": []

@@ -36,6 +36,7 @@ interface AboutData {
   cvUrl: string;
   portfolioUrl: string;
   techStack: string;
+  tools: string;
   experiences: Experience[];
   educations: Education[];
 }
@@ -51,6 +52,7 @@ const defaultData: AboutData = {
   cvUrl: '',
   portfolioUrl: '',
   techStack: '',
+  tools: '',
   experiences: [],
   educations: [],
 };
@@ -337,6 +339,24 @@ export default function AdminAboutPage() {
             onChange={e => setData(prev => ({ ...prev, techStack: e.target.value }))}
             placeholder="JavaScript, TypeScript, React, Next.js, Node.js"
             helperText="Comma separated list of technologies"
+          />
+        </div>
+
+        {/* Tools */}
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
+              <Code className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+            </div>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Tools</h2>
+          </div>
+
+          <Input
+            label="Tools & Software"
+            value={data.tools}
+            onChange={e => setData(prev => ({ ...prev, tools: e.target.value }))}
+            placeholder="VS Code, Figma, Docker, Git, Postman, Notion"
+            helperText="Comma separated list of tools (icons will be shown automatically)"
           />
         </div>
 

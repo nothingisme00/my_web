@@ -23,10 +23,12 @@ export async function login(prevState: FormState | null, formData: FormData): Pr
   // Validate input
   const validation = validateFormData(LoginSchema, formData);
   if (!validation.success) {
+    console.log('❌ Validation failed:', validation.error);
     return { error: validation.error };
   }
 
   const { email, password } = validation.data;
+  console.log('🔐 Login attempt for:', email);
 
   // Rate limiting: 5 attempts per 15 minutes per email
   const rateLimitResult = loginLimiter.check(
@@ -37,6 +39,7 @@ export async function login(prevState: FormState | null, formData: FormData): Pr
 
   if (!rateLimitResult.success) {
     const minutesLeft = Math.ceil((rateLimitResult.resetTime - Date.now()) / 60000);
+    console.log('⏱️ Rate limited:', email, minutesLeft, 'minutes left');
     return {
       error: `Too many login attempts. Please try again in ${minutesLeft} minute${minutesLeft > 1 ? 's' : ''}.`,
     };
@@ -49,17 +52,23 @@ export async function login(prevState: FormState | null, formData: FormData): Pr
     });
 
     if (!user) {
+      console.log('❌ User not found:', email);
       logAuthAttempt(email, false);
       return { error: 'Invalid email or password' };
     }
+
+    console.log('✅ User found:', user.email);
 
     // Verify password
     const isPasswordValid = await verifyPassword(password, user.password);
 
     if (!isPasswordValid) {
+      console.log('❌ Invalid password for:', email);
       logAuthAttempt(email, false);
       return { error: 'Invalid email or password' };
     }
+
+    console.log('✅ Password valid for:', email);
 
     // Successful login - reset rate limit for this email
     loginLimiter.reset(email);
@@ -67,6 +76,7 @@ export async function login(prevState: FormState | null, formData: FormData): Pr
 
     // Generate JWT token
     const token = await generateToken(user.id, user.email);
+    console.log('✅ JWT token generated');
 
     // Set secure cookie
     (await cookies()).set('auth_token', token, {
@@ -77,11 +87,15 @@ export async function login(prevState: FormState | null, formData: FormData): Pr
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
-    redirect('/admin');
+    console.log('✅ Cookie set, redirecting to /admin');
   } catch (error) {
+    console.error('❌ Login error:', error);
     logError(error as Error, { context: 'login', email });
     return { error: 'An error occurred during login' };
   }
+
+  // Redirect OUTSIDE try-catch (Next.js redirect throws special error)
+  redirect('/admin');
 }
 
 export async function logout() {

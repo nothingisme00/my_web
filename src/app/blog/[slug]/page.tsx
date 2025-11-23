@@ -10,6 +10,8 @@ import Image from "next/image";
 import DOMPurify from 'isomorphic-dompurify';
 import { Prisma } from "@prisma/client";
 import { ReadingProgress } from '@/components/blog/ReadingProgress';
+import { BlogContent } from '@/components/blog/BlogContent';
+import { ReactionButtons } from '@/components/blog/ReactionButtons';
 
 // Enable ISR - revalidate every hour
 export const revalidate = 3600;
@@ -191,22 +193,20 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
           {/* Article Content */}
           <article className="lg:col-span-10 order-1 lg:order-2">
-            <div
-              className="prose prose-lg prose-blue dark:prose-invert max-w-none
-                prose-headings:font-bold prose-headings:tracking-tight
-                prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6
-                prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-4
-                prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed
-                prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
-                prose-strong:text-gray-900 dark:prose-strong:text-white
-                prose-code:text-blue-600 dark:prose-code:text-blue-400 prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none
-                prose-pre:bg-gray-900 dark:prose-pre:bg-gray-950 prose-pre:border prose-pre:border-gray-800
-                prose-img:rounded-xl prose-img:shadow-lg
-                prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:bg-blue-50 dark:prose-blockquote:bg-blue-900/10 prose-blockquote:py-1 prose-blockquote:px-6
-                prose-ul:list-disc prose-ol:list-decimal
-                prose-li:text-gray-700 dark:prose-li:text-gray-300"
-              dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-            />
+            <BlogContent content={sanitizedContent} />
+
+            {/* Reaction Buttons */}
+            <div className="flex justify-center my-12 py-8 border-y border-gray-200 dark:border-gray-800">
+              <ReactionButtons
+                slug={post.slug}
+                initialReactions={{
+                  love: post.reactionsLove,
+                  like: post.reactionsLike,
+                  wow: post.reactionsWow,
+                  fire: post.reactionsFire,
+                }}
+              />
+            </div>
 
             {/* Tags */}
             {post.tags && post.tags.length > 0 && (

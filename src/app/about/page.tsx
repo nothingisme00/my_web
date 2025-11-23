@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/Button";
-import { Download, Mail, MapPin, Globe, ExternalLink, Github, FileText } from "lucide-react";
-import { getProjects, getSettings } from "@/lib/actions";
+import { Download, Mail, MapPin, Globe, Github, FileText, Linkedin, Instagram, Send } from "lucide-react";
+import { getSettings } from "@/lib/actions";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { ContactForm } from "@/components/contact/ContactForm";
+import { Accordion } from "@/components/ui/Accordion";
+import { getToolIcon } from "@/lib/tool-icons";
 
 const monthNames: Record<string, string> = {
   '01': 'Jan', '02': 'Feb', '03': 'Mar', '04': 'Apr',
@@ -47,6 +50,7 @@ interface AboutData {
   cvUrl: string;
   portfolioUrl: string;
   techStack: string;
+  tools: string;
   experiences: Experience[];
   educations: Education[];
 }
@@ -66,12 +70,10 @@ async function getAboutContent(): Promise<AboutData | null> {
 }
 
 export default async function AboutPage() {
-  const [projects, aboutData, settings] = await Promise.all([
-    getProjects(),
+  const [aboutData, settings] = await Promise.all([
     getAboutContent(),
     getSettings(),
   ]);
-  const selectedProjects = projects.slice(0, 4);
 
   // Use aboutData or fallback to settings/defaults
   const name = aboutData?.name || settings.owner_name || 'Alfattah';
@@ -84,6 +86,7 @@ export default async function AboutPage() {
   const cvUrl = aboutData?.cvUrl || '';
   const portfolioUrl = aboutData?.portfolioUrl || '';
   const techStack = aboutData?.techStack ? aboutData.techStack.split(',').map(t => t.trim()) : [];
+  const tools = aboutData?.tools ? aboutData.tools.split(',').map(t => t.trim()) : [];
   const experiences = aboutData?.experiences || [];
   const educations = aboutData?.educations || [];
 
@@ -106,7 +109,7 @@ export default async function AboutPage() {
           {/* Sidebar Info */}
           <div className="lg:col-span-1">
             <div className="lg:sticky lg:top-24 space-y-8">
-              <div className="rounded-2xl bg-gray-50 dark:bg-gray-800 p-8 border border-gray-200 dark:border-gray-700">
+              <div className="rounded-2xl bg-gray-50/50 dark:bg-gray-800/30 p-8 border-0">
                 {/* Profile Avatar */}
                 <div className="aspect-square rounded-xl overflow-hidden mb-6 bg-gradient-to-br from-blue-500 to-blue-600">
                   {profileImage ? (
@@ -161,22 +164,6 @@ export default async function AboutPage() {
                   </div>
                 )}
               </div>
-
-              {/* Tech Stack */}
-              {techStack.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 uppercase tracking-wider">
-                    Tech Stack
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {techStack.map((tech) => (
-                      <span key={tech} className="inline-flex items-center rounded-md bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 
@@ -191,26 +178,6 @@ export default async function AboutPage() {
                     <p key={i} className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
                       {paragraph}
                     </p>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Experience */}
-            {experiences.length > 0 && (
-              <section>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Pengalaman Kerja</h2>
-                <div className="space-y-8">
-                  {experiences.map((exp, index) => (
-                    <div key={exp.id} className="relative pl-8 border-l-2 border-gray-200 dark:border-gray-700">
-                      <div className={`absolute -left-[9px] top-0 h-4 w-4 rounded-full ring-4 ring-white dark:ring-gray-900 ${exp.isCurrent ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}`} />
-                      <div className="mb-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">{exp.title}</h3>
-                        <span className="text-sm text-gray-500 dark:text-gray-400">{formatPeriod(exp.startMonth, exp.startYear, exp.endMonth, exp.endYear, exp.isCurrent)}</span>
-                      </div>
-                      <p className="text-blue-600 dark:text-blue-400 font-medium mb-3">{exp.company}</p>
-                      <p className="text-gray-600 dark:text-gray-300">{exp.description}</p>
-                    </div>
                   ))}
                 </div>
               </section>
@@ -235,87 +202,210 @@ export default async function AboutPage() {
                 </div>
               </section>
             )}
+
+            {/* Experience - Accordion Style */}
+            {experiences.length > 0 && (
+              <section>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Pengalaman Kerja</h2>
+                <div className="space-y-4">
+                  {experiences.map((exp) => (
+                    <Accordion
+                      key={exp.id}
+                      trigger={
+                        <div className="flex-1">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">{exp.title}</h3>
+                            <span className="text-sm text-gray-500 dark:text-gray-400">
+                              {formatPeriod(exp.startMonth, exp.startYear, exp.endMonth, exp.endYear, exp.isCurrent)}
+                            </span>
+                          </div>
+                          <p className="text-blue-600 dark:text-blue-400 font-medium mt-1">{exp.company}</p>
+                          {exp.isCurrent && (
+                            <span className="inline-flex items-center mt-2 rounded-full bg-blue-100 dark:bg-blue-900/30 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:text-blue-300">
+                              Currently Working
+                            </span>
+                          )}
+                        </div>
+                      }
+                    >
+                      <p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
+                        {exp.description}
+                      </p>
+                    </Accordion>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Tech Stack */}
+            {techStack.length > 0 && (
+              <section>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Tech Stack</h2>
+                <div className="flex flex-wrap gap-3">
+                  {techStack.map((tech) => (
+                    <span
+                      key={tech}
+                      className="inline-flex items-center rounded-lg bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-800/50 px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-200 hover:scale-105"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Tools */}
+            {tools.length > 0 && (
+              <section>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Tools</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {tools.map((tool) => (
+                    <div
+                      key={tool}
+                      className="flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-lg transition-all duration-200 hover:scale-105"
+                    >
+                      <div className="flex-shrink-0 w-5 h-5 text-gray-700 dark:text-gray-300">
+                        {getToolIcon(tool)}
+                      </div>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {tool}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
         </div>
 
-        {/* Selected Projects Section */}
-        {selectedProjects.length > 0 && (
-          <section className="border-t border-gray-200 dark:border-gray-800 pt-16">
-            <div className="mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Selected Works</h2>
-              <p className="text-lg text-gray-600 dark:text-gray-400">
-                Beberapa project yang pernah saya kerjakan
+        {/* Contact Section */}
+        <section className="border-t border-gray-200 dark:border-gray-800 pt-20 mt-20 bg-gradient-to-b from-transparent to-gray-50/50 dark:to-gray-800/30">
+          <div className="mx-auto max-w-6xl">
+            {/* Header */}
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                Let's Work Together
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                Have a project in mind or want to collaborate? I'd love to hear from you.
+                Send me a message and I'll respond as soon as possible.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
-              {selectedProjects.map((project) => (
-                <article
-                  key={project.id}
-                  className="group flex flex-col h-full border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden hover:border-blue-200 dark:hover:border-blue-900/50 hover:shadow-lg transition-all duration-300 ease-out hover:-translate-y-1"
-                >
-                  {project.image && (
-                    <div className="relative w-full h-48 overflow-hidden bg-gray-100 dark:bg-gray-800">
-                      <img
-                        src={project.image}
-                        alt={project.title}
-                        className="w-full h-full object-cover img-zoom"
-                      />
-                    </div>
-                  )}
-
-                  <div className="p-6 flex flex-col flex-grow">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 ease-out">
-                      {project.title}
-                    </h3>
-
-                    <p className="text-gray-600 dark:text-gray-400 mb-4 flex-grow line-clamp-2">
-                      {project.description}
-                    </p>
-
-                    {project.techStack && (
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {project.techStack.split(',').slice(0, 3).map((tech) => (
-                          <span
-                            key={tech.trim()}
-                            className="inline-flex items-center rounded-md bg-blue-50 dark:bg-blue-900/30 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-400"
-                          >
-                            {tech.trim()}
-                          </span>
-                        ))}
+            {/* Contact Content */}
+            <div className="grid lg:grid-cols-3 gap-12">
+              {/* Contact Info - Left Side */}
+              <div className="lg:col-span-1 space-y-6">
+                {/* Email Card */}
+                {email && (
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-900/50 transition-all duration-200 hover:shadow-lg">
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                        <Mail className="w-6 h-6 text-white" />
                       </div>
-                    )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Email
+                        </p>
+                        <a
+                          href={`mailto:${email}`}
+                          className="text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors break-all"
+                        >
+                          {email}
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-                    <div className="flex items-center gap-4 pt-4 border-t border-gray-100 dark:border-gray-800">
-                      {project.demoUrl && (
-                        <a
-                          href={project.demoUrl}
+                {/* Location Card */}
+                {location && (
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:border-green-200 dark:hover:border-green-900/50 transition-all duration-200 hover:shadow-lg">
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
+                        <MapPin className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          Location
+                        </p>
+                        <p className="text-gray-900 dark:text-white">
+                          {location}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Social Links Card */}
+                {(settings.social_github || settings.social_linkedin || settings.social_instagram) && (
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">
+                      Connect With Me
+                    </h3>
+                    <div className="flex gap-3">
+                      {settings.social_github && (
+                        <Link
+                          href={settings.social_github}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200 ease-out"
+                          className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-900 dark:hover:bg-gray-600 hover:text-white transition-all duration-200 hover:scale-110"
+                          aria-label="GitHub"
                         >
-                          <ExternalLink className="h-4 w-4" />
-                          Live Demo
-                        </a>
+                          <Github className="w-5 h-5" />
+                        </Link>
                       )}
-                      {project.githubUrl && (
-                        <a
-                          href={project.githubUrl}
+                      {settings.social_linkedin && (
+                        <Link
+                          href={settings.social_linkedin}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200 ease-out"
+                          className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all duration-200 hover:scale-110"
+                          aria-label="LinkedIn"
                         >
-                          <Github className="h-4 w-4" />
-                          Source
-                        </a>
+                          <Linkedin className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {settings.social_instagram && (
+                        <Link
+                          href={settings.social_instagram}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gradient-to-br hover:from-purple-600 hover:to-pink-600 hover:text-white transition-all duration-200 hover:scale-110"
+                          aria-label="Instagram"
+                        >
+                          <Instagram className="w-5 h-5" />
+                        </Link>
                       )}
                     </div>
                   </div>
-                </article>
-              ))}
+                )}
+
+                {/* Response Time Card */}
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10 rounded-xl p-6 border border-blue-100 dark:border-blue-900/30">
+                  <div className="flex items-start gap-3">
+                    <Send className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                    <div>
+                      <h3 className="text-sm font-bold text-blue-900 dark:text-blue-400 mb-2 uppercase tracking-wide">
+                        Response Time
+                      </h3>
+                      <p className="text-sm text-blue-800 dark:text-blue-300">
+                        I typically respond within 24-48 hours during weekdays.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact Form - Right Side */}
+              <div className="lg:col-span-2">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 lg:p-12 border border-gray-200 dark:border-gray-700 shadow-xl">
+                  <ContactForm />
+                </div>
+              </div>
             </div>
-          </section>
-        )}
+          </div>
+        </section>
       </div>
     </div>
   );
