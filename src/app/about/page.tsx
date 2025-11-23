@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/Button";
-import { Download, Mail, MapPin, Globe, Github, FileText, Linkedin, Instagram, Send } from "lucide-react";
+import { Download, Mail, MapPin, Globe, FileText } from "lucide-react";
 import { getSettings } from "@/lib/actions";
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { Accordion } from "@/components/ui/Accordion";
@@ -279,130 +278,22 @@ export default async function AboutPage() {
         </div>
 
         {/* Contact Section */}
-        <section className="border-t border-gray-200 dark:border-gray-800 pt-20 mt-20 bg-gradient-to-b from-transparent to-gray-50/50 dark:to-gray-800/30">
-          <div className="mx-auto max-w-6xl">
+        <section className="border-t border-gray-200 dark:border-gray-800 pt-20 mt-20">
+          <div className="mx-auto max-w-3xl">
             {/* Header */}
-            <div className="text-center mb-16">
+            <div className="text-center mb-12">
               <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
                 Let's Work Together
               </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="text-lg text-gray-600 dark:text-gray-400">
                 Have a project in mind or want to collaborate? I'd love to hear from you.
                 Send me a message and I'll respond as soon as possible.
               </p>
             </div>
 
-            {/* Contact Content */}
-            <div className="grid lg:grid-cols-3 gap-12">
-              {/* Contact Info - Left Side */}
-              <div className="lg:col-span-1 space-y-6">
-                {/* Email Card */}
-                {email && (
-                  <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-900/50 transition-all duration-200 hover:shadow-lg">
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                        <Mail className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                          Email
-                        </p>
-                        <a
-                          href={`mailto:${email}`}
-                          className="text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors break-all"
-                        >
-                          {email}
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Location Card */}
-                {location && (
-                  <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:border-green-200 dark:hover:border-green-900/50 transition-all duration-200 hover:shadow-lg">
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
-                        <MapPin className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                          Location
-                        </p>
-                        <p className="text-gray-900 dark:text-white">
-                          {location}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Social Links Card */}
-                {(settings.social_github || settings.social_linkedin || settings.social_instagram) && (
-                  <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-                    <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">
-                      Connect With Me
-                    </h3>
-                    <div className="flex gap-3">
-                      {settings.social_github && (
-                        <Link
-                          href={settings.social_github}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-900 dark:hover:bg-gray-600 hover:text-white transition-all duration-200 hover:scale-110"
-                          aria-label="GitHub"
-                        >
-                          <Github className="w-5 h-5" />
-                        </Link>
-                      )}
-                      {settings.social_linkedin && (
-                        <Link
-                          href={settings.social_linkedin}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all duration-200 hover:scale-110"
-                          aria-label="LinkedIn"
-                        >
-                          <Linkedin className="w-5 h-5" />
-                        </Link>
-                      )}
-                      {settings.social_instagram && (
-                        <Link
-                          href={settings.social_instagram}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gradient-to-br hover:from-purple-600 hover:to-pink-600 hover:text-white transition-all duration-200 hover:scale-110"
-                          aria-label="Instagram"
-                        >
-                          <Instagram className="w-5 h-5" />
-                        </Link>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Response Time Card */}
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/10 rounded-xl p-6 border border-blue-100 dark:border-blue-900/30">
-                  <div className="flex items-start gap-3">
-                    <Send className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
-                    <div>
-                      <h3 className="text-sm font-bold text-blue-900 dark:text-blue-400 mb-2 uppercase tracking-wide">
-                        Response Time
-                      </h3>
-                      <p className="text-sm text-blue-800 dark:text-blue-300">
-                        I typically respond within 24-48 hours during weekdays.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Contact Form - Right Side */}
-              <div className="lg:col-span-2">
-                <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 lg:p-12 border border-gray-200 dark:border-gray-700 shadow-xl">
-                  <ContactForm />
-                </div>
-              </div>
+            {/* Contact Form */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 lg:p-12 border border-gray-200 dark:border-gray-700 shadow-xl">
+              <ContactForm />
             </div>
           </div>
         </section>

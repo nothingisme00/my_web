@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Send, Loader2, CheckCircle2, Mail, User, FileText, MessageSquare } from 'lucide-react';
+import { Send, Loader2, CheckCircle2, Mail, User, FileText, MessageSquare, Info } from 'lucide-react';
 
 interface FormData {
   name: string;
@@ -86,6 +86,24 @@ export function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
+      {/* Response Time Info Tooltip */}
+      <div className="group relative inline-block mb-6">
+        <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800/50 cursor-help">
+          <Info className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+          <span className="text-sm text-blue-900 dark:text-blue-300 font-medium">Response Time</span>
+        </div>
+        
+        {/* Tooltip */}
+        <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-gray-900 dark:bg-gray-800 text-white text-sm rounded-lg shadow-xl 
+                        opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10
+                        border border-gray-700">
+          <div className="absolute -top-2 left-4 w-4 h-4 bg-gray-900 dark:bg-gray-800 border-l border-t border-gray-700 transform rotate-45"></div>
+          <p className="relative">
+            I typically respond within <strong className="text-blue-400">~24 hours</strong> during weekdays.
+          </p>
+        </div>
+      </div>
+
       {/* Name */}
       <div>
         <label
