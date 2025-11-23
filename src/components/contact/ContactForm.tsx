@@ -86,21 +86,23 @@ export function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
-      {/* Response Time Info Tooltip */}
-      <div className="group relative inline-block mb-6">
-        <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800/50 cursor-help">
-          <Info className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-          <span className="text-sm text-blue-900 dark:text-blue-300 font-medium">Response Time</span>
-        </div>
-        
-        {/* Tooltip */}
-        <div className="absolute left-0 top-full mt-2 w-64 p-3 bg-gray-900 dark:bg-gray-800 text-white text-sm rounded-lg shadow-xl 
-                        opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10
-                        border border-gray-700">
-          <div className="absolute -top-2 left-4 w-4 h-4 bg-gray-900 dark:bg-gray-800 border-l border-t border-gray-700 transform rotate-45"></div>
-          <p className="relative">
-            I typically respond within <strong className="text-blue-400">~24 hours</strong> during weekdays.
-          </p>
+      {/* Response Time Info Tooltip - Icon Only */}
+      <div className="flex justify-end mb-4">
+        <div className="group relative">
+          <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center cursor-help
+                          hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-all duration-200">
+            <Info className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+          </div>
+          
+          {/* Tooltip */}
+          <div className="absolute right-0 top-full mt-2 w-64 p-3 bg-gray-900 dark:bg-gray-800 text-white text-sm rounded-lg shadow-xl 
+                          opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10
+                          border border-gray-700">
+            <div className="absolute -top-2 right-4 w-4 h-4 bg-gray-900 dark:bg-gray-800 border-l border-t border-gray-700 transform rotate-45"></div>
+            <p className="relative">
+              I typically respond within <strong className="text-blue-400">~24 hours</strong> during weekdays.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -108,9 +110,11 @@ export function ContactForm() {
       <div>
         <label
           htmlFor="name"
-          className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white mb-2"
+          className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white mb-3"
         >
-          <User className="w-4 h-4" />
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+            <User className="w-4 h-4 text-white" />
+          </div>
           Name *
         </label>
         <input
@@ -120,11 +124,12 @@ export function ContactForm() {
           required
           value={formData.name}
           onChange={handleChange}
-          className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700
-            bg-white dark:bg-gray-800 text-gray-900 dark:text-white
-            focus:ring-2 focus:ring-blue-500 focus:border-transparent
-            transition-all duration-200"
-          placeholder="Your name"
+          className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 dark:border-gray-700
+            bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white
+            focus:border-blue-500 dark:focus:border-blue-400 focus:bg-white dark:focus:bg-gray-900
+            focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-400/10
+            transition-all duration-200 placeholder:text-gray-400"
+          placeholder="John Doe"
         />
       </div>
 
@@ -132,9 +137,11 @@ export function ContactForm() {
       <div>
         <label
           htmlFor="email"
-          className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white mb-2"
+          className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white mb-3"
         >
-          <Mail className="w-4 h-4" />
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
+            <Mail className="w-4 h-4 text-white" />
+          </div>
           Email *
         </label>
         <input
@@ -144,11 +151,12 @@ export function ContactForm() {
           required
           value={formData.email}
           onChange={handleChange}
-          className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700
-            bg-white dark:bg-gray-800 text-gray-900 dark:text-white
-            focus:ring-2 focus:ring-blue-500 focus:border-transparent
-            transition-all duration-200"
-          placeholder="your.email@example.com"
+          className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 dark:border-gray-700
+            bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white
+            focus:border-purple-500 dark:focus:border-purple-400 focus:bg-white dark:focus:bg-gray-900
+            focus:ring-4 focus:ring-purple-500/10 dark:focus:ring-purple-400/10
+            transition-all duration-200 placeholder:text-gray-400"
+          placeholder="john@example.com"
         />
       </div>
 
@@ -156,9 +164,11 @@ export function ContactForm() {
       <div>
         <label
           htmlFor="subject"
-          className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white mb-2"
+          className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white mb-3"
         >
-          <FileText className="w-4 h-4" />
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
+            <FileText className="w-4 h-4 text-white" />
+          </div>
           Subject *
         </label>
         <input
@@ -168,11 +178,12 @@ export function ContactForm() {
           required
           value={formData.subject}
           onChange={handleChange}
-          className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700
-            bg-white dark:bg-gray-800 text-gray-900 dark:text-white
-            focus:ring-2 focus:ring-blue-500 focus:border-transparent
-            transition-all duration-200"
-          placeholder="What is this regarding?"
+          className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 dark:border-gray-700
+            bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white
+            focus:border-green-500 dark:focus:border-green-400 focus:bg-white dark:focus:bg-gray-900
+            focus:ring-4 focus:ring-green-500/10 dark:focus:ring-green-400/10
+            transition-all duration-200 placeholder:text-gray-400"
+          placeholder="Project Collaboration"
         />
       </div>
 
@@ -180,9 +191,11 @@ export function ContactForm() {
       <div>
         <label
           htmlFor="message"
-          className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white mb-2"
+          className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white mb-3"
         >
-          <MessageSquare className="w-4 h-4" />
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
+            <MessageSquare className="w-4 h-4 text-white" />
+          </div>
           Message *
         </label>
         <textarea
@@ -192,18 +205,19 @@ export function ContactForm() {
           value={formData.message}
           onChange={handleChange}
           rows={6}
-          className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700
-            bg-white dark:bg-gray-800 text-gray-900 dark:text-white
-            focus:ring-2 focus:ring-blue-500 focus:border-transparent
-            transition-all duration-200 resize-none"
-          placeholder="Your message..."
+          className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 dark:border-gray-700
+            bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white
+            focus:border-orange-500 dark:focus:border-orange-400 focus:bg-white dark:focus:bg-gray-900
+            focus:ring-4 focus:ring-orange-500/10 dark:focus:ring-orange-400/10
+            transition-all duration-200 resize-none placeholder:text-gray-400"
+          placeholder="Tell me about your project..."
         />
       </div>
 
       {/* Error Message */}
       {error && (
-        <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        <div className="p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800">
+          <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>
         </div>
       )}
 
@@ -211,10 +225,12 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full py-3 px-6 rounded-lg bg-blue-600 hover:bg-blue-700
-          text-white font-medium flex items-center justify-center gap-2
+        className="w-full py-4 px-6 rounded-xl font-semibold text-white
+          bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600
+          flex items-center justify-center gap-2
           disabled:opacity-50 disabled:cursor-not-allowed
-          transition-all duration-200 hover:shadow-lg"
+          transform hover:scale-[1.02] active:scale-[0.98]
+          transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40"
       >
         {isSubmitting ? (
           <>
