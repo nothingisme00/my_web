@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Send, Loader2, CheckCircle2, Mail, User, FileText, MessageSquare, Info } from 'lucide-react';
+import { Send, Loader2, CheckCircle2, Info } from 'lucide-react';
 
 interface FormData {
   name: string;
@@ -85,37 +85,30 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
-      {/* Response Time Info Tooltip - Icon Only */}
-      <div className="flex justify-end mb-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
+      {/* Form Header with Tooltip */}
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Send me a message</h3>
         <div className="group relative">
-          <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center cursor-help
-                          hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-all duration-200">
-            <Info className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-          </div>
-          
-          {/* Tooltip */}
-          <div className="absolute right-0 top-full mt-2 w-64 p-3 bg-gray-900 dark:bg-gray-800 text-white text-sm rounded-lg shadow-xl 
-                          opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10
-                          border border-gray-700">
-            <div className="absolute -top-2 right-4 w-4 h-4 bg-gray-900 dark:bg-gray-800 border-l border-t border-gray-700 transform rotate-45"></div>
-            <p className="relative">
-              I typically respond within <strong className="text-blue-400">~24 hours</strong> during weekdays.
-            </p>
+          <button
+            type="button"
+            className="w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center
+                       hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-help"
+          >
+            <Info className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+          </button>
+          <div className="absolute right-0 top-full mt-2 w-56 p-3 bg-gray-900 dark:bg-gray-950 text-white text-xs rounded-lg shadow-xl 
+                          opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+            <div className="absolute -top-1.5 right-2 w-3 h-3 bg-gray-900 dark:bg-gray-950 transform rotate-45"></div>
+            <p className="relative">I typically respond within ~24 hours during weekdays.</p>
           </div>
         </div>
       </div>
 
       {/* Name */}
       <div>
-        <label
-          htmlFor="name"
-          className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white mb-3"
-        >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-            <User className="w-4 h-4 text-white" />
-          </div>
-          Name *
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Name
         </label>
         <input
           type="text"
@@ -124,25 +117,18 @@ export function ContactForm() {
           required
           value={formData.name}
           onChange={handleChange}
-          className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 dark:border-gray-700
-            bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white
-            focus:border-blue-500 dark:focus:border-blue-400 focus:bg-white dark:focus:bg-gray-900
-            focus:ring-4 focus:ring-blue-500/10 dark:focus:ring-blue-400/10
-            transition-all duration-200 placeholder:text-gray-400"
+          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700
+            bg-white dark:bg-gray-900 text-gray-900 dark:text-white
+            focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500
+            transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
           placeholder="John Doe"
         />
       </div>
 
       {/* Email */}
       <div>
-        <label
-          htmlFor="email"
-          className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white mb-3"
-        >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
-            <Mail className="w-4 h-4 text-white" />
-          </div>
-          Email *
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Email
         </label>
         <input
           type="email"
@@ -151,25 +137,18 @@ export function ContactForm() {
           required
           value={formData.email}
           onChange={handleChange}
-          className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 dark:border-gray-700
-            bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white
-            focus:border-purple-500 dark:focus:border-purple-400 focus:bg-white dark:focus:bg-gray-900
-            focus:ring-4 focus:ring-purple-500/10 dark:focus:ring-purple-400/10
-            transition-all duration-200 placeholder:text-gray-400"
+          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700
+            bg-white dark:bg-gray-900 text-gray-900 dark:text-white
+            focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500
+            transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
           placeholder="john@example.com"
         />
       </div>
 
       {/* Subject */}
       <div>
-        <label
-          htmlFor="subject"
-          className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white mb-3"
-        >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
-            <FileText className="w-4 h-4 text-white" />
-          </div>
-          Subject *
+        <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Subject
         </label>
         <input
           type="text"
@@ -178,25 +157,18 @@ export function ContactForm() {
           required
           value={formData.subject}
           onChange={handleChange}
-          className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 dark:border-gray-700
-            bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white
-            focus:border-green-500 dark:focus:border-green-400 focus:bg-white dark:focus:bg-gray-900
-            focus:ring-4 focus:ring-green-500/10 dark:focus:ring-green-400/10
-            transition-all duration-200 placeholder:text-gray-400"
+          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700
+            bg-white dark:bg-gray-900 text-gray-900 dark:text-white
+            focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500
+            transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
           placeholder="Project Collaboration"
         />
       </div>
 
       {/* Message */}
       <div>
-        <label
-          htmlFor="message"
-          className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white mb-3"
-        >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
-            <MessageSquare className="w-4 h-4 text-white" />
-          </div>
-          Message *
+        <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Message
         </label>
         <textarea
           id="message"
@@ -204,20 +176,19 @@ export function ContactForm() {
           required
           value={formData.message}
           onChange={handleChange}
-          rows={6}
-          className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 dark:border-gray-700
-            bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white
-            focus:border-orange-500 dark:focus:border-orange-400 focus:bg-white dark:focus:bg-gray-900
-            focus:ring-4 focus:ring-orange-500/10 dark:focus:ring-orange-400/10
-            transition-all duration-200 resize-none placeholder:text-gray-400"
+          rows={5}
+          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700
+            bg-white dark:bg-gray-900 text-gray-900 dark:text-white
+            focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500
+            transition-all resize-none placeholder:text-gray-400 dark:placeholder:text-gray-500"
           placeholder="Tell me about your project..."
         />
       </div>
 
       {/* Error Message */}
       {error && (
-        <div className="p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800">
-          <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>
+        <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
         </div>
       )}
 
@@ -225,12 +196,11 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full py-4 px-6 rounded-xl font-semibold text-white
-          bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600
+        className="w-full py-3 px-4 rounded-lg font-medium text-white
+          bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700
           flex items-center justify-center gap-2
           disabled:opacity-50 disabled:cursor-not-allowed
-          transform hover:scale-[1.02] active:scale-[0.98]
-          transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40"
+          transition-colors duration-200"
       >
         {isSubmitting ? (
           <>
@@ -239,7 +209,7 @@ export function ContactForm() {
           </>
         ) : (
           <>
-            <Send className="w-5 h-5" />
+            <Send className="w-4 h-4" />
             Send Message
           </>
         )}
