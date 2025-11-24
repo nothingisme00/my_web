@@ -1,20 +1,14 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { clsx } from 'clsx';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const navItems = [
-  { name: 'Home', href: '/' },
-  { name: 'Blog', href: '/blog' },
-  { name: 'Portfolio', href: '/portfolio' },
-  { name: 'Gallery', href: '/gallery' },
-  { name: 'About', href: '/about' },
-];
 
 interface NavbarProps {
   settings?: {
@@ -27,8 +21,17 @@ export function Navbar({ settings }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const t = useTranslations('nav');
 
   const siteName = settings?.owner_name || settings?.site_name || 'Alfattah';
+
+  const navItems = [
+    { name: t('home'), href: '/' },
+    { name: t('blog'), href: '/blog' },
+    { name: t('projects'), href: '/portfolio' },
+    { name: t('gallery'), href: '/gallery' },
+    { name: t('about'), href: '/about' },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -87,7 +90,8 @@ export function Navbar({ settings }: NavbarProps) {
         </div>
 
         {/* Right Side */}
-        <div className="hidden md:flex items-center">
+        <div className="hidden md:flex items-center gap-2">
+          <LanguageSwitcher />
           <ThemeToggle />
         </div>
 
@@ -153,7 +157,8 @@ export function Navbar({ settings }: NavbarProps) {
                 </motion.div>
               ))}
             </motion.div>
-            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-center">
+            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-center gap-2">
+              <LanguageSwitcher />
               <ThemeToggle />
             </div>
           </motion.div>

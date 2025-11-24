@@ -11,6 +11,7 @@ import { QuotesCarousel } from "@/components/home/QuotesCarousel";
 import { FeaturedPostCard } from "@/components/home/FeaturedPostCard";
 import { RecentPostsGrid } from "@/components/home/RecentPostsGrid";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import { getTranslations } from 'next-intl/server';
 
 type PostWithRelations = Prisma.PostGetPayload<{
   include: {
@@ -32,11 +33,12 @@ async function getAboutData() {
 }
 
 export default async function Home() {
-  const [allPosts, categories, settings, aboutData] = await Promise.all([
+  const [allPosts, categories, settings, aboutData, t] = await Promise.all([
     getFeaturedPosts(9) as Promise<PostWithRelations[]>,
     getCategories(),
     getSettings(),
     getAboutData(),
+    getTranslations('home'),
   ]);
 
   // Separate featured (first post) and recent posts
@@ -134,7 +136,7 @@ export default async function Home() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 rounded-full bg-blue-100 dark:bg-blue-900/30 px-4 py-2 text-sm font-medium text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/20 animate-slide-down">
               <Sparkles className="h-4 w-4" />
-              Hi! It's me
+              {t('hero.badge')}
             </div>
 
             {/* Main Heading */}
@@ -153,7 +155,7 @@ export default async function Home() {
                 Enthusiast
               </p>
               <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed animate-slide-up !mt-4 sm:!mt-5 md:!mt-6 max-w-lg" style={{ animationDelay: '0.2s' }}>
-                Sharing experiences and interesting things I want you to know
+                {t('hero.description')}
               </p>
             </div>
 
@@ -209,7 +211,7 @@ export default async function Home() {
           {featuredPost && (
             <div className="mb-16">
               <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Featured</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('articles.featured')}</h2>
               </div>
 
               <FeaturedPostCard post={featuredPost} />
@@ -220,12 +222,12 @@ export default async function Home() {
           {recentPosts.length > 0 && (
             <div>
               <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Recent Articles</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('articles.recentTitle')}</h2>
                 <Link
                   href="/blog"
                   className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
                 >
-                  View all
+                  {t('articles.viewAll')}
                 </Link>
               </div>
 
@@ -236,12 +238,12 @@ export default async function Home() {
           {/* Empty State */}
           {allPosts.length === 0 && (
             <div className="text-center py-20">
-              <p className="text-gray-500 dark:text-gray-400 mb-4">Belum ada artikel tersedia.</p>
+              <p className="text-gray-500 dark:text-gray-400 mb-4">{t('articles.noArticles')}</p>
               <Link
                 href="/admin/posts/new"
                 className="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium"
               >
-                Buat artikel pertama
+                {t('articles.createFirst')}
               </Link>
             </div>
           )}
@@ -257,15 +259,14 @@ export default async function Home() {
           <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-8 md:p-12 border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
           <span className="text-4xl mb-4 block">👋</span>
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            Hei, salam kenal!
+            {t('aboutCta.title')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-            Saya {aboutData?.name || settings.owner_name || 'seseorang'} — suka ngulik hal-hal baru dan berbagi cerita lewat tulisan.
-            Kalau kamu penasaran siapa di balik blog ini, yuk kenalan!
+            {t('aboutCta.description', { name: aboutData?.name || settings.owner_name || 'seseorang' })}
           </p>
           <Link href="/about">
             <Button className="gap-2">
-              Kenalan yuk <ArrowRight className="h-4 w-4" />
+              {t('aboutCta.button')} <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
           </div>

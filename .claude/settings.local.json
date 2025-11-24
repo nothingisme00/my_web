@@ -22,7 +22,20 @@
       "Bash(npm run dev:*)",
       "Bash(npx prisma studio:*)",
       "Bash(netstat:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(timeout /t 5 /nobreak)",
+      "Bash(for i in 1 2 3 4)",
+      "Bash(do echo \"Request $i:\")",
+      "Bash(done)",
+      "Bash(cat:*)",
+      "Bash(git mv:*)",
+      "Bash(do echo \"Waiting...\")",
+      "Bash(for i in 1 2 3 4 5)",
+      "Bash(dir \"D:\\Dokumen\\Abang Punya\\Project\\my_web\\src\\app\\[locale]\" /B)",
+      "Bash(dir:*)",
+      "Bash(timeout:*)",
+      "Bash(ping:*)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []

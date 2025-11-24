@@ -1,34 +1,50 @@
+import createMiddleware from 'next-intl/middleware';
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { locales, defaultLocale } from '@/i18n/config';
 
-export function middleware(request: NextRequest) {
+// Create i18n middleware
+const intlMiddleware = createMiddleware({
+  locales,
+  defaultLocale,
+  localePrefix: 'always', // Always add locale prefix
+});
+
+export default function middleware(request: NextRequest) {
   const authToken = request.cookies.get('auth_token')
   const pathname = request.nextUrl.pathname
-  const referer = request.headers.get('referer') || ''
 
-  // Check if user is in CMS context (has auth token)
-  const isInCMS = !!authToken
-  const isAccessingCMS = pathname.startsWith('/admin') || pathname === '/login'
-  const isAccessingPublic = !isAccessingCMS && pathname !== '/login'
+  // Skip i18n for admin and api routes
+  const isAdminOrApi = pathname.startsWith('/admin') || pathname.startsWith('/api') || pathname === '/login';
 
-  // STRICT ISOLATION: If logged in (in CMS), block access to public pages
-  if (isInCMS && isAccessingPublic) {
-    return NextResponse.redirect(new URL('/admin', request.url))
-  }
+  if (isAdminOrApi) {
+    // Check if user is in CMS context (has auth token)
+    const isInCMS = !!authToken
+    const isAccessingCMS = pathname.startsWith('/admin') || pathname === '/login'
+    const isAccessingPublic = !isAccessingCMS && pathname !== '/login'
 
-  // Protect admin routes - redirect to login if not authenticated
-  if (pathname.startsWith('/admin')) {
-    if (!authToken) {
-      return NextResponse.redirect(new URL('/login', request.url))
+    // STRICT ISOLATION: If logged in (in CMS), block access to public pages
+    if (isInCMS && isAccessingPublic) {
+      return NextResponse.redirect(new URL('/admin', request.url))
     }
+
+    // Protect admin routes - redirect to login if not authenticated
+    if (pathname.startsWith('/admin')) {
+      if (!authToken) {
+        return NextResponse.redirect(new URL('/login', request.url))
+      }
+    }
+
+    // Redirect to admin if already logged in and trying to access login
+    if (pathname === '/login' && authToken) {
+      return NextResponse.redirect(new URL('/admin', request.url))
+    }
+
+    return NextResponse.next()
   }
 
-  // Redirect to admin if already logged in and trying to access login
-  if (pathname === '/login' && authToken) {
-    return NextResponse.redirect(new URL('/admin', request.url))
-  }
-
-  return NextResponse.next()
+  // Apply i18n middleware for public routes
+  return intlMiddleware(request);
 }
 
 export const config = {

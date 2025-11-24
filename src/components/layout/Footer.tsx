@@ -1,8 +1,11 @@
 import { Github, Linkedin, Twitter, Instagram, Mail } from 'lucide-react';
 import { getSettings } from '@/lib/actions';
+import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 
 export async function Footer() {
   const settings = await getSettings();
+  const t = await getTranslations('footer');
 
   const socialLinks = [
     { name: 'GitHub', href: settings.social_github, icon: Github, hoverColor: 'hover:text-gray-500 dark:hover:text-gray-300' },
@@ -33,7 +36,7 @@ export async function Footer() {
         )}
         <div className="mt-8 md:order-1 md:mt-0">
           <p className="text-center text-xs leading-5 text-gray-500 dark:text-gray-400">
-            &copy; {new Date().getFullYear()} {settings.owner_name || 'Alfattah'}. All rights reserved.
+            &copy; {new Date().getFullYear()} {settings.owner_name || 'Alfattah'}. {t('copyright')}
           </p>
         </div>
       </div>

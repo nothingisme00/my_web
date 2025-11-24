@@ -1,0 +1,236 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "search": "Search",
+    "readMore": "Read More",
+    "learnMore": "Learn More"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "blog": "Blog",
+    "projects": "Projects",
+    "gallery": "Gallery",
+    "contact": "Contact",
+    "admin": "Admin"
+  },
+  "home": {
+    "hero": {
+      "badge": "Hi! It's me",
+      "greeting": "I'm a",
+      "typewriter": {
+        "learning": "Learning",
+        "creative": "Creative",
+        "tech": "Tech",
+        "art": "Art"
+      },
+      "enthusiast": "Enthusiast",
+      "description": "Sharing experiences and interesting things I want you to know",
+      "title": "Welcome to My Portfolio",
+      "subtitle": "Full Stack Developer & Creative Problem Solver",
+      "cta": "Get in Touch",
+      "learnMore": "Learn More About Me"
+    },
+    "articles": {
+      "featured": "Featured",
+      "recentTitle": "Recent Articles",
+      "viewAll": "View all",
+      "noArticles": "No articles available yet.",
+      "createFirst": "Create first article"
+    },
+    "aboutCta": {
+      "title": "Hey, nice to meet you!",
+      "description": "I'm {name} — I love exploring new things and sharing stories through writing. If you're curious about who's behind this blog, let's get acquainted!",
+      "button": "Let's get acquainted"
+    },
+    "about": {
+      "title": "About Me",
+      "description": "I'm a passionate developer who loves building amazing web applications."
+    },
+    "skills": {
+      "title": "Skills & Technologies",
+      "description": "Technologies I work with"
+    },
+    "projects": {
+      "title": "Featured Projects",
+      "viewAll": "View All Projects"
+    },
+    "blog": {
+      "title": "Latest Blog Posts",
+      "viewAll": "View All Posts"
+    },
+    "contact": {
+      "title": "Get In Touch",
+      "description": "Have a project in mind? Let's work together!"
+    }
+  },
+  "about": {
+    "title": "About Me",
+    "subtitle": "Get to know me better",
+    "description": "I'm a full stack developer passionate about creating beautiful and functional web applications.",
+    "contact": {
+      "title": "Let's Work Together",
+      "description": "I'm always open to discussing new projects and opportunities."
+    }
+  },
+  "contact": {
+    "form": {
+      "title": "Send me a message",
+      "quickSelect": "Quick select subject",
+      "name": {
+        "label": "Name",
+        "placeholder": "Your Name",
+        "required": "Name is required",
+        "minLength": "Name must be at least 2 characters",
+        "maxLength": "Name is too long",
+        "invalid": "Name can only contain letters, spaces, hyphens, and apostrophes"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Input Your Email",
+        "required": "Email is required",
+        "invalid": "Invalid email address",
+        "typo": "Did you mean gmail.com?"
+      },
+      "subject": {
+        "label": "Subject",
+        "placeholder": "Your Subject",
+        "required": "Subject is required",
+        "minLength": "Subject must be at least 5 characters",
+        "maxLength": "Subject is too long"
+      },
+      "message": {
+        "label": "Message",
+        "placeholder": "Your Message",
+        "required": "Message is required",
+        "minLength": "Message must be at least 10 characters",
+        "maxLength": "Message is too long",
+        "spam": "Message contains suspicious repetitive characters"
+      },
+      "subjects": {
+        "collaboration": "Project Collaboration",
+        "inquiry": "General Inquiry",
+        "job": "Job Opportunity",
+        "technical": "Technical Question"
+      },
+      "submit": "Send Message",
+      "submitting": "Sending...",
+      "success": {
+        "title": "Message Sent Successfully!",
+        "message": "Thank you for reaching out! I'll get back to you within 24 hours.",
+        "timeline": {
+          "title": "What happens next?",
+          "step1": {
+            "title": "Message Received",
+            "description": "Your message has been delivered to my inbox"
+          },
+          "step2": {
+            "title": "Review & Respond",
+            "description": "I'll carefully read your message and prepare a thoughtful response"
+          },
+          "step3": {
+            "title": "You'll Hear From Me",
+            "description": "Expect a reply within 24 hours during weekdays"
+          }
+        },
+        "autoClose": "Auto-closing in {seconds} seconds...",
+        "sendAnother": "Send Another Message"
+      },
+      "error": {
+        "general": "Failed to send message. Please try again.",
+        "network": "An error occurred. Please try again later.",
+        "rateLimit": "Too many contact form submissions. Please try again later.",
+        "recaptcha": "reCAPTCHA verification failed. Please try again.",
+        "recaptchaNotReady": "reCAPTCHA not ready. Please try again."
+      },
+      "info": {
+        "responseTime": "I typically respond within ~24 hours during weekdays. Press Ctrl+Enter to submit quickly!",
+        "privacy": "Your information is secure and will never be shared with third parties.",
+        "protected": "Protected by reCAPTCHA"
+      }
+    }
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Thoughts, tutorials, and insights",
+    "readMore": "Read More",
+    "readTime": "{minutes} min read",
+    "publishedOn": "Published on",
+    "category": "Category",
+    "tags": "Tags",
+    "relatedPosts": "Related Posts",
+    "noPosts": "No blog posts yet",
+    "search": "Search posts...",
+    "filter": {
+      "all": "All",
+      "category": "Category",
+      "tag": "Tag"
+    }
+  },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "Things I've built",
+    "viewDemo": "View Demo",
+    "viewCode": "View Code",
+    "techStack": "Tech Stack",
+    "status": {
+      "completed": "Completed",
+      "inProgress": "In Progress",
+      "planned": "Planned"
+    },
+    "noProjects": "No projects yet"
+  },
+  "footer": {
+    "description": "Full Stack Developer passionate about creating amazing web experiences.",
+    "quickLinks": "Quick Links",
+    "connect": "Connect",
+    "copyright": "All rights reserved.",
+    "builtWith": "Built with Next.js & Tailwind CSS"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "posts": "Posts",
+    "projects": "Projects",
+    "settings": "Settings",
+    "logout": "Logout",
+    "welcome": "Welcome back!",
+    "stats": {
+      "totalPosts": "Total Posts",
+      "totalProjects": "Total Projects",
+      "totalViews": "Total Views"
+    }
+  },
+  "seo": {
+    "home": {
+      "title": "Home",
+      "description": "Welcome to my portfolio website"
+    },
+    "about": {
+      "title": "About",
+      "description": "Learn more about me and my work"
+    },
+    "blog": {
+      "title": "Blog",
+      "description": "Read my latest blog posts and tutorials"
+    },
+    "projects": {
+      "title": "Projects",
+      "description": "Check out my latest projects and work"
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "Get in touch with me for collaborations and opportunities"
+    }
+  }
+}
