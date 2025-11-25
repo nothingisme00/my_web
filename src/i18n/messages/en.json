@@ -79,9 +79,17 @@
     "title": "About Me",
     "subtitle": "Get to know me better",
     "description": "I'm a full stack developer passionate about creating beautiful and functional web applications.",
+    "bio": "Bio",
+    "education": "Education",
+    "experience": "Work Experience",
+    "techStack": "Tech Stack",
+    "tools": "Tools",
+    "downloadCV": "Download CV",
+    "downloadPortfolio": "Download Portfolio",
+    "currentlyWorking": "Currently Working",
     "contact": {
       "title": "Let's Work Together",
-      "description": "I'm always open to discussing new projects and opportunities."
+      "description": "Have a project in mind or want to collaborate? I'd love to hear from you. Send me a message and I'll respond as soon as possible."
     }
   },
   "contact": {

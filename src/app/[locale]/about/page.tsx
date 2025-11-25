@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { Accordion } from "@/components/ui/Accordion";
 import { getToolIcon } from "@/lib/tool-icons";
+import { getTranslations } from 'next-intl/server';
 
 const monthNames: Record<string, string> = {
   '01': 'Jan', '02': 'Feb', '03': 'Mar', '04': 'Apr',
@@ -69,9 +70,10 @@ async function getAboutContent(): Promise<AboutData | null> {
 }
 
 export default async function AboutPage() {
-  const [aboutData, settings] = await Promise.all([
+  const [aboutData, settings, t] = await Promise.all([
     getAboutContent(),
     getSettings(),
+    getTranslations('about'),
   ]);
 
   // Use aboutData or fallback to settings/defaults
@@ -95,7 +97,7 @@ export default async function AboutPage() {
         {/* Header */}
         <div className="mx-auto max-w-3xl text-center mb-16">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl mb-6">
-            Tentang Saya
+            {t('title')}
           </h1>
           {bio && (
             <p className="text-xl leading-8 text-gray-600 dark:text-gray-300">
@@ -149,14 +151,14 @@ export default async function AboutPage() {
                     {cvUrl && (
                       <a href={cvUrl} target="_blank" rel="noopener noreferrer">
                         <Button className="w-full gap-2">
-                          <Download className="h-4 w-4" /> Download CV
+                          <Download className="h-4 w-4" /> {t('downloadCV')}
                         </Button>
                       </a>
                     )}
                     {portfolioUrl && (
                       <a href={portfolioUrl} target="_blank" rel="noopener noreferrer">
                         <Button variant="secondary" className="w-full gap-2">
-                          <FileText className="h-4 w-4" /> Download Portfolio
+                          <FileText className="h-4 w-4" /> {t('downloadPortfolio')}
                         </Button>
                       </a>
                     )}
@@ -171,7 +173,7 @@ export default async function AboutPage() {
             {/* Bio */}
             {bio && (
               <section>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Bio</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('bio')}</h2>
                 <div className="prose prose-lg dark:prose-invert max-w-none">
                   {bio.split('\n').map((paragraph, i) => (
                     <p key={i} className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
@@ -185,7 +187,7 @@ export default async function AboutPage() {
             {/* Education */}
             {educations.length > 0 && (
               <section>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Pendidikan</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">{t('education')}</h2>
                 <div className="space-y-8">
                   {educations.map((edu) => (
                     <div key={edu.id} className="relative pl-8 border-l-2 border-gray-200 dark:border-gray-700">
@@ -205,7 +207,7 @@ export default async function AboutPage() {
             {/* Experience - Accordion Style */}
             {experiences.length > 0 && (
               <section>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Pengalaman Kerja</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">{t('experience')}</h2>
                 <div className="space-y-4">
                   {experiences.map((exp) => (
                     <Accordion
@@ -221,7 +223,7 @@ export default async function AboutPage() {
                           <p className="text-blue-600 dark:text-blue-400 font-medium mt-1">{exp.company}</p>
                           {exp.isCurrent && (
                             <span className="inline-flex items-center mt-2 rounded-full bg-blue-100 dark:bg-blue-900/30 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:text-blue-300">
-                              Currently Working
+                              {t('currentlyWorking')}
                             </span>
                           )}
                         </div>
@@ -239,7 +241,7 @@ export default async function AboutPage() {
             {/* Tech Stack */}
             {techStack.length > 0 && (
               <section>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Tech Stack</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('techStack')}</h2>
                 <div className="flex flex-wrap gap-3">
                   {techStack.map((tech) => (
                     <span
@@ -256,7 +258,7 @@ export default async function AboutPage() {
             {/* Tools */}
             {tools.length > 0 && (
               <section>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Tools</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('tools')}</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {tools.map((tool) => (
                     <div
@@ -283,11 +285,10 @@ export default async function AboutPage() {
             {/* Header */}
             <div className="text-center mb-12">
               <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                Let's Work Together
+                {t('contact.title')}
               </h2>
               <p className="text-lg text-gray-600 dark:text-gray-400">
-                Have a project in mind or want to collaborate? I'd love to hear from you.
-                Send me a message and I'll respond as soon as possible.
+                {t('contact.description')}
               </p>
             </div>
 

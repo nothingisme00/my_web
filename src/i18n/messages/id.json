@@ -79,9 +79,17 @@
     "title": "Tentang Saya",
     "subtitle": "Kenali saya lebih dekat",
     "description": "Saya adalah seorang full stack developer yang passionate dalam menciptakan aplikasi web yang indah dan fungsional.",
+    "bio": "Bio",
+    "education": "Pendidikan",
+    "experience": "Pengalaman Kerja",
+    "techStack": "Tech Stack",
+    "tools": "Tools",
+    "downloadCV": "Unduh CV",
+    "downloadPortfolio": "Unduh Portfolio",
+    "currentlyWorking": "Sedang Bekerja",
     "contact": {
       "title": "Mari Bekerja Sama",
-      "description": "Saya selalu terbuka untuk mendiskusikan proyek dan peluang baru."
+      "description": "Punya proyek yang ingin dikerjakan atau ingin berkolaborasi? Saya ingin mendengar dari Anda. Kirim pesan dan saya akan merespons sesegera mungkin."
     }
   },
   "contact": {

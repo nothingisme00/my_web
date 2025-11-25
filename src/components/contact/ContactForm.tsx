@@ -99,35 +99,35 @@ export function ContactForm() {
   const validateField = useCallback((name: string, value: string): string | undefined => {
     switch (name) {
       case 'name':
-        if (!value.trim()) return 'Name is required';
-        if (value.length < 2) return 'Name must be at least 2 characters';
-        if (value.length > 100) return 'Name is too long';
-        if (!/^[a-zA-Z\s'-]+$/.test(value)) return 'Name can only contain letters, spaces, hyphens, and apostrophes';
+        if (!value.trim()) return t('name.required');
+        if (value.length < 2) return t('name.minLength');
+        if (value.length > 100) return t('name.maxLength');
+        if (!/^[a-zA-Z\s'-]+$/.test(value)) return t('name.invalid');
         return undefined;
 
       case 'email':
-        if (!value.trim()) return 'Email is required';
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Invalid email address';
-        if (value.includes('gmial.com')) return 'Did you mean gmail.com?';
+        if (!value.trim()) return t('email.required');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return t('email.invalid');
+        if (value.includes('gmial.com')) return t('email.typo');
         return undefined;
 
       case 'subject':
-        if (!value.trim()) return 'Subject is required';
-        if (value.length < 5) return 'Subject must be at least 5 characters';
-        if (value.length > 200) return 'Subject is too long';
+        if (!value.trim()) return t('subject.required');
+        if (value.length < 5) return t('subject.minLength');
+        if (value.length > 200) return t('subject.maxLength');
         return undefined;
 
       case 'message':
-        if (!value.trim()) return 'Message is required';
-        if (value.length < 10) return 'Message must be at least 10 characters';
-        if (value.length > 2000) return 'Message is too long';
-        if (/(.)\1{10,}/.test(value)) return 'Message contains suspicious repetitive characters';
+        if (!value.trim()) return t('message.required');
+        if (value.length < 10) return t('message.minLength');
+        if (value.length > 2000) return t('message.maxLength');
+        if (/(.)\\1{10,}/.test(value)) return t('message.spam');
         return undefined;
 
       default:
         return undefined;
     }
-  }, []);
+  }, [t]);
 
   // Update field errors when data changes
   useEffect(() => {
@@ -196,7 +196,7 @@ export function ContactForm() {
     try {
       // Execute reCAPTCHA
       if (!executeRecaptcha) {
-        setError('reCAPTCHA not ready. Please try again.');
+        setError(t('error.recaptchaNotReady'));
         setIsSubmitting(false);
         return;
       }
@@ -231,10 +231,10 @@ export function ContactForm() {
         localStorage.removeItem(STORAGE_KEY);
         setCountdown(10);
       } else {
-        setError(data.error || 'Failed to send message. Please try again.');
+        setError(data.error || t('error.general'));
       }
     } catch (err) {
-      setError('An error occurred. Please try again later.');
+      setError(t('error.network'));
     } finally {
       setIsSubmitting(false);
     }
@@ -295,7 +295,7 @@ export function ContactForm() {
           transition={{ delay: 0.3 }}
           className="text-3xl font-bold text-gray-900 dark:text-white mb-4"
         >
-          Message Sent Successfully!
+          {t('success.title')}
         </motion.h2>
 
         <motion.p
@@ -304,7 +304,7 @@ export function ContactForm() {
           transition={{ delay: 0.4 }}
           className="text-gray-600 dark:text-gray-400 mb-8"
         >
-          Thank you for reaching out! I'll get back to you within 24 hours.
+          {t('success.message')}
         </motion.p>
 
         <motion.div
@@ -313,25 +313,25 @@ export function ContactForm() {
           transition={{ delay: 0.5 }}
           className="mb-8 p-6 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
         >
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">What happens next?</h3>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">{t('success.timeline.title')}</h3>
           <div className="space-y-3 text-left max-w-md mx-auto">
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <span className="text-xs font-semibold text-blue-600 dark:text-blue-400">1</span>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">You'll receive a confirmation email shortly</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('success.timeline.step1.description')}</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <span className="text-xs font-semibold text-blue-600 dark:text-blue-400">2</span>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">I'll review your message and prepare a response</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('success.timeline.step2.description')}</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <span className="text-xs font-semibold text-blue-600 dark:text-blue-400">3</span>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Expect a reply within 24 hours during weekdays</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t('success.timeline.step3.description')}</p>
             </div>
           </div>
         </motion.div>
@@ -342,7 +342,7 @@ export function ContactForm() {
           transition={{ delay: 0.6 }}
           className="text-sm text-gray-500 dark:text-gray-500 mb-6"
         >
-          Auto-closing in {countdown} seconds...
+          {t('success.autoClose', { seconds: countdown })}
         </motion.p>
 
         <motion.button
@@ -355,7 +355,7 @@ export function ContactForm() {
           }}
           className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
         >
-          Send Another Message
+          {t('success.sendAnother')}
         </motion.button>
       </motion.div>
     );
@@ -369,7 +369,7 @@ export function ContactForm() {
         animate={{ opacity: 1, y: 0 }}
         className="flex items-center justify-between mb-6"
       >
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Send me a message</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('title')}</h3>
         <div className="group relative">
           <button
             type="button"
@@ -383,7 +383,7 @@ export function ContactForm() {
                           opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10"
                role="tooltip">
             <div className="absolute -top-1.5 right-2 w-3 h-3 bg-gray-900 dark:bg-gray-950 transform rotate-45"></div>
-            <p className="relative">I typically respond within ~24 hours during weekdays. Press Ctrl+Enter to submit quickly!</p>
+            <p className="relative">{t('info.responseTime')}</p>
           </div>
         </div>
       </motion.div>
@@ -395,7 +395,7 @@ export function ContactForm() {
         transition={{ delay: 0.1 }}
       >
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Quick select subject
+          {t('quickSelect')}
         </label>
         <div className="flex flex-wrap gap-2">
           {SUBJECT_SUGGESTIONS.map((suggestion, index) => (
@@ -427,7 +427,7 @@ export function ContactForm() {
         transition={{ delay: 0.15 }}
       >
         <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Name <span className="text-red-500">*</span>
+          {t('name.label')} <span className="text-red-500">*</span>
         </label>
         <div className="relative">
           <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -450,7 +450,7 @@ export function ContactForm() {
                 getFieldStatus('name') === 'success' ? 'border-green-500 dark:border-green-500' :
                 'border-gray-300 dark:border-gray-700'
               }`}
-            placeholder="Your Name"
+            placeholder={t('name.placeholder')}
             aria-invalid={!!fieldErrors.name}
             aria-describedby={fieldErrors.name ? 'name-error' : undefined}
           />
@@ -487,7 +487,7 @@ export function ContactForm() {
         transition={{ delay: 0.2 }}
       >
         <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Email <span className="text-red-500">*</span>
+          {t('email.label')} <span className="text-red-500">*</span>
         </label>
         <div className="relative">
           <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -510,7 +510,7 @@ export function ContactForm() {
                 getFieldStatus('email') === 'success' ? 'border-green-500 dark:border-green-500' :
                 'border-gray-300 dark:border-gray-700'
               }`}
-            placeholder="Input Your Email"
+            placeholder={t('email.placeholder')}
             aria-invalid={!!fieldErrors.email}
             aria-describedby={fieldErrors.email ? 'email-error' : undefined}
             inputMode="email"
@@ -549,7 +549,7 @@ export function ContactForm() {
         transition={{ delay: 0.25 }}
       >
         <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Subject <span className="text-red-500">*</span>
+          {t('subject.label')} <span className="text-red-500">*</span>
         </label>
         <div className="relative">
           <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -573,7 +573,7 @@ export function ContactForm() {
                 getFieldStatus('subject') === 'success' ? 'border-green-500 dark:border-green-500' :
                 'border-gray-300 dark:border-gray-700'
               }`}
-            placeholder="Your Subject"
+            placeholder={t('subject.placeholder')}
             aria-invalid={!!fieldErrors.subject}
             aria-describedby={fieldErrors.subject ? 'subject-error subject-counter' : 'subject-counter'}
           />
@@ -631,7 +631,7 @@ export function ContactForm() {
         transition={{ delay: 0.3 }}
       >
         <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Message <span className="text-red-500">*</span>
+          {t('message.label')} <span className="text-red-500">*</span>
         </label>
         <div className="relative">
           <div className="absolute left-3 top-3 text-gray-400">
@@ -655,7 +655,7 @@ export function ContactForm() {
                 getFieldStatus('message') === 'success' ? 'border-green-500 dark:border-green-500' :
                 'border-gray-300 dark:border-gray-700'
               }`}
-            placeholder="Your Message"
+            placeholder={t('message.placeholder')}
             aria-invalid={!!fieldErrors.message}
             aria-describedby={fieldErrors.message ? 'message-error message-counter' : 'message-counter'}
           />
@@ -732,12 +732,12 @@ export function ContactForm() {
         {isSubmitting ? (
           <>
             <Loader2 className="w-5 h-5 animate-spin" />
-            Sending...
+            {t('submitting')}
           </>
         ) : (
           <>
             <Send className="w-4 h-4" />
-            Send Message
+            {t('submit')}
           </>
         )}
       </motion.button>
@@ -749,7 +749,7 @@ export function ContactForm() {
           transition={{ delay: 0.4 }}
           className="text-xs text-center text-gray-500 dark:text-gray-500"
         >
-          Your information is secure and will never be shared with third parties.
+          {t('info.privacy')}
         </motion.p>
 
         {executeRecaptcha && (
@@ -760,7 +760,7 @@ export function ContactForm() {
             className="flex items-center justify-center gap-1.5 text-xs text-gray-400 dark:text-gray-600"
           >
             <Shield className="w-3 h-3" />
-            <span>Protected by reCAPTCHA</span>
+            <span>{t('info.protected')}</span>
           </motion.div>
         )}
       </div>
