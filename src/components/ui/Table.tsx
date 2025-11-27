@@ -18,7 +18,7 @@ interface TableProps<T> {
   emptyMessage?: string;
 }
 
-export function Table<T extends Record<string, any>>({
+export function Table<T extends Record<string, unknown>>({
   data,
   columns,
   className,

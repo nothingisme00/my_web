@@ -899,3 +899,67 @@ export async function deleteGalleryPhoto(id: string) {
     revalidatePath('/gallery');
   }
 }
+
+// About Page Data
+export interface Experience {
+  id: string;
+  title: string;
+  company: string;
+  startMonth: string;
+  startYear: string;
+  endMonth: string;
+  endYear: string;
+  descriptionEn: string;
+  descriptionId: string;
+  isCurrent: boolean;
+}
+
+export interface Volunteer {
+  id: string;
+  role: string;
+  organization: string;
+  period: string;
+  descriptionEn: string;
+  descriptionId: string;
+}
+
+export interface Education {
+  id: string;
+  degree: string;
+  institution: string;
+  period: string;
+  description: string;
+}
+
+export interface AboutData {
+  name: string;
+  title: string;
+  tagline: string;
+  profileImage: string;
+  location: string;
+  email: string;
+  website: string;
+  bio: string;
+  cvUrl: string;
+  portfolioUrl: string;
+  techStack: string;
+  tools: string;
+  hobbies: string;
+  experiences: Experience[];
+  volunteering: Volunteer[];
+  educations: Education[];
+}
+
+export async function getAboutContent(): Promise<AboutData | null> {
+  const setting = await prisma.settings.findUnique({
+    where: { key: 'about_page_content' },
+  });
+
+  if (!setting) return null;
+
+  try {
+    return JSON.parse(setting.value);
+  } catch {
+    return null;
+  }
+}

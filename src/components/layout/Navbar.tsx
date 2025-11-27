@@ -1,7 +1,7 @@
 'use client';
 
 import { Link } from '@/i18n/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Menu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -22,6 +22,7 @@ export function Navbar({ settings }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
   const t = useTranslations('nav');
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   const siteName = settings?.owner_name || settings?.site_name || 'Alfattah';
 
@@ -41,6 +42,23 @@ export function Navbar({ settings }: NavbarProps) {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Click outside to close mobile menu
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isOpen && mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
 
   return (
     <nav className="fixed top-4 left-0 right-0 z-50 mx-auto max-w-5xl px-4">
@@ -77,12 +95,8 @@ export function Navbar({ settings }: NavbarProps) {
                 {item.name}
               </span>
               {pathname === item.href && (
-                <motion.div
-                  layoutId="navbar-indicator"
+                <div
                   className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1.0] }}
                 />
               )}
             </Link>
@@ -115,6 +129,7 @@ export function Navbar({ settings }: NavbarProps) {
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            ref={mobileMenuRef}
             initial={{ opacity: 0, y: -10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -133,7 +148,7 @@ export function Navbar({ settings }: NavbarProps) {
                 },
               }}
             >
-              {navItems.map((item, index) => (
+              {navItems.map((item) => (
                 <motion.div
                   key={item.name}
                   variants={{

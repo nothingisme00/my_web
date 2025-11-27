@@ -8,6 +8,7 @@ import { Footer } from '@/components/layout/Footer';
 import { getSettings } from '@/lib/actions';
 import { ScrollToTop } from '@/components/blog/ScrollToTop';
 import { ReCaptchaProvider } from '@/components/providers/ReCaptchaProvider';
+import { NavigationProvider } from '@/components/providers/NavigationProvider';
 import { locales } from '@/i18n/config';
 import '../globals.css';
 
@@ -22,10 +23,11 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
-  const { locale } = await params;
+  await params; // Consume params to avoid unused warning if linter is strict about awaiting
   const settings = await getSettings();
 
   return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
     title: {
       default: settings.site_name || 'My Portfolio',
       template: `%s | ${settings.site_name || 'My Portfolio'}`,
@@ -45,7 +47,7 @@ export default async function LocaleLayout({
   const { locale } = await params;
 
   // Validate locale
-  if (!locales.includes(locale as any)) {
+  if (!locales.includes(locale as (typeof locales)[number])) {
     notFound();
   }
 
@@ -54,13 +56,35 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
+      <head />
       <body className={`${inter.className} min-h-screen flex flex-col`}>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('theme');
+                  var supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+                  if (!theme && supportDarkMode) theme = 'dark';
+                  if (!theme) theme = 'light';
+                  if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
         <NextIntlClientProvider messages={messages}>
           <ReCaptchaProvider>
-            <ScrollToTop />
-            <LayoutWrapper settings={settings} footer={<Footer />}>
-              {children}
-            </LayoutWrapper>
+            <NavigationProvider>
+              <ScrollToTop />
+              <LayoutWrapper settings={settings} footer={<Footer />}>
+                {children}
+              </LayoutWrapper>
+            </NavigationProvider>
           </ReCaptchaProvider>
         </NextIntlClientProvider>
       </body>

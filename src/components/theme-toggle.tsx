@@ -14,6 +14,12 @@ export function ThemeToggle() {
     setMounted(true)
   }, [])
 
+  React.useEffect(() => {
+    if (resolvedTheme) {
+      document.cookie = `theme=${resolvedTheme}; path=/; max-age=31536000`;
+    }
+  }, [resolvedTheme])
+
   if (!mounted) {
     return (
       <Button variant="ghost" size="icon" className="rounded-full">
@@ -30,7 +36,19 @@ export function ThemeToggle() {
         onClick={() => {
           const newTheme = resolvedTheme === "dark" ? "light" : "dark"
           console.log("Toggling theme to:", newTheme)
-          setTheme(newTheme)
+          
+          // Use View Transition API for ultra-smooth theme change
+          if (typeof document !== 'undefined' && 'startViewTransition' in document) {
+            const doc = document as Document & {
+              startViewTransition: (callback: () => void) => void;
+            };
+            doc.startViewTransition(() => {
+              setTheme(newTheme)
+            })
+          } else {
+            // Fallback for browsers that don't support View Transitions
+            setTheme(newTheme)
+          }
         }}
         className="rounded-full relative overflow-hidden"
       >
@@ -38,20 +56,20 @@ export function ThemeToggle() {
           {resolvedTheme === "dark" ? (
             <motion.div
               key="moon"
-              initial={{ y: -20, opacity: 0, rotate: -90 }}
-              animate={{ y: 0, opacity: 1, rotate: 0 }}
-              exit={{ y: 20, opacity: 0, rotate: 90 }}
-              transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1.0] }}
+              initial={{ scale: 0.5, rotate: -90, opacity: 0 }}
+              animate={{ scale: 1, rotate: 0, opacity: 1 }}
+              exit={{ scale: 0.5, rotate: 90, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 200, damping: 20 }}
             >
               <Moon className="h-[1.2rem] w-[1.2rem]" />
             </motion.div>
           ) : (
             <motion.div
               key="sun"
-              initial={{ y: -20, opacity: 0, rotate: -90 }}
-              animate={{ y: 0, opacity: 1, rotate: 0 }}
-              exit={{ y: 20, opacity: 0, rotate: 90 }}
-              transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1.0] }}
+              initial={{ scale: 0.5, rotate: -90, opacity: 0 }}
+              animate={{ scale: 1, rotate: 0, opacity: 1 }}
+              exit={{ scale: 0.5, rotate: 90, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 200, damping: 20 }}
             >
               <Sun className="h-[1.2rem] w-[1.2rem]" />
             </motion.div>

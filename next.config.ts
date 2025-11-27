@@ -5,12 +5,20 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
   /* config options here */
-  reactCompiler: true,
+
   images: {
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+      {
+        protocol: 'https',
+        hostname: 'localhost',
       },
     ],
   },
@@ -54,6 +62,18 @@ const nextConfig: NextConfig = {
         ],
       },
     ];
+  },
+
+  // Fix photo paths - bypass locale routing for /uploads
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: '/:locale/uploads/:path*',
+          destination: '/uploads/:path*',
+        },
+      ],
+    };
   },
 };
 

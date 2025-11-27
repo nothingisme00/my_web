@@ -1,6 +1,5 @@
 import { getProjects } from '@/lib/actions';
-import Link from 'next/link';
-import { ExternalLink, Github, Briefcase } from 'lucide-react';
+import { Briefcase } from 'lucide-react';
 import { Project } from '@prisma/client';
 import { ProjectsGrid } from '@/components/portfolio/ProjectsGrid';
 
@@ -13,7 +12,7 @@ export default async function PortfolioPage() {
   const projects = await getProjects() as Project[];
 
   return (
-    <div className="bg-white dark:bg-gray-900 min-h-screen py-16 lg:py-20">
+    <div className="min-h-screen py-16 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -25,7 +24,7 @@ export default async function PortfolioPage() {
             My Projects
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            A collection of projects I've worked on
+            A collection of projects I&apos;ve worked on
           </p>
         </div>
 

@@ -1,7 +1,5 @@
-import Link from "next/link";
 import { getPublishedPosts } from "@/lib/actions";
-import { formatDate, formatViewCount } from "@/lib/utils";
-import { Clock, Eye, Search, BookOpen } from "lucide-react";
+import { Search, BookOpen } from "lucide-react";
 import { Prisma } from "@prisma/client";
 import { BlogPostsGrid } from "@/components/blog/BlogPostsGrid";
 
@@ -18,9 +16,9 @@ export default async function BlogPage() {
   const otherPosts = posts.slice(1);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+    <div className="min-h-screen">
       {/* Hero Section with Search */}
-      <section className="bg-gradient-to-b from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-800">
+      <section className="border-b border-gray-200/50 dark:border-gray-800/50 backdrop-blur-sm">
         <div className="mx-auto max-w-7xl px-6 lg:px-8 py-16 lg:py-24">
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4">

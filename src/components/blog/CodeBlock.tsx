@@ -13,10 +13,16 @@ export function CodeBlock({ children, className }: CodeBlockProps) {
 
   const handleCopy = async () => {
     // Extract text content from children
-    const codeElement = (children as any)?.props?.children;
-    const textToCopy = typeof codeElement === 'string'
-      ? codeElement
-      : codeElement?.toString() || '';
+    let textToCopy = '';
+    
+    if (typeof children === 'string') {
+      textToCopy = children;
+    } else if (children && typeof children === 'object' && 'props' in children) {
+      const props = (children as { props: { children: React.ReactNode } }).props;
+      if (typeof props.children === 'string') {
+        textToCopy = props.children;
+      }
+    }
 
     try {
       await navigator.clipboard.writeText(textToCopy);

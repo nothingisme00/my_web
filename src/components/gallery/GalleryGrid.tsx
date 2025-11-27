@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { X, Calendar, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -28,6 +29,18 @@ export default function GalleryGrid({ photos, categories }: GalleryGridProps) {
     ? photos.filter((p) => p.category === activeCategory)
     : photos;
 
+  const navigateNext = useCallback(() => {
+    const nextIndex = (currentIndex + 1) % filteredPhotos.length;
+    setCurrentIndex(nextIndex);
+    setSelectedPhoto(filteredPhotos[nextIndex]);
+  }, [currentIndex, filteredPhotos]);
+
+  const navigatePrev = useCallback(() => {
+    const prevIndex = (currentIndex - 1 + filteredPhotos.length) % filteredPhotos.length;
+    setCurrentIndex(prevIndex);
+    setSelectedPhoto(filteredPhotos[prevIndex]);
+  }, [currentIndex, filteredPhotos]);
+
   // Keyboard navigation
   useEffect(() => {
     if (!selectedPhoto) return;
@@ -44,19 +57,7 @@ export default function GalleryGrid({ photos, categories }: GalleryGridProps) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedPhoto, currentIndex]);
-
-  const navigateNext = () => {
-    const nextIndex = (currentIndex + 1) % filteredPhotos.length;
-    setCurrentIndex(nextIndex);
-    setSelectedPhoto(filteredPhotos[nextIndex]);
-  };
-
-  const navigatePrev = () => {
-    const prevIndex = (currentIndex - 1 + filteredPhotos.length) % filteredPhotos.length;
-    setCurrentIndex(prevIndex);
-    setSelectedPhoto(filteredPhotos[prevIndex]);
-  };
+  }, [selectedPhoto, currentIndex, filteredPhotos, navigateNext, navigatePrev]);
 
   const openLightbox = (photo: Photo, index: number) => {
     setSelectedPhoto(photo);
@@ -103,15 +104,19 @@ export default function GalleryGrid({ photos, categories }: GalleryGridProps) {
         {filteredPhotos.map((photo, index) => (
           <div
             key={photo.id}
-            className="break-inside-avoid cursor-pointer group"
+            className="break-inside-avoid cursor-pointer group mb-4"
             onClick={() => openLightbox(photo, index)}
           >
-            <div className="relative overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800">
-              <img
+            <div className="relative overflow-hidden rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-md shadow-md hover:shadow-xl transition-all duration-300">
+              <Image
                 src={`/gallery/${photo.filename}`}
                 alt={photo.title}
+                width={0}
+                height={0}
+                sizes="100vw"
                 className="w-full h-auto object-cover img-zoom"
-                loading="lazy"
+                style={{ width: '100%', height: 'auto' }}
+                unoptimized
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="absolute bottom-0 left-0 right-0 p-4">
@@ -207,17 +212,26 @@ export default function GalleryGrid({ photos, categories }: GalleryGridProps) {
               onClick={(e) => e.stopPropagation()}
             >
               <AnimatePresence mode="wait">
-                <motion.img
+                <motion.div
                   key={selectedPhoto.id}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.25 }}
-                  src={`/gallery/${selectedPhoto.filename}`}
-                  alt={selectedPhoto.title}
-                  className="max-h-[70vh] w-auto object-contain rounded-lg"
-                  draggable={false}
-                />
+                  className="relative flex justify-center"
+                >
+                  <Image
+                    src={`/gallery/${selectedPhoto.filename}`}
+                    alt={selectedPhoto.title}
+                    width={0}
+                    height={0}
+                    sizes="100vw"
+                    className="max-h-[70vh] w-auto object-contain rounded-lg"
+                    style={{ width: 'auto', height: 'auto' }}
+                    draggable={false}
+                    unoptimized
+                  />
+                </motion.div>
               </AnimatePresence>
 
               <motion.div

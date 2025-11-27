@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { Save, User, Briefcase, GraduationCap, Code, Plus, Trash2, Check, Upload, X } from 'lucide-react';
+import { Save, User, Briefcase, GraduationCap, Code, Plus, Trash2, Check, Upload, X, Heart } from 'lucide-react';
 
 interface Experience {
   id: string;
@@ -13,8 +14,18 @@ interface Experience {
   startYear: string;
   endMonth: string;
   endYear: string;
-  description: string;
+  descriptionEn: string;
+  descriptionId: string;
   isCurrent: boolean;
+}
+
+interface Volunteer {
+  id: string;
+  role: string;
+  organization: string;
+  period: string;
+  descriptionEn: string;
+  descriptionId: string;
 }
 
 interface Education {
@@ -28,6 +39,7 @@ interface Education {
 interface AboutData {
   name: string;
   title: string;
+  tagline: string;
   profileImage: string;
   location: string;
   email: string;
@@ -37,13 +49,16 @@ interface AboutData {
   portfolioUrl: string;
   techStack: string;
   tools: string;
+  hobbies: string;
   experiences: Experience[];
+  volunteering: Volunteer[];
   educations: Education[];
 }
 
 const defaultData: AboutData = {
   name: '',
   title: '',
+  tagline: '',
   profileImage: '',
   location: '',
   email: '',
@@ -53,7 +68,9 @@ const defaultData: AboutData = {
   portfolioUrl: '',
   techStack: '',
   tools: '',
+  hobbies: '',
   experiences: [],
+  volunteering: [],
   educations: [],
 };
 
@@ -69,7 +86,19 @@ export default function AdminAboutPage() {
       .then(res => res.json())
       .then(result => {
         if (result && Object.keys(result).length > 0) {
-          setData({ ...defaultData, ...result });
+          // Migration for existing experiences
+          const migratedExperiences = result.experiences?.map((exp: Experience & { description?: string }) => ({
+            ...exp,
+            descriptionEn: exp.descriptionEn || exp.description || '',
+            descriptionId: exp.descriptionId || exp.description || '',
+          })) || [];
+          
+          setData({ 
+            ...defaultData, 
+            ...result,
+            experiences: migratedExperiences,
+            volunteering: result.volunteering || []
+          });
         }
         setIsLoading(false);
       });
@@ -113,19 +142,78 @@ export default function AdminAboutPage() {
     if (!file) return;
 
     setIsUploading(true);
-    const formData = new FormData();
-    formData.append('file', file);
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
 
-    const res = await fetch('/api/about/upload', {
-      method: 'POST',
-      body: formData,
-    });
+      console.log('📤 Uploading file:', file.name, file.type, file.size);
 
-    const result = await res.json();
-    if (result.url) {
-      setData(prev => ({ ...prev, profileImage: result.url }));
+      const res = await fetch('/api/about/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      console.log('📡 Upload response status:', res.status);
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error('❌ Upload failed:', errorData);
+        alert(`Upload failed: ${errorData.error || 'Unknown error'}`);
+        setIsUploading(false);
+        return;
+      }
+
+      const result = await res.json();
+      console.log('✅ Upload successful, URL:', result.url);
+      
+      if (result.url) {
+        // Add timestamp to bust cache
+        const imageUrlWithTimestamp = `${result.url}?t=${Date.now()}`;
+        console.log('🖼️ Image URL with cache buster:', imageUrlWithTimestamp);
+        
+        // Update state with new image URL
+        const updatedData = { ...data, profileImage: result.url };
+        console.log('💾 Updated data object:', updatedData);
+        setData(updatedData);
+        
+        // Auto-save to database
+        console.log('💿 Auto-saving to database...');
+        const saveRes = await fetch('/api/about', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedData),
+        });
+
+        if (!saveRes.ok) {
+          const saveError = await saveRes.json();
+          console.error('❌ Auto-save failed:', saveError);
+          alert('Photo uploaded but failed to save. Please click Save button manually.');
+          setIsUploading(false);
+          return;
+        }
+
+        const saveResult = await saveRes.json();
+        console.log('✅ Auto-save successful:', saveResult);
+        console.log('🔄 Reloading page to show new image...');
+        
+        alert('✅ Profile photo uploaded and saved successfully! Page will refresh...');
+        setSaved(true);
+        
+        // Force page reload to ensure image displays
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        console.error('❌ No URL in response:', result);
+        alert('Upload failed: No URL returned');
+      }
+    } catch (error) {
+      console.error('❌ Upload error:', error);
+      alert('Upload failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    } finally {
+      setIsUploading(false);
     }
-    setIsUploading(false);
   }
 
   function removeImage() {
@@ -162,7 +250,8 @@ export default function AdminAboutPage() {
         startYear: '',
         endMonth: '',
         endYear: '',
-        description: '',
+        descriptionEn: '',
+        descriptionId: '',
         isCurrent: false,
       }],
     }));
@@ -181,6 +270,36 @@ export default function AdminAboutPage() {
     setData(prev => ({
       ...prev,
       experiences: prev.experiences.filter(exp => exp.id !== id),
+    }));
+  }
+
+  function addVolunteer() {
+    setData(prev => ({
+      ...prev,
+      volunteering: [...prev.volunteering, {
+        id: Date.now().toString(),
+        role: '',
+        organization: '',
+        period: '',
+        descriptionEn: '',
+        descriptionId: '',
+      }],
+    }));
+  }
+
+  function updateVolunteer(id: string, field: keyof Volunteer, value: string) {
+    setData(prev => ({
+      ...prev,
+      volunteering: prev.volunteering.map(vol =>
+        vol.id === id ? { ...vol, [field]: value } : vol
+      ),
+    }));
+  }
+
+  function removeVolunteer(id: string) {
+    setData(prev => ({
+      ...prev,
+      volunteering: prev.volunteering.filter(vol => vol.id !== id),
     }));
   }
 
@@ -243,7 +362,7 @@ export default function AdminAboutPage() {
               <div className="relative w-32 h-32 rounded-xl overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 flex-shrink-0">
                 {data.profileImage ? (
                   <>
-                    <img src={data.profileImage} alt="Profile" className="w-full h-full object-cover" />
+                    <Image src={data.profileImage} alt="Profile" className="object-cover" fill unoptimized />
                     <button
                       type="button"
                       onClick={removeImage}
@@ -292,6 +411,15 @@ export default function AdminAboutPage() {
               onChange={e => setData(prev => ({ ...prev, title: e.target.value }))}
               placeholder="Learning Enthusiast"
             />
+            <div className="md:col-span-2">
+              <Input
+                label="Tagline / Hook"
+                value={data.tagline}
+                onChange={e => setData(prev => ({ ...prev, tagline: e.target.value }))}
+                placeholder="e.g. Crafting digital experiences with passion..."
+                helperText="This text will appear under the 'About Me' header"
+              />
+            </div>
             <Input
               label="Location"
               value={data.location}
@@ -374,6 +502,24 @@ export default function AdminAboutPage() {
             onChange={e => setData(prev => ({ ...prev, tools: e.target.value }))}
             placeholder="VS Code, Figma, Docker, Git, Postman, Notion"
             helperText="Comma separated list of tools (icons will be shown automatically)"
+          />
+        </div>
+
+        {/* Hobbies */}
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-rose-100 dark:bg-rose-900/30 rounded-lg">
+              <Heart className="h-5 w-5 text-rose-600 dark:text-rose-400" />
+            </div>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Hobbies & Interests</h2>
+          </div>
+
+          <Input
+            label="Hobbies"
+            value={data.hobbies}
+            onChange={e => setData(prev => ({ ...prev, hobbies: e.target.value }))}
+            placeholder="Gaming, Hiking, Photography, Reading"
+            helperText="Comma separated list of hobbies"
           />
         </div>
 
@@ -468,20 +614,105 @@ export default function AdminAboutPage() {
                   />
                   <label htmlFor={`current-${exp.id}`} className="text-sm text-gray-700 dark:text-gray-300">Posisi saat ini</label>
                 </div>
-                <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
-                  <textarea
-                    value={exp.description}
-                    onChange={e => updateExperience(exp.id, 'description', e.target.value)}
-                    rows={2}
-                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Describe your responsibilities..."
-                  />
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description (EN)</label>
+                    <textarea
+                      value={exp.descriptionEn}
+                      onChange={e => updateExperience(exp.id, 'descriptionEn', e.target.value)}
+                      rows={3}
+                      className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Describe your responsibilities in English..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Deskripsi (ID)</label>
+                    <textarea
+                      value={exp.descriptionId}
+                      onChange={e => updateExperience(exp.id, 'descriptionId', e.target.value)}
+                      rows={3}
+                      className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Jelaskan tanggung jawab Anda dalam Bahasa Indonesia..."
+                    />
+                  </div>
                 </div>
               </div>
             ))}
             {data.experiences.length === 0 && (
               <p className="text-center text-gray-500 py-4">No experience added yet</p>
+            )}
+          </div>
+        </div>
+
+        {/* Volunteering Section */}
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-teal-100 dark:bg-teal-900/30 rounded-lg">
+                <User className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+              </div>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Volunteering & Organization</h2>
+            </div>
+            <Button type="button" variant="secondary" size="sm" onClick={addVolunteer} className="gap-1">
+              <Plus className="h-4 w-4" /> Add
+            </Button>
+          </div>
+
+          <div className="space-y-6">
+            {data.volunteering.map((vol, index) => (
+              <div key={vol.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <div className="flex justify-between items-start mb-4">
+                  <span className="text-sm font-medium text-gray-500">Activity #{index + 1}</span>
+                  <button type="button" onClick={() => removeVolunteer(vol.id)} className="text-red-500 hover:text-red-700">
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Input
+                    label="Role"
+                    value={vol.role}
+                    onChange={e => updateVolunteer(vol.id, 'role', e.target.value)}
+                    placeholder="Member / Volunteer"
+                  />
+                  <Input
+                    label="Organization"
+                    value={vol.organization}
+                    onChange={e => updateVolunteer(vol.id, 'organization', e.target.value)}
+                    placeholder="Organization Name"
+                  />
+                  <Input
+                    label="Period"
+                    value={vol.period}
+                    onChange={e => updateVolunteer(vol.id, 'period', e.target.value)}
+                    placeholder="2024"
+                  />
+                </div>
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description (EN)</label>
+                    <textarea
+                      value={vol.descriptionEn}
+                      onChange={e => updateVolunteer(vol.id, 'descriptionEn', e.target.value)}
+                      rows={2}
+                      className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Description in English..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Deskripsi (ID)</label>
+                    <textarea
+                      value={vol.descriptionId}
+                      onChange={e => updateVolunteer(vol.id, 'descriptionId', e.target.value)}
+                      rows={2}
+                      className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Deskripsi dalam Bahasa Indonesia..."
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+            {data.volunteering.length === 0 && (
+              <p className="text-center text-gray-500 py-4">No volunteering experience added yet</p>
             )}
           </div>
         </div>

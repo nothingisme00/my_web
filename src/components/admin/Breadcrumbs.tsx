@@ -11,7 +11,7 @@ export function Breadcrumbs() {
   const segments = pathname.split('/').filter(Boolean);
   
   // Map segments to readable names
-  const getSegmentName = (segment: string, index: number) => {
+  const getSegmentName = (segment: string) => {
     const nameMap: Record<string, string> = {
       'admin': 'Dashboard',
       'posts': 'Posts',
@@ -30,7 +30,7 @@ export function Breadcrumbs() {
   // Build breadcrumb path
   const breadcrumbs = segments.map((segment, index) => {
     const path = '/' + segments.slice(0, index + 1).join('/');
-    const name = getSegmentName(segment, index);
+    const name = getSegmentName(segment);
     return { name, path };
   });
 

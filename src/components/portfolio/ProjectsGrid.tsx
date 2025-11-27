@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { ExternalLink, Github } from 'lucide-react';
 import { StaggerContainer, StaggerItem } from '@/components/transitions/ScrollReveal';
 
@@ -24,14 +25,16 @@ export function ProjectsGrid({ projects }: ProjectsGridProps) {
     <StaggerContainer className="grid md:grid-cols-2 lg:grid-cols-3 gap-8" staggerDelay={0.1}>
       {projects.map((project) => (
         <StaggerItem key={project.id}>
-          <article className="group flex flex-col h-full border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden hover:border-blue-200 dark:hover:border-blue-900/50 hover:shadow-lg transition-all duration-300 ease-out hover:-translate-y-1">
+          <article className="group flex flex-col h-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/60 dark:border-gray-700/60 rounded-2xl overflow-hidden hover:border-blue-400 dark:hover:border-blue-600 shadow-md hover:shadow-xl transition-all duration-300 ease-out hover:-translate-y-1">
             {/* Project Image */}
             {project.image && (
               <div className="relative w-full h-48 overflow-hidden bg-gray-100 dark:bg-gray-800">
-                <img
+                <Image
                   src={project.image}
                   alt={project.title}
-                  className="w-full h-full object-cover img-zoom"
+                  className="object-cover img-zoom"
+                  fill
+                  unoptimized
                 />
               </div>
             )}

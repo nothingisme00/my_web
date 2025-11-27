@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Loader2, CheckCircle2, Info, User, Mail, FileText, MessageSquare, X, Check, AlertCircle, Shield } from 'lucide-react';
+import { Send, Loader2, CheckCircle2, User, Mail, FileText, MessageSquare, Check, AlertCircle, Shield } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { useTranslations } from 'next-intl';
@@ -54,7 +54,7 @@ export function ContactForm() {
       try {
         const draft = JSON.parse(saved);
         setFormData(draft);
-      } catch (e) {
+      } catch {
         // Invalid JSON, ignore
       }
     }
@@ -233,7 +233,7 @@ export function ContactForm() {
       } else {
         setError(data.error || t('error.general'));
       }
-    } catch (err) {
+    } catch {
       setError(t('error.network'));
     } finally {
       setIsSubmitting(false);
@@ -367,23 +367,23 @@ export function ContactForm() {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between mb-6"
+        className="relative mb-8 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm"
       >
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('title')}</h3>
-        <div className="group relative">
-          <button
-            type="button"
-            className="w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center
-                       hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-help"
-            aria-label="Response time information"
-          >
-            <Info className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-          </button>
-          <div className="absolute right-0 top-full mt-2 w-56 p-3 bg-gray-900 dark:bg-gray-950 text-white text-xs rounded-lg shadow-xl
-                          opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10"
-               role="tooltip">
-            <div className="absolute -top-1.5 right-2 w-3 h-3 bg-gray-900 dark:bg-gray-950 transform rotate-45"></div>
-            <p className="relative">{t('info.responseTime')}</p>
+        {/* Background & Decoration - Clipped */}
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800/50 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mr-16 -mt-16" />
+        </div>
+
+        {/* Content */}
+        <div className="relative p-5 flex items-center gap-4">
+          <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 ring-1 ring-blue-100 dark:ring-blue-800/30">
+            <MessageSquare className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white leading-tight">{t('title')}</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 font-medium">
+              {t('info.responseTime')}
+            </p>
           </div>
         </div>
       </motion.div>

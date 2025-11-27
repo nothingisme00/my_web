@@ -1,5 +1,5 @@
 import PostForm from '@/components/admin/PostForm';
-import { getCategories, getTags } from '@/lib/actions';
+import { getCategories } from '@/lib/actions';
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 
@@ -18,7 +18,6 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
   }
 
   const categories = await getCategories();
-  const tags = await getTags();
 
-  return <PostForm categories={categories} tags={tags} initialData={post} />;
+  return <PostForm categories={categories} initialData={post} />;
 }

@@ -17,40 +17,47 @@ import {
   Link as LinkIcon,
   Image as ImageIcon,
 } from 'lucide-react'
-import { clsx } from 'clsx'
 
 interface EditorToolbarProps {
   editor: Editor | null
+}
+
+interface ToolbarButtonProps {
+  onClick: () => void
+  isActive?: boolean
+  children?: React.ReactNode
+  title?: string
+}
+
+function ToolbarButton({
+  onClick,
+  isActive = false,
+  children,
+  title,
+}: ToolbarButtonProps) {
+  return (
+    <button
+      onClick={(e) => {
+        e.preventDefault()
+        onClick()
+      }}
+      className={`p-2 rounded-md transition-colors ${
+        isActive
+          ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+          : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800'
+      }`}
+      title={title}
+      type="button"
+    >
+      {children}
+    </button>
+  )
 }
 
 export function EditorToolbar({ editor }: EditorToolbarProps) {
   if (!editor) {
     return null
   }
-
-  const ToolbarButton = ({
-    onClick,
-    isActive = false,
-    children,
-    title,
-  }: {
-    onClick: () => void
-    isActive?: boolean
-    children: React.ReactNode
-    title: string
-  }) => (
-    <button
-      type="button"
-      onClick={onClick}
-      title={title}
-      className={clsx(
-        'p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors',
-        isActive && 'bg-gray-200 dark:bg-gray-700 text-blue-600 dark:text-blue-400'
-      )}
-    >
-      {children}
-    </button>
-  )
 
   const addImage = () => {
     const url = window.prompt('Enter image URL:')
@@ -60,10 +67,22 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
   }
 
   const addLink = () => {
-    const url = window.prompt('Enter URL:')
-    if (url) {
-      editor.chain().focus().setLink({ href: url }).run()
+    const previousUrl = editor.getAttributes('link').href
+    const url = window.prompt('Enter URL', previousUrl)
+
+    // cancelled
+    if (url === null) {
+      return
     }
+
+    // empty
+    if (url === '') {
+      editor.chain().focus().extendMarkRange('link').unsetLink().run()
+      return
+    }
+
+    // update link
+    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
   }
 
   return (
@@ -101,7 +120,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         <Code className="w-4 h-4" />
       </ToolbarButton>
 
-      <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1" />
+      <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 self-center" />
 
       {/* Headings */}
       <ToolbarButton
@@ -128,12 +147,12 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         <Heading3 className="w-4 h-4" />
       </ToolbarButton>
 
-      <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1" />
+      <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 self-center" />
 
       {/* Lists */}
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBulletList().run()}
-        isActive={editor.isActive('bulletList')}
+        isActive={editor.isActive('bulletList')}    
         title="Bullet List"
       >
         <List className="w-4 h-4" />
@@ -141,7 +160,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        isActive={editor.isActive('orderedList')}
+        isActive={editor.isActive('orderedList')}   
         title="Numbered List"
       >
         <ListOrdered className="w-4 h-4" />
@@ -149,13 +168,13 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        isActive={editor.isActive('blockquote')}
+        isActive={editor.isActive('blockquote')}    
         title="Quote"
       >
         <Quote className="w-4 h-4" />
       </ToolbarButton>
 
-      <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1" />
+      <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 self-center" />
 
       {/* Insert */}
       <ToolbarButton onClick={addLink} title="Add Link">
@@ -166,7 +185,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         <ImageIcon className="w-4 h-4" />
       </ToolbarButton>
 
-      <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1" />
+      <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 self-center" />
 
       {/* Undo/Redo */}
       <ToolbarButton

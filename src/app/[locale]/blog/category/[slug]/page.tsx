@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from 'next/image';
 import { notFound } from "next/navigation";
 import { Clock, Eye, ArrowLeft } from "lucide-react";
 import { getPostsByCategory, getCategoryBySlug } from "@/lib/actions";
@@ -60,10 +61,12 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                   {/* Image */}
                   {post.image && (
                     <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800 mb-4">
-                      <img
+                      <Image
                         src={post.image}
                         alt={post.title}
-                        className="w-full h-full object-cover img-zoom"
+                        className="object-cover img-zoom"
+                        fill
+                        unoptimized
                       />
                     </div>
                   )}

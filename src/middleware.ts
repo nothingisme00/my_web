@@ -20,7 +20,7 @@ export default function middleware(request: NextRequest) {
   if (isAdminOrApi) {
     // Check if user is in CMS context (has auth token)
     const isInCMS = !!authToken
-    const isAccessingCMS = pathname.startsWith('/admin') || pathname === '/login'
+    const isAccessingCMS = pathname.startsWith('/admin') || pathname === '/login' || pathname.startsWith('/api')
     const isAccessingPublic = !isAccessingCMS && pathname !== '/login'
 
     // STRICT ISOLATION: If logged in (in CMS), block access to public pages

@@ -17,7 +17,6 @@ interface PostWithRelations extends Post {
 
 interface PostFormProps {
   categories: Category[];
-  tags: Tag[];
   initialData?: PostWithRelations;
 }
 
@@ -31,7 +30,7 @@ function SubmitButton({ isEditing }: { isEditing: boolean }) {
   );
 }
 
-export default function PostForm({ categories, tags, initialData }: PostFormProps) {
+export default function PostForm({ categories, initialData }: PostFormProps) {
   const [content, setContent] = useState(initialData?.content || '');
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
 

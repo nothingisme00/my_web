@@ -53,7 +53,7 @@ export default function MediaGallery({ initialMedia }: MediaGalleryProps) {
       try {
         await deleteMedia(id);
         toast.success('Image deleted successfully!');
-      } catch (error) {
+      } catch {
         toast.error('Failed to delete image.');
       }
     }

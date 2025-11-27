@@ -14,7 +14,7 @@ export default async function GalleryPage() {
   ]);
 
   return (
-    <div className="bg-white dark:bg-gray-900 min-h-screen py-16 lg:py-20">
+    <div className="min-h-screen py-16 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">

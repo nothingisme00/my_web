@@ -84,12 +84,20 @@
     "experience": "Work Experience",
     "techStack": "Tech Stack",
     "tools": "Tools",
+    "hobbies": "Hobbies & Interests",
     "downloadCV": "Download CV",
     "downloadPortfolio": "Download Portfolio",
     "currentlyWorking": "Currently Working",
     "contact": {
       "title": "Let's Work Together",
       "description": "Have a project in mind or want to collaborate? I'd love to hear from you. Send me a message and I'll respond as soon as possible."
+    },
+    "clickToView": "See job details",
+    "volunteering": {
+      "title": "Volunteering & Organization",
+      "role": "Role",
+      "organization": "Organization",
+      "period": "Period"
     }
   },
   "contact": {

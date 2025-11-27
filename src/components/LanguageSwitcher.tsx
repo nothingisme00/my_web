@@ -2,23 +2,26 @@
 
 import { useLocale } from 'next-intl';
 import { useRouter, usePathname } from 'next/navigation';
-import { useState, useTransition } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Languages, Check } from 'lucide-react';
-import { locales, localeNames, localeFlags, type Locale } from '@/i18n/config';
+import { useTransition, useState, useEffect } from 'react';
+import { locales, type Locale } from '@/i18n/config';
 
 export function LanguageSwitcher() {
   const locale = useLocale() as Locale;
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
-  const [isOpen, setIsOpen] = useState(false);
+  const [optimisticLocale, setOptimisticLocale] = useState<Locale>(locale);
+
+  // Sync optimistic state when actual locale changes (e.g. navigation completes)
+  useEffect(() => {
+    setOptimisticLocale(locale);
+  }, [locale]);
 
   const handleLocaleChange = (newLocale: Locale) => {
-    if (newLocale === locale) {
-      setIsOpen(false);
-      return;
-    }
+    if (newLocale === optimisticLocale) return;
+
+    // Optimistic update
+    setOptimisticLocale(newLocale);
 
     // Save preference to localStorage
     localStorage.setItem('preferred-locale', newLocale);
@@ -37,84 +40,40 @@ export function LanguageSwitcher() {
 
       const newPath = segments.join('/');
       router.replace(newPath);
-      setIsOpen(false);
     });
   };
 
+  // Calculate the active index for sliding animation
+  const activeIndex = locales.indexOf(optimisticLocale);
+
   return (
-    <div className="relative">
-      {/* Trigger Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        disabled={isPending}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg
-                   bg-gray-100 dark:bg-gray-800
-                   hover:bg-gray-200 dark:hover:bg-gray-700
-                   transition-colors duration-200
-                   disabled:opacity-50 disabled:cursor-not-allowed"
-        aria-label="Change language"
-        aria-expanded={isOpen}
-      >
-        <Languages className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          {localeFlags[locale]} {localeNames[locale]}
-        </span>
-      </button>
-
-      {/* Dropdown Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)}
-              className="fixed inset-0 z-40"
-            />
-
-            {/* Menu */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: -10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -10 }}
-              transition={{ duration: 0.15 }}
-              className="absolute right-0 mt-2 w-48 py-2 rounded-lg shadow-lg
-                         bg-white dark:bg-gray-800
-                         border border-gray-200 dark:border-gray-700
-                         z-50"
-            >
-              {locales.map((loc) => (
-                <button
-                  key={loc}
-                  onClick={() => handleLocaleChange(loc)}
-                  disabled={isPending}
-                  className={`w-full flex items-center justify-between px-4 py-2.5
-                    hover:bg-gray-100 dark:hover:bg-gray-700
-                    transition-colors duration-150
-                    disabled:opacity-50 disabled:cursor-not-allowed
-                    ${loc === locale ? 'bg-gray-50 dark:bg-gray-750' : ''}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">{localeFlags[loc]}</span>
-                    <span className={`text-sm font-medium
-                      ${loc === locale
-                        ? 'text-blue-600 dark:text-blue-400'
-                        : 'text-gray-700 dark:text-gray-300'
-                      }`}>
-                      {localeNames[loc]}
-                    </span>
-                  </div>
-                  {loc === locale && (
-                    <Check className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  )}
-                </button>
-              ))}
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+    <div className="relative flex items-center p-1 rounded-full bg-gray-200/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700">
+      {/* Sliding background indicator */}
+      <div
+        className="absolute top-1 left-1 w-12 h-7 bg-white dark:bg-gray-700 rounded-full shadow-sm transition-transform duration-300 ease-out pointer-events-none"
+        style={{
+          transform: `translateX(${activeIndex * 48}px)`, // 48px = w-12
+        }}
+      />
+      
+      {/* Language buttons */}
+      {locales.map((loc) => (
+        <button
+          key={loc}
+          type="button"
+          onClick={() => handleLocaleChange(loc)}
+          disabled={isPending}
+          className={`
+            relative flex items-center justify-center w-12 h-7 text-xs font-bold rounded-full transition-colors duration-200 outline-none focus-visible:ring-2 focus-visible:ring-blue-500
+            ${loc === optimisticLocale 
+              ? 'text-blue-600 dark:text-blue-400' 
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+            }
+          `}
+        >
+          <span className="relative z-10">{loc.toUpperCase()}</span>
+        </button>
+      ))}
     </div>
   );
 }

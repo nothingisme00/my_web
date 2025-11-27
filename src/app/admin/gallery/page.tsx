@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { Plus, Trash2, Image as ImageIcon, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
@@ -16,22 +16,26 @@ interface GalleryPhoto {
 }
 
 export default function AdminGalleryPage() {
-  const router = useRouter();
   const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchPhotos();
+  const fetchPhotos = useCallback(async () => {
+    try {
+      const res = await fetch('/api/gallery');
+      const data = await res.json();
+      setPhotos(data);
+    } catch (error) {
+      console.error('Failed to fetch photos:', error);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  async function fetchPhotos() {
-    const res = await fetch('/api/gallery');
-    const data = await res.json();
-    setPhotos(data);
-    setIsLoading(false);
-  }
+  useEffect(() => {
+    fetchPhotos();
+  }, [fetchPhotos]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -87,10 +91,12 @@ export default function AdminGalleryPage() {
               key={photo.id}
               className="group relative aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800"
             >
-              <img
+              <Image
                 src={`/gallery/${photo.filename}`}
                 alt={photo.title}
-                className="w-full h-full object-cover"
+                className="object-cover"
+                fill
+                unoptimized
               />
               <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
                 <div className="text-white">

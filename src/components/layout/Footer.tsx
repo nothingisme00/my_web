@@ -1,6 +1,5 @@
 import { Github, Linkedin, Twitter, Instagram, Mail } from 'lucide-react';
 import { getSettings } from '@/lib/actions';
-import { useTranslations } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 
 export async function Footer() {

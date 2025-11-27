@@ -22,7 +22,8 @@ export function useScrollReveal<T extends HTMLElement>(
     // Check if user prefers reduced motion
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) {
-      setIsVisible(true);
+      // Use requestAnimationFrame to avoid synchronous state update warning
+      requestAnimationFrame(() => setIsVisible(true));
       return;
     }
 

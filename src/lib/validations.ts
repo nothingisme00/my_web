@@ -61,17 +61,17 @@ export const SettingsSchema = z.object({
 
 // Helper function to validate FormData
 export function validateFormData<T>(schema: z.ZodSchema<T>, formData: FormData): { success: true; data: T } | { success: false; error: string } {
-  const data = Object.fromEntries(formData.entries());
+  const data: Record<string, unknown> = Object.fromEntries(formData.entries());
 
   // Convert checkbox values and parse JSON arrays
   for (const [key, value] of Object.entries(data)) {
     if (value === 'on' || value === 'true') {
-      (data as any)[key] = true;
+      data[key] = true;
     } else if (value === 'false') {
-      (data as any)[key] = false;
+      data[key] = false;
     } else if (typeof value === 'string' && value.startsWith('[') && value.endsWith(']')) {
       try {
-        (data as any)[key] = JSON.parse(value);
+        data[key] = JSON.parse(value);
       } catch {
         // Keep as string if not valid JSON
       }

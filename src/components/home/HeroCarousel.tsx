@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Clock, Eye, ChevronRight } from 'lucide-react';
 import { formatDate, formatViewCount } from '@/lib/utils';
 
@@ -56,10 +57,12 @@ export function HeroCarousel({ posts }: HeroCarouselProps) {
           {/* Image */}
           {currentPost.image && (
             <div className="relative h-48 overflow-hidden bg-gray-100 dark:bg-gray-800">
-              <img
+              <Image
                 src={currentPost.image}
                 alt={currentPost.title}
-                className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-103"
+                className="object-cover transition-transform duration-500 ease-out group-hover:scale-103"
+                fill
+                unoptimized
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
             </div>

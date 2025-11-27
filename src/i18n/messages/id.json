@@ -83,13 +83,21 @@
     "education": "Pendidikan",
     "experience": "Pengalaman Kerja",
     "techStack": "Tech Stack",
-    "tools": "Tools",
+    "tools": "Alat & Software",
+    "hobbies": "Hobi & Minat",
     "downloadCV": "Unduh CV",
     "downloadPortfolio": "Unduh Portfolio",
     "currentlyWorking": "Sedang Bekerja",
     "contact": {
       "title": "Mari Bekerja Sama",
       "description": "Punya proyek yang ingin dikerjakan atau ingin berkolaborasi? Saya ingin mendengar dari Anda. Kirim pesan dan saya akan merespons sesegera mungkin."
+    },
+    "clickToView": "Lihat detail pekerjaan",
+    "volunteering": {
+      "title": "Pengalaman Organisasi & Sukarelawan",
+      "role": "Peran",
+      "organization": "Organisasi",
+      "period": "Periode"
     }
   },
   "contact": {

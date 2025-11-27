@@ -70,7 +70,7 @@ export function QuotesCarousel() {
               }`}
             >
               <blockquote className="text-xl md:text-2xl lg:text-3xl text-gray-700 dark:text-gray-200 leading-relaxed mb-8 font-light italic max-w-3xl">
-                "{quote.text}"
+                &ldquo;{quote.text}&rdquo;
               </blockquote>
 
               <div className="space-y-1">

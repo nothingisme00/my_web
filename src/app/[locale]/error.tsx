@@ -37,7 +37,7 @@ export default function Error({
             Oops! Something went wrong
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            We encountered an unexpected error. Don't worry, you can try again.
+            We encountered an unexpected error. Don&apos;t worry, you can try again.
           </p>
         </div>
 

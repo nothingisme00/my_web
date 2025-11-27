@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Clock, Eye } from 'lucide-react';
-import { StaggerContainer, StaggerItem, ScrollReveal } from '@/components/transitions/ScrollReveal';
+import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer';
+import { ScrollReveal } from '@/components/ui/ScrollReveal';
 import { formatDate, formatViewCount } from '@/lib/utils';
 
 interface Post {
@@ -32,17 +34,19 @@ export function BlogPostsGrid({ featuredPost, posts }: BlogPostsGridProps) {
       {featuredPost && (
         <ScrollReveal className="mb-16">
           <Link href={`/blog/${featuredPost.slug}`} className="group block">
-            <article className="grid lg:grid-cols-2 gap-8 p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-out">
+            <article className="grid lg:grid-cols-2 gap-8 p-6 rounded-2xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/60 dark:border-gray-700/60 shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-out">
               {/* Image */}
               {featuredPost.image && (
                 <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800">
-                  <img
+                  <Image
                     src={featuredPost.image}
                     alt={featuredPost.title}
-                    className="w-full h-full object-cover img-zoom"
+                    className="object-cover img-zoom"
+                    fill
+                    unoptimized
                   />
                   <div className="absolute top-4 left-4">
-                    <span className="px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-medium">
+                    <span className="px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-medium shadow-md">
                       Featured
                     </span>
                   </div>
@@ -52,7 +56,7 @@ export function BlogPostsGrid({ featuredPost, posts }: BlogPostsGridProps) {
               {/* Content */}
               <div className="flex flex-col justify-center">
                 {featuredPost.category && (
-                  <span className="inline-flex items-center w-fit rounded-md bg-blue-50 dark:bg-blue-900/30 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-400 mb-4">
+                  <span className="inline-flex items-center w-fit rounded-md bg-blue-50 dark:bg-blue-900/30 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-400 mb-4 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/20">
                     {featuredPost.category.name}
                   </span>
                 )}
@@ -98,14 +102,16 @@ export function BlogPostsGrid({ featuredPost, posts }: BlogPostsGridProps) {
           {posts.map((post) => (
             <StaggerItem key={post.id}>
               <Link href={`/blog/${post.slug}`} className="group block h-full">
-                <article className="flex flex-col h-full rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                <article className="flex flex-col h-full rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/60 dark:border-gray-700/60 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
                   {/* Image */}
                   {post.image && (
                     <div className="relative aspect-[16/10] overflow-hidden bg-gray-100 dark:bg-gray-800">
-                      <img
+                      <Image
                         src={post.image}
                         alt={post.title}
-                        className="w-full h-full object-cover img-zoom"
+                        className="object-cover img-zoom"
+                        fill
+                        unoptimized
                       />
                     </div>
                   )}

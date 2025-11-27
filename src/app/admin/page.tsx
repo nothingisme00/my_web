@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { getDashboardStats } from '@/lib/actions';
 import { Button } from '@/components/ui/Button';
-import { FileText, Briefcase, FolderOpen, Tags, Plus, TrendingUp } from 'lucide-react';
+import { FileText, Briefcase, FolderOpen, Tags, Plus } from 'lucide-react';
 
 export default async function AdminDashboard() {
   const stats = await getDashboardStats();
@@ -41,7 +41,7 @@ export default async function AdminDashboard() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Dashboard</h1>
-        <p className="text-gray-500 dark:text-gray-400">Welcome back! Here's an overview of your content.</p>
+        <p className="text-gray-500 dark:text-gray-400">Welcome back! Here&apos;s an overview of your content.</p>
       </div>
 
       {/* Stats Grid */}

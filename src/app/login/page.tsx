@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { login } from '@/lib/actions';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -66,12 +67,12 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <a
+            <Link
               href="/"
               className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
             >
               ← Back to website
-            </a>
+            </Link>
           </div>
         </div>
       </div>

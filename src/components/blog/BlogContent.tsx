@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { Check, Copy } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 
 interface BlogContentProps {
   content: string;

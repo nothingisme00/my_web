@@ -5,6 +5,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { ThemeProvider } from '@/components/theme-provider';
 import { ToastProvider } from '@/components/providers/ToastProvider';
 import { PageTransition } from '@/components/transitions/PageTransition';
+import { BackgroundEffects } from '@/components/ui/BackgroundEffects';
 
 interface LayoutWrapperProps {
   children: React.ReactNode;
@@ -19,17 +20,23 @@ export function LayoutWrapper({ children, settings, footer }: LayoutWrapperProps
   const isCMSPage = pathname?.startsWith('/admin') || pathname === '/login';
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="theme">
+      {/* Global Background Effects (except on CMS/Login and Reading pages) */}
+      {!isCMSPage && <BackgroundEffects />}
+      
       {/* Only show Navbar/Footer for public pages */}
       {!isCMSPage && <Navbar settings={settings} />}
-      {isCMSPage ? (
-        <main>{children}</main>
-      ) : (
-        <PageTransition>
-          <main className="flex-grow pt-24">{children}</main>
-        </PageTransition>
-      )}
-      {!isCMSPage && footer}
+      
+      <div className="relative z-10 flex flex-col flex-grow w-full">
+        {isCMSPage ? (
+          <main>{children}</main>
+        ) : (
+          <PageTransition>
+            <main className="flex-grow pt-24">{children}</main>
+          </PageTransition>
+        )}
+        {!isCMSPage && footer}
+      </div>
       <ToastProvider />
     </ThemeProvider>
   );
