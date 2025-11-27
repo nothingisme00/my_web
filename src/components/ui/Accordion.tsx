@@ -19,9 +19,9 @@ export function Accordion({ trigger, children, defaultOpen = false, helperText, 
     <div className="border-b border-gray-200 dark:border-gray-700 last:border-0">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-start justify-between py-4 text-left hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-200 rounded-lg px-2 group"
+        className="w-full flex items-center justify-between py-4 text-left hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-200 rounded-lg px-2 group"
       >
-        <div className="flex-1 pt-1">{trigger}</div>
+        <div className="flex-1">{trigger}</div>
           <div className="flex items-center gap-3">
             {meta && (
               <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">

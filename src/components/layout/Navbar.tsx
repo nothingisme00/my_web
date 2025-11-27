@@ -1,9 +1,8 @@
 'use client';
 
-import { Link } from '@/i18n/navigation';
+import { Link, usePathname } from '@/i18n/navigation';
 import { useState, useEffect, useRef } from 'react';
 import { Menu, X } from 'lucide-react';
-import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { clsx } from 'clsx';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -63,10 +62,10 @@ export function Navbar({ settings }: NavbarProps) {
   return (
     <nav className="fixed top-4 left-0 right-0 z-50 mx-auto max-w-5xl px-4">
       <div className={clsx(
-        'relative backdrop-blur-xl border rounded-full px-6 h-16 flex items-center justify-between transition-all duration-300 ease-out',
+        'relative backdrop-blur-xl border-2 rounded-full px-6 h-16 flex items-center justify-between transition-all duration-300 ease-out',
         isScrolled
-          ? 'bg-white/95 dark:bg-gray-900/95 border-gray-200/50 dark:border-gray-700/50'
-          : 'bg-white/80 dark:bg-gray-900/80 border-white/20 dark:border-gray-700/20 supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-900/60'
+          ? 'bg-white/90 dark:bg-gray-900/90 border-gray-200 dark:border-gray-700 shadow-sm'
+          : 'bg-white/80 dark:bg-gray-900/80 border-white/20 dark:border-gray-700/20 shadow-sm supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-900/60'
       )}>
 
         {/* Logo */}
@@ -80,27 +79,34 @@ export function Navbar({ settings }: NavbarProps) {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-1">
-          {navItems.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className="relative px-4 py-2 text-sm font-medium transition-colors duration-200 ease-out group"
-            >
-              <span className={clsx(
-                'relative z-10 transition-colors duration-200',
-                pathname === item.href
-                  ? 'text-blue-600 dark:text-blue-400'
-                  : 'text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'
-              )}>
-                {item.name}
-              </span>
-              {pathname === item.href && (
-                <div
-                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full"
-                />
-              )}
-            </Link>
-          ))}
+          {navItems.map((item) => {
+            const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
+            
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="relative px-4 py-2 text-sm font-medium transition-colors duration-200 ease-out group"
+              >
+                <span className={clsx(
+                  'relative z-10 transition-colors duration-200',
+                  isActive
+                    ? 'text-blue-600 dark:text-blue-400 font-bold'
+                    : 'text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'
+                )}>
+                  {item.name}
+                </span>
+                {isActive && (
+                  <motion.div
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                  />
+                )}
+              </Link>
+            );
+          })}
         </div>
 
         {/* Right Side */}

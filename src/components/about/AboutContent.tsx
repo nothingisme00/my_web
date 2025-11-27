@@ -72,7 +72,12 @@ interface AboutData {
 
 interface AboutContentProps {
   aboutData: AboutData | null;
-  settings: any;
+  settings?: {
+    owner_name?: string | null;
+    contact_email?: string | null;
+    social_instagram?: string | null;
+    social_whatsapp?: string | null;
+  };
 }
 
 export function AboutContent({ aboutData, settings }: AboutContentProps) {
@@ -80,12 +85,12 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
   const locale = useLocale();
 
   // Use aboutData or fallback to settings/defaults
-  const name = aboutData?.name || settings.owner_name || 'Alfattah';
+  const name = aboutData?.name || settings?.owner_name || 'Alfattah';
   const title = aboutData?.title || 'Learning Enthusiast';
   const tagline = aboutData?.tagline || '';
   const profileImage = aboutData?.profileImage || '';
   const location = aboutData?.location || '';
-  const email = aboutData?.email || settings.contact_email || '';
+  const email = aboutData?.email || settings?.contact_email || '';
   const website = aboutData?.website || '';
   const bio = aboutData?.bio || '';
   const cvUrl = aboutData?.cvUrl || '';
@@ -144,7 +149,7 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
               <div className="lg:sticky lg:top-24 space-y-8">
                 <div className="rounded-2xl bg-white/80 dark:bg-gray-900/80 border-2 border-gray-200/60 dark:border-gray-700/60">
                   {/* Top Section: Photo, Name, Icons */}
-                  <div className="p-8 md:p-10">
+                  <div className="p-8 md:p-10 pb-4 md:pb-4">
                     {/* Profile Avatar - Large & Centered */}
                     <div className="flex justify-center mb-6">
                       <div className="relative w-40 h-40 rounded-2xl overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 ring-4 ring-white/10 dark:ring-white/5">
@@ -229,7 +234,7 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
 
                   {/* Action Buttons */}
                   {(cvUrl || portfolioUrl) && (
-                    <div className="p-8 md:p-10 pt-6 md:pt-6 space-y-3">
+                    <div className="p-8 md:p-10 pt-4 md:pt-4 space-y-3">
                       {cvUrl && (
                         <a href={cvUrl} target="_blank" rel="noopener noreferrer" className="block w-full">
                           <Button className="w-full py-6 text-base gap-3 hover:-translate-y-1 transition-all duration-300 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white border-none justify-center rounded-xl">
@@ -271,7 +276,7 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
                 {/* Education */}
                 {educations.length > 0 && (
                   <>
-                    <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent opacity-50" />
+                    <div className="my-8 h-[1.5px] bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-800 to-transparent" />
                     <div className="p-8 md:p-10">
                       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">{t('education')}</h2>
                       <div className="space-y-8">
@@ -294,7 +299,7 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
                 {/* Experience - Accordion Style */}
                 {experiences.length > 0 && (
                   <>
-                    <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent opacity-50" />
+                    <div className="my-8 h-[1.5px] bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-800 to-transparent" />
                     <div className="p-8 md:p-10">
                       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">{t('experience')}</h2>
                       <div className="space-y-4">
@@ -309,8 +314,8 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
                                 </div>
                                 <div className="flex-1">
                                   <h3 className="text-lg font-bold text-gray-900 dark:text-white">{exp.title}</h3>
-                                  <p className="text-blue-600 dark:text-blue-400 font-medium mt-1">{exp.company}</p>
-                                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                  <p className="text-blue-600 dark:text-blue-400 font-medium">{exp.company}</p>
+                                  <p className="text-sm text-gray-500 dark:text-gray-400">
                                     {formatPeriod(exp.startMonth, exp.startYear, exp.endMonth, exp.endYear, exp.isCurrent)}
                                   </p>
                                 </div>
@@ -330,7 +335,7 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
                 {/* Volunteering & Organization */}
                 {volunteering.length > 0 && (
                   <>
-                    <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent opacity-50" />
+                    <div className="my-8 h-[1.5px] bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-800 to-transparent" />
                     <div className="p-8 md:p-10">
                       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">{t('volunteering.title')}</h2>
                       <div className="space-y-4">
@@ -345,8 +350,8 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
                                 </div>
                                 <div className="flex-1">
                                   <h3 className="text-lg font-bold text-gray-900 dark:text-white">{vol.role}</h3>
-                                  <p className="text-teal-600 dark:text-teal-400 font-medium mt-1">{vol.organization}</p>
-                                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{vol.period}</p>
+                                  <p className="text-teal-600 dark:text-teal-400 font-medium">{vol.organization}</p>
+                                  <p className="text-sm text-gray-500 dark:text-gray-400">{vol.period}</p>
                                 </div>
                               </div>
                             }
@@ -364,7 +369,7 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
                 {/* Hobbies */}
                 {hobbies.length > 0 && (
                   <>
-                    <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent opacity-50" />
+                    <div className="my-8 h-[1.5px] bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-800 to-transparent" />
                     <div className="p-8 md:p-10">
                       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('hobbies')}</h2>
                       <div className="flex flex-wrap gap-3">
@@ -384,7 +389,7 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
                 {/* Tech Stack */}
                 {techStack.length > 0 && (
                   <>
-                    <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent opacity-50" />
+                    <div className="my-8 h-[1.5px] bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-800 to-transparent" />
                     <div className="p-8 md:p-10">
                       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('techStack')}</h2>
                       <div className="flex flex-wrap gap-3">
@@ -404,7 +409,7 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
                 {/* Tools */}
                 {tools.length > 0 && (
                   <>
-                    <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent opacity-50" />
+                    <div className="my-8 h-[1.5px] bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-800 to-transparent" />
                     <div className="p-8 md:p-10">
                       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('tools')}</h2>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
