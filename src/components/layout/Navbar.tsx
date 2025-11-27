@@ -65,8 +65,8 @@ export function Navbar({ settings }: NavbarProps) {
       <div className={clsx(
         'relative backdrop-blur-xl border rounded-full px-6 h-16 flex items-center justify-between transition-all duration-300 ease-out',
         isScrolled
-          ? 'bg-white/95 dark:bg-gray-900/95 border-gray-200/50 dark:border-gray-700/50 shadow-xl shadow-gray-200/30 dark:shadow-gray-900/50'
-          : 'bg-white/80 dark:bg-gray-900/80 border-white/20 dark:border-gray-700/20 shadow-lg shadow-gray-200/20 dark:shadow-gray-900/30 supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-900/60'
+          ? 'bg-white/95 dark:bg-gray-900/95 border-gray-200/50 dark:border-gray-700/50'
+          : 'bg-white/80 dark:bg-gray-900/80 border-white/20 dark:border-gray-700/20 supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-900/60'
       )}>
 
         {/* Logo */}

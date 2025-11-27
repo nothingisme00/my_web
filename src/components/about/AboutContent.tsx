@@ -3,7 +3,7 @@
 import { motion, Variants } from "framer-motion";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
-import { MapPin, Mail, Globe, Download, FileText, Briefcase, Users } from "lucide-react";
+import { MapPin, Mail, Globe, Download, FileText, Briefcase, Users, Instagram, Phone } from "lucide-react";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { Accordion } from "@/components/ui/Accordion";
 import { getToolIcon } from "@/lib/tool-icons";
@@ -119,9 +119,6 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
 
   return (
     <div className="py-16 lg:py-20 transition-colors duration-300 min-h-screen relative">
-      {/* Background Pattern for Glassmorphism Effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900/20 -z-10" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-100/20 via-transparent to-purple-100/20 dark:from-blue-900/10 dark:via-transparent dark:to-purple-900/10 -z-10" />
       
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <motion.div
@@ -145,55 +142,105 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
             {/* Sidebar Info - GLASSMORPHISM CARD */}
             <motion.div variants={itemVariants} className="lg:col-span-1">
               <div className="lg:sticky lg:top-24 space-y-8">
-                <div className="rounded-2xl backdrop-blur-xl bg-white/30 dark:bg-gray-900/30 border border-white/20 dark:border-gray-700/30 shadow-xl p-8">
-                  {/* Profile Avatar */}
-                  <div className="relative aspect-square rounded-xl overflow-hidden mb-6 bg-gradient-to-br from-blue-500 to-blue-600">
-                    {profileImage ? (
-                      <Image src={profileImage} alt={name} className="object-cover" fill unoptimized />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-white text-6xl font-bold">
-                        {name.charAt(0).toUpperCase()}
+                <div className="rounded-2xl bg-white/80 dark:bg-gray-900/80 border-2 border-gray-200/60 dark:border-gray-700/60">
+                  {/* Top Section: Photo, Name, Icons */}
+                  <div className="p-8 md:p-10">
+                    {/* Profile Avatar - Large & Centered */}
+                    <div className="flex justify-center mb-6">
+                      <div className="relative w-40 h-40 rounded-2xl overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 ring-4 ring-white/10 dark:ring-white/5">
+                        {profileImage ? (
+                          <Image src={profileImage} alt={name} className="object-cover" fill unoptimized />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-white text-5xl font-bold">
+                            {name.charAt(0).toUpperCase()}
+                          </div>
+                        )}
                       </div>
-                    )}
+                    </div>
+
+                    {/* Name & Title */}
+                    <div className="text-center">
+                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{name}</h2>
+                      <p className="text-blue-600 dark:text-blue-400 font-medium text-lg mb-4">{title}</p>
+                      
+                      {/* Contact Icons - Centered below Title */}
+                      <div className="flex items-center justify-center gap-3 text-gray-600 dark:text-gray-300">
+                        {location && (
+                          <a 
+                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 transition-all hover:scale-110"
+                            title={location}
+                          >
+                            <MapPin className="h-5 w-5" />
+                          </a>
+                        )}
+                        {email && (
+                          <a 
+                            href={`mailto:${email}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 transition-all hover:scale-110"
+                            title={email}
+                          >
+                            <Mail className="h-5 w-5" />
+                          </a>
+                        )}
+                        {website && (
+                          <a 
+                            href={website.startsWith('http') ? website : `https://${website}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 transition-all hover:scale-110"
+                            title={website}
+                          >
+                            <Globe className="h-5 w-5" />
+                          </a>
+                        )}
+                        {settings?.social_instagram && (
+                          <a 
+                            href={settings.social_instagram}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20 hover:text-pink-600 transition-all hover:scale-110"
+                            title="Instagram"
+                          >
+                            <Instagram className="h-5 w-5" />
+                          </a>
+                        )}
+                        {settings?.social_whatsapp && (
+                          <a 
+                            href={`https://wa.me/${settings.social_whatsapp.replace(/[^0-9]/g, '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 transition-all hover:scale-110"
+                            title="WhatsApp"
+                          >
+                            <Phone className="h-5 w-5" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{name}</h2>
-                  <p className="text-blue-600 dark:text-blue-400 font-medium mb-6">{title}</p>
+                  {/* Divider - Full Width */}
+                  <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent opacity-50" />
 
-                  <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300 mb-8">
-                    {location && (
-                      <div className="flex items-center gap-3">
-                        <MapPin className="h-4 w-4" />
-                        <span>{location}</span>
-                      </div>
-                    )}
-                    {email && (
-                      <div className="flex items-center gap-3">
-                        <Mail className="h-4 w-4" />
-                        <span>{email}</span>
-                      </div>
-                    )}
-                    {website && (
-                      <div className="flex items-center gap-3">
-                        <Globe className="h-4 w-4" />
-                        <span>{website}</span>
-                      </div>
-                    )}
-                  </div>
-
+                  {/* Action Buttons */}
                   {(cvUrl || portfolioUrl) && (
-                    <div className="space-y-3">
+                    <div className="p-8 md:p-10 pt-6 md:pt-6 space-y-3">
                       {cvUrl && (
-                        <a href={cvUrl} target="_blank" rel="noopener noreferrer">
-                          <Button className="w-full gap-2">
-                            <Download className="h-4 w-4" /> {t('downloadCV')}
+                        <a href={cvUrl} target="_blank" rel="noopener noreferrer" className="block w-full">
+                          <Button className="w-full py-6 text-base gap-3 hover:-translate-y-1 transition-all duration-300 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white border-none justify-center rounded-xl">
+                            <Download className="h-5 w-5" /> {t('downloadCV')}
                           </Button>
                         </a>
                       )}
                       {portfolioUrl && (
-                        <a href={portfolioUrl} target="_blank" rel="noopener noreferrer">
-                          <Button variant="secondary" className="w-full gap-2">
-                            <FileText className="h-4 w-4" /> {t('downloadPortfolio')}
+                        <a href={portfolioUrl} target="_blank" rel="noopener noreferrer" className="block w-full">
+                          <Button variant="outline" className="w-full py-6 text-base gap-3 hover:border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:-translate-y-1 transition-all duration-300 justify-center rounded-xl border-2">
+                            <FileText className="h-5 w-5" /> Portfolio
                           </Button>
                         </a>
                       )}
@@ -203,9 +250,9 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
               </div>
             </motion.div>
 
-            {/* Main Content */}
+            {/* Main Content - Transparent with High Contrast Border */}
             <motion.div variants={itemVariants} className="lg:col-span-2">
-              <div className="rounded-2xl backdrop-blur-xl bg-white/30 dark:bg-gray-900/30 border border-white/20 dark:border-gray-700/30 shadow-xl overflow-hidden">
+              <div className="rounded-2xl bg-white/80 dark:bg-gray-900/80 border-2 border-gray-200/60 dark:border-gray-700/60">
                 
                 {/* Bio */}
                 {bio && (
@@ -255,7 +302,6 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
                           <Accordion
                             key={exp.id}
                             helperText={t('clickToView')}
-                            meta={`${exp.startMonth}/${exp.startYear} - ${exp.isCurrent ? t('present') : `${exp.endMonth}/${exp.endYear}`}`}
                             trigger={
                               <div className="flex items-center gap-4">
                                 <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg shrink-0 hidden sm:block">
@@ -264,6 +310,9 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
                                 <div className="flex-1">
                                   <h3 className="text-lg font-bold text-gray-900 dark:text-white">{exp.title}</h3>
                                   <p className="text-blue-600 dark:text-blue-400 font-medium mt-1">{exp.company}</p>
+                                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                    {formatPeriod(exp.startMonth, exp.startYear, exp.endMonth, exp.endYear, exp.isCurrent)}
+                                  </p>
                                 </div>
                               </div>
                             }
@@ -289,7 +338,6 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
                           <Accordion
                             key={vol.id}
                             helperText={t('clickToView')}
-                            meta={vol.period}
                             trigger={
                               <div className="flex items-center gap-4">
                                 <div className="p-2 bg-teal-100 dark:bg-teal-900/30 rounded-lg shrink-0 hidden sm:block">
@@ -298,6 +346,7 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
                                 <div className="flex-1">
                                   <h3 className="text-lg font-bold text-gray-900 dark:text-white">{vol.role}</h3>
                                   <p className="text-teal-600 dark:text-teal-400 font-medium mt-1">{vol.organization}</p>
+                                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{vol.period}</p>
                                 </div>
                               </div>
                             }

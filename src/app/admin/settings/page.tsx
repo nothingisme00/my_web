@@ -159,6 +159,16 @@ export default function SettingsPage() {
               defaultValue={settings.social_instagram || ''}
               placeholder="https://instagram.com/username"
             />
+
+            <Input
+              label="WhatsApp Number"
+              name="social_whatsapp"
+              id="social_whatsapp"
+              type="tel"
+              defaultValue={settings.social_whatsapp || ''}
+              placeholder="6281234567890"
+              helperText="Format: Country code + Number (e.g., 628...)"
+            />
           </div>
         </div>
 

@@ -30,6 +30,7 @@ export async function POST(request: NextRequest) {
       'social_linkedin',
       'social_twitter',
       'social_instagram',
+      'social_whatsapp',
       'seo_description',
       'seo_keywords',
     ];
@@ -47,6 +48,7 @@ export async function POST(request: NextRequest) {
 
     revalidatePath('/admin/settings');
     revalidatePath('/');
+    revalidatePath('/about');
 
     return NextResponse.json({ success: true });
   } catch (error) {

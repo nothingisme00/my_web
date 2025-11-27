@@ -1,39 +1,7 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
-
 export function BackgroundEffects() {
-  const pathname = usePathname();
-
-  // Check if it's a reading page (single blog post)
-  // Logic: /blog/[slug] but NOT /blog, /blog/category/..., /blog/tag/...
-  const isReadingPage = 
-    pathname?.includes('/blog/') && 
-    !pathname?.includes('/blog/category') && 
-    !pathname?.includes('/blog/tag') &&
-    // Ensure it's not just /blog (although includes('/blog/') handles that if there is a trailing slash or subpath)
-    // If pathname is exactly '/en/blog', includes('/blog/') is true.
-    // We want to exclude the index page from being considered a "reading page".
-    // The index page SHOULD have the background.
-    // So we want isReadingPage = TRUE only for single posts.
-    // Single post path: /en/blog/my-post
-    // Blog index: /en/blog
-    pathname.split('/').length > 3; // /en/blog is 3 segments (['', 'en', 'blog'])? No, split('/') gives ['', 'en', 'blog']. Length is 3.
-    // /en/blog/my-post gives ['', 'en', 'blog', 'my-post']. Length is 4.
-
-  // Wait, let's test split logic.
-  // '/'.split('/') -> ['', ''] (length 2)
-  // '/en'.split('/') -> ['', 'en'] (length 2)
-  // '/en/blog'.split('/') -> ['', 'en', 'blog'] (length 3)
-  // '/en/blog/post'.split('/') -> ['', 'en', 'blog', 'post'] (length 4)
-
-  // So if length > 3 and includes /blog/, it's likely a post or category/tag.
-  // We already exclude category and tag.
-  
-  if (isReadingPage) {
-    return null;
-  }
-
+  // Show background on ALL pages for consistency
   return (
     <div className="fixed inset-0 z-0 pointer-events-none">
       {/* Background Pattern - Full Page */}

@@ -606,6 +606,7 @@ export async function updateSettings(formData: FormData) {
     'social_linkedin',
     'social_twitter',
     'social_instagram',
+    'social_whatsapp',
     'seo_description',
     'seo_keywords',
   ];
@@ -623,6 +624,7 @@ export async function updateSettings(formData: FormData) {
 
   revalidatePath('/admin/settings');
   revalidatePath('/');
+  revalidatePath('/about');
   return { success: true };
 }
 
