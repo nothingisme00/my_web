@@ -23,12 +23,11 @@ export async function login(prevState: FormState | null, formData: FormData): Pr
   // Validate input
   const validation = validateFormData(LoginSchema, formData);
   if (!validation.success) {
-    console.log('❌ Validation failed:', validation.error);
+    logError(new Error('Login validation failed'), { error: validation.error });
     return { error: validation.error };
   }
 
   const { email, password } = validation.data;
-  console.log('🔐 Login attempt for:', email);
 
   // Rate limiting: 5 attempts per 15 minutes per email
   const rateLimitResult = loginLimiter.check(
@@ -39,7 +38,7 @@ export async function login(prevState: FormState | null, formData: FormData): Pr
 
   if (!rateLimitResult.success) {
     const minutesLeft = Math.ceil((rateLimitResult.resetTime - Date.now()) / 60000);
-    console.log('⏱️ Rate limited:', email, minutesLeft, 'minutes left');
+    logAuthAttempt(email, false, 'rate-limited');
     return {
       error: `Too many login attempts. Please try again in ${minutesLeft} minute${minutesLeft > 1 ? 's' : ''}.`,
     };
@@ -52,31 +51,24 @@ export async function login(prevState: FormState | null, formData: FormData): Pr
     });
 
     if (!user) {
-      console.log('❌ User not found:', email);
-      logAuthAttempt(email, false);
+      logAuthAttempt(email, false, 'user-not-found');
       return { error: 'Invalid email or password' };
     }
-
-    console.log('✅ User found:', user.email);
 
     // Verify password
     const isPasswordValid = await verifyPassword(password, user.password);
 
     if (!isPasswordValid) {
-      console.log('❌ Invalid password for:', email);
-      logAuthAttempt(email, false);
+      logAuthAttempt(email, false, 'invalid-password');
       return { error: 'Invalid email or password' };
     }
 
-    console.log('✅ Password valid for:', email);
-
     // Successful login - reset rate limit for this email
     loginLimiter.reset(email);
-    logAuthAttempt(email, true);
+    logAuthAttempt(email, true, 'login-success');
 
     // Generate JWT token
     const token = await generateToken(user.id, user.email);
-    console.log('✅ JWT token generated');
 
     // Set secure cookie
     (await cookies()).set('auth_token', token, {
@@ -136,25 +128,40 @@ export async function createPost(formData: FormData) {
       formData.set('categoryId', categoryId);
     }
 
-    // Handle Tags: Parse comma-separated string
+    // Handle Tags: Parse comma-separated string and new tag
     const tagsInput = formData.get('tagsInput') as string;
+    const newTagName = formData.get('newTag') as string;
     const tagIds: string[] = [];
 
+    // Add new tag if provided
+    if (newTagName && newTagName.trim()) {
+      const slug = newTagName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+      let tag = await prisma.tag.findUnique({ where: { slug } });
+      if (!tag) {
+        tag = await prisma.tag.create({ data: { name: newTagName.trim(), slug } });
+      }
+      tagIds.push(tag.id);
+    }
+
+    // Add existing selected tags
     if (tagsInput) {
       const tagNames = tagsInput.split(',').map(t => t.trim()).filter(t => t.length > 0);
-      
+
       for (const tagName of tagNames) {
         const slug = tagName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-        
+
         // Find or create tag
         let tag = await prisma.tag.findUnique({ where: { slug } });
         if (!tag) {
           tag = await prisma.tag.create({ data: { name: tagName, slug } });
         }
-        tagIds.push(tag.id);
+        if (!tagIds.includes(tag.id)) {
+          tagIds.push(tag.id);
+        }
       }
     }
-    
+
     // Fallback to existing checkbox tags if any (legacy support or mixed usage)
     const existingTags = formData.getAll('tags') as string[];
     existingTags.forEach(id => {
@@ -228,21 +235,36 @@ export async function updatePost(id: string, formData: FormData) {
       formData.set('categoryId', categoryId);
     }
 
-    // Handle Tags: Parse comma-separated string
+    // Handle Tags: Parse comma-separated string and new tag
     const tagsInput = formData.get('tagsInput') as string;
+    const newTagName = formData.get('newTag') as string;
     const tagIds: string[] = [];
 
+    // Add new tag if provided
+    if (newTagName && newTagName.trim()) {
+      const slug = newTagName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+      let tag = await prisma.tag.findUnique({ where: { slug } });
+      if (!tag) {
+        tag = await prisma.tag.create({ data: { name: newTagName.trim(), slug } });
+      }
+      tagIds.push(tag.id);
+    }
+
+    // Add existing selected tags
     if (tagsInput) {
       const tagNames = tagsInput.split(',').map(t => t.trim()).filter(t => t.length > 0);
-      
+
       for (const tagName of tagNames) {
         const slug = tagName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-        
+
         let tag = await prisma.tag.findUnique({ where: { slug } });
         if (!tag) {
           tag = await prisma.tag.create({ data: { name: tagName, slug } });
         }
-        tagIds.push(tag.id);
+        if (!tagIds.includes(tag.id)) {
+          tagIds.push(tag.id);
+        }
       }
     }
 
@@ -467,6 +489,45 @@ export async function updateTag(id: string, formData: FormData) {
   redirect('/admin/tags');
 }
 
+// Quick create actions for PostForm (return created items)
+export async function quickCreateCategory(name: string) {
+  'use server';
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+  // Check if exists first
+  const existingCategory = await prisma.category.findUnique({ where: { slug } });
+  if (existingCategory) {
+    return existingCategory;
+  }
+
+  const newCategory = await prisma.category.create({
+    data: { name, slug }
+  });
+
+  revalidatePath('/admin/posts');
+  revalidatePath('/admin/categories');
+  return newCategory;
+}
+
+export async function quickCreateTag(name: string) {
+  'use server';
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+  // Check if exists first
+  const existingTag = await prisma.tag.findUnique({ where: { slug } });
+  if (existingTag) {
+    return existingTag;
+  }
+
+  const newTag = await prisma.tag.create({
+    data: { name, slug }
+  });
+
+  revalidatePath('/admin/posts');
+  revalidatePath('/admin/tags');
+  return newTag;
+}
+
 // Media
 export async function getMedia() {
   return await prisma.media.findMany({ 
@@ -524,7 +585,25 @@ export async function uploadMedia(formData: FormData) {
 
   const filepath = join(uploadDir, filename);
 
+  // Write file to disk
   await writeFile(filepath, buffer);
+
+  // Auto-optimize images (compress and resize if needed)
+  let finalFileSize = file.size;
+  if (file.type.startsWith('image/') && !file.type.includes('svg')) {
+    try {
+      const { optimizeImage } = await import('./image-optimizer');
+      const result = await optimizeImage(filepath);
+
+      if (result.success && result.savedBytes > 0) {
+        finalFileSize = result.optimizedSize;
+        console.log(`✅ Image optimized: ${result.savedPercent}% reduction (${result.savedBytes} bytes saved)`);
+      }
+    } catch (error) {
+      console.warn('⚠️  Image optimization failed, using original file:', error);
+      // Continue with original file if optimization fails
+    }
+  }
 
   await prisma.media.create({
     data: {
@@ -532,7 +611,7 @@ export async function uploadMedia(formData: FormData) {
       originalName: file.name,
       url: `/uploads/${filename}`,
       mimeType: file.type,
-      size: file.size,
+      size: finalFileSize, // Use optimized size if available
     },
   });
 

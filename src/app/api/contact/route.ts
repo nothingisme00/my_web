@@ -87,13 +87,21 @@ export async function POST(request: NextRequest) {
     console.log(`Time: ${new Date().toISOString()}`);
     console.log("━".repeat(50));
 
+    // Validate required environment variables
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY is not configured');
+    }
+    if (!process.env.CONTACT_EMAIL) {
+      throw new Error('CONTACT_EMAIL is not configured');
+    }
+
     // Send email using Resend
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     // Send notification email to you
     await resend.emails.send({
       from: "onboarding@resend.dev",
-      to: process.env.CONTACT_EMAIL || "alfatahatalarais12@gmail.com",
+      to: process.env.CONTACT_EMAIL,
       replyTo: validatedData.email,
       subject: `Contact Form: ${validatedData.subject}`,
       html: `

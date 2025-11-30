@@ -5,13 +5,13 @@ import { twMerge } from 'tailwind-merge';
 import { InputHTMLAttributes, forwardRef, TextareaHTMLAttributes } from 'react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
+  label?: React.ReactNode;
   error?: string;
   helperText?: string;
 }
 
 interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-  label?: string;
+  label?: React.ReactNode;
   error?: string;
   helperText?: string;
 }

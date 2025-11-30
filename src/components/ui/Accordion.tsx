@@ -16,10 +16,10 @@ export function Accordion({ trigger, children, defaultOpen = false, helperText, 
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="border-b border-gray-200 dark:border-gray-700 last:border-0">
+    <div>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between py-4 text-left hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-200 rounded-lg px-2 group"
+        className="w-full flex items-center justify-between py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-200 rounded-lg px-2 group"
       >
         <div className="flex-1">{trigger}</div>
           <div className="flex items-center gap-3">
@@ -52,7 +52,7 @@ export function Accordion({ trigger, children, defaultOpen = false, helperText, 
             transition={{ duration: 0.2, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <div className="pb-4 px-2">
+            <div className="pb-3 px-2">
               {children}
             </div>
           </motion.div>

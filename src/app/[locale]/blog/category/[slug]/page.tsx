@@ -24,21 +24,21 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   const posts = await getPostsByCategory(slug) as PostWithRelations[];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 py-16 lg:py-20">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        {/* Breadcrumb */}
-        <div className="mb-8">
-          <Link
-            href="/blog"
-            className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Blog
-          </Link>
-        </div>
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      {/* Breadcrumb */}
+      <div className="mx-auto max-w-7xl px-6 lg:px-8 pt-16 lg:pt-20">
+        <Link
+          href="/blog"
+          className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Blog
+        </Link>
+      </div>
 
-        {/* Category Header */}
-        <div className="mb-12 pb-8 border-b border-gray-200 dark:border-gray-800">
+      {/* Category Header - Full Width */}
+      <section className="relative -mt-16 pt-24 border-b border-gray-200/50 dark:border-gray-800/50">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8 py-16 lg:py-24">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             {category.name}
           </h1>
@@ -51,8 +51,10 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
             {category._count?.posts || 0} {category._count?.posts === 1 ? 'article' : 'articles'}
           </p>
         </div>
+      </section>
 
-        {/* Posts Grid */}
+      {/* Posts Grid */}
+      <div className="mx-auto max-w-7xl px-6 lg:px-8 py-16 lg:py-20">
         {posts.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {posts.map((post) => (

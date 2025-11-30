@@ -1,8 +1,18 @@
 import { SignJWT, jwtVerify } from 'jose';
 import bcrypt from 'bcryptjs';
 
-// JWT Secret - should be in environment variable
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
+// JWT Secret - MUST be set in environment variable
+const JWT_SECRET = process.env.JWT_SECRET;
+
+// Validate JWT_SECRET exists (fail fast for security)
+if (!JWT_SECRET) {
+  throw new Error(
+    'JWT_SECRET is not set in environment variables. ' +
+    'This is required for authentication. ' +
+    'Generate one with: node -e "console.log(require(\'crypto\').randomBytes(64).toString(\'hex\'))"'
+  );
+}
+
 const secret = new TextEncoder().encode(JWT_SECRET);
 
 // JWT Token expiration time (7 days)
@@ -55,7 +65,7 @@ export async function verifyToken(token: string): Promise<{
       userId: payload.userId as string,
       email: payload.email as string,
     };
-  } catch (error) {
+  } catch {
     // Token is invalid or expired
     return null;
   }

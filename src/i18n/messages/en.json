@@ -27,32 +27,30 @@
   },
   "home": {
     "hero": {
-      "badge": "Hi! It's me",
-      "greeting": "I'm a",
-      "typewriter": {
-        "learning": "Learning",
-        "creative": "Creative",
-        "tech": "Tech",
-        "art": "Art"
-      },
-      "enthusiast": "Enthusiast",
-      "description": "Sharing experiences and interesting things I want you to know",
-      "title": "Welcome to My Portfolio",
-      "subtitle": "Full Stack Developer & Creative Problem Solver",
-      "cta": "Get in Touch",
-      "learnMore": "Learn More About Me"
+      "title": "Latest Articles",
+      "subtitle": "Exploring software testing, development, and technology"
     },
     "articles": {
-      "featured": "Featured",
+      "featured": "Featured Article",
       "recentTitle": "Recent Articles",
       "viewAll": "View all",
-      "noArticles": "No articles available yet.",
-      "createFirst": "Create first article"
+      "noArticles": "No articles available yet. Check back soon!",
+      "readArticle": "Read Article",
+      "loadMore": "Load More Articles"
     },
-    "aboutCta": {
-      "title": "Hey, nice to meet you!",
-      "description": "I'm {name} — I love exploring new things and sharing stories through writing. If you're curious about who's behind this blog, let's get acquainted!",
-      "button": "Let's get acquainted"
+    "newsletter": {
+      "title": "Stay Updated",
+      "description": "Subscribe to my newsletter for the latest articles, tutorials, and insights delivered straight to your inbox.",
+      "emailPlaceholder": "Enter your email",
+      "subscribe": "Subscribe",
+      "subscribing": "Subscribing...",
+      "success": "Successfully subscribed! Check your email for confirmation.",
+      "error": "Failed to subscribe. Please try again.",
+      "invalidEmail": "Please enter a valid email address"
+    },
+    "aboutMini": {
+      "title": "About Me",
+      "learnMore": "Learn More About Me"
     },
     "about": {
       "title": "About Me",
@@ -66,13 +64,47 @@
       "title": "Featured Projects",
       "viewAll": "View All Projects"
     },
-    "blog": {
+    "blogSection": {
       "title": "Latest Blog Posts",
       "viewAll": "View All Posts"
     },
     "contact": {
       "title": "Get In Touch",
       "description": "Have a project in mind? Let's work together!"
+    }
+  },
+  "blog": {
+    "search": {
+      "placeholder": "Search articles...",
+      "searching": "Searching..."
+    },
+    "filters": {
+      "category": {
+        "label": "Category",
+        "all": "All Categories",
+        "select": "Select category"
+      },
+      "tags": {
+        "label": "Tags",
+        "select": "Select tags",
+        "none": "No tags selected"
+      },
+      "sort": {
+        "label": "Sort by",
+        "newest": "Newest First",
+        "oldest": "Oldest First",
+        "mostViewed": "Most Viewed",
+        "readingTime": "Reading Time"
+      },
+      "clearAll": "Clear All",
+      "active": "Active Filters"
+    },
+    "results": {
+      "showing": "Showing {count} of {total} articles",
+      "noResults": "No articles found",
+      "noResultsDescription": "Try adjusting your filters to find more articles",
+      "totalArticles": "{count} articles",
+      "clearAll": "Clear All Filters"
     }
   },
   "about": {

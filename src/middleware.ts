@@ -14,32 +14,31 @@ export default function middleware(request: NextRequest) {
   const authToken = request.cookies.get('auth_token')
   const pathname = request.nextUrl.pathname
 
-  // Skip i18n for admin and api routes
-  const isAdminOrApi = pathname.startsWith('/admin') || pathname.startsWith('/api') || pathname === '/login';
+  // Define route types
+  const isAdminRoute = pathname.startsWith('/admin')
+  const isLoginRoute = pathname === '/login'
+  const isApiRoute = pathname.startsWith('/api')
+  const isPublicRoute = !isAdminRoute && !isLoginRoute && !isApiRoute
 
-  if (isAdminOrApi) {
-    // Check if user is in CMS context (has auth token)
-    const isInCMS = !!authToken
-    const isAccessingCMS = pathname.startsWith('/admin') || pathname === '/login' || pathname.startsWith('/api')
-    const isAccessingPublic = !isAccessingCMS && pathname !== '/login'
+  // AUTHENTICATION RULES:
 
-    // STRICT ISOLATION: If logged in (in CMS), block access to public pages
-    if (isInCMS && isAccessingPublic) {
-      return NextResponse.redirect(new URL('/admin', request.url))
-    }
+  // 1. Protect admin routes - redirect to login if not authenticated
+  if (isAdminRoute && !authToken) {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
 
-    // Protect admin routes - redirect to login if not authenticated
-    if (pathname.startsWith('/admin')) {
-      if (!authToken) {
-        return NextResponse.redirect(new URL('/login', request.url))
-      }
-    }
+  // 2. Redirect to admin if already logged in and trying to access login
+  if (isLoginRoute && authToken) {
+    return NextResponse.redirect(new URL('/admin', request.url))
+  }
 
-    // Redirect to admin if already logged in and trying to access login
-    if (pathname === '/login' && authToken) {
-      return NextResponse.redirect(new URL('/admin', request.url))
-    }
+  // 3. STRICT ISOLATION: If logged in, prevent access to public pages
+  if (isPublicRoute && authToken) {
+    return NextResponse.redirect(new URL('/admin', request.url))
+  }
 
+  // Skip i18n middleware for admin, api, and login routes
+  if (isAdminRoute || isApiRoute || isLoginRoute) {
     return NextResponse.next()
   }
 

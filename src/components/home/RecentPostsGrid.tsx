@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Clock } from 'lucide-react';
+import { Clock, Eye } from 'lucide-react';
 import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer';
-import { formatDate } from '@/lib/utils';
+import { formatDate, formatViewCount } from '@/lib/utils';
 
 interface Post {
   id: string;
@@ -13,6 +13,7 @@ interface Post {
   excerpt: string | null;
   image: string | null;
   readingTime: number;
+  views: number;
   publishedAt: Date | null;
   createdAt: Date;
   category: {
@@ -46,7 +47,7 @@ export function RecentPostsGrid({ posts }: RecentPostsGridProps) {
 
               {/* Category */}
               {post.category && (
-                <span className="inline-flex items-center w-fit rounded-md bg-gray-100 dark:bg-gray-800 px-2 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 mb-3">
+                <span className="inline-flex items-center w-fit rounded-md bg-blue-50 dark:bg-blue-900/30 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-400 mb-3 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/20">
                   {post.category.name}
                 </span>
               )}
@@ -71,6 +72,15 @@ export function RecentPostsGrid({ posts }: RecentPostsGridProps) {
                   <Clock className="h-3 w-3" />
                   <span>{post.readingTime} min</span>
                 </div>
+                {post.views > 0 && (
+                  <>
+                    <span>·</span>
+                    <div className="flex items-center gap-1">
+                      <Eye className="h-3 w-3" />
+                      <span>{formatViewCount(post.views)}</span>
+                    </div>
+                  </>
+                )}
               </div>
             </article>
           </Link>

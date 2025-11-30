@@ -2,8 +2,7 @@
 
 import { motion, Variants } from "framer-motion";
 import Image from "next/image";
-import { Button } from "@/components/ui/Button";
-import { MapPin, Mail, Globe, Download, FileText, Briefcase, Users, Instagram, Phone } from "lucide-react";
+import { Mail, Download, Briefcase, Users, Instagram, MessageCircle, Github } from "lucide-react";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { Accordion } from "@/components/ui/Accordion";
 import { getToolIcon } from "@/lib/tool-icons";
@@ -77,7 +76,50 @@ interface AboutContentProps {
     contact_email?: string | null;
     social_instagram?: string | null;
     social_whatsapp?: string | null;
+    social_github?: string | null;
   };
+}
+
+// Spacing and typography constants for bento grid
+const SPACING = {
+  heroCard: "p-8 md:p-10",
+  card: "p-5 md:p-6",
+  cardCompact: "p-4 md:p-5",
+  cardGap: "gap-3",
+  sectionTitle: "mb-4",
+  itemGap: "space-y-3",
+  iconSize: "w-4 h-4",
+  profileImage: "w-48 h-48", // 192px
+};
+
+const TYPOGRAPHY = {
+  sectionTitle: "text-xl font-bold text-gray-900 dark:text-white",
+  cardTitle: "text-base font-bold text-gray-900 dark:text-white",
+  subtitle: "text-sm font-medium",
+  meta: "text-xs text-gray-500 dark:text-gray-400",
+  body: "text-sm text-gray-700 dark:text-gray-300 leading-relaxed",
+};
+
+// Icon-only badge component with grayscale + color on hover
+interface IconBadgeProps {
+  icon: React.ReactNode;
+  label: string;
+}
+
+function IconBadge({ icon, label }: IconBadgeProps) {
+  return (
+    <div className="group relative inline-flex items-center justify-center p-2">
+      {/* Icon - grayscale by default, colored on hover with smooth transition */}
+      <div className="grayscale group-hover:grayscale-0 opacity-60 group-hover:opacity-100 transition-all duration-500 ease-out transform group-hover:scale-110">
+        {icon}
+      </div>
+
+      {/* Tooltip on hover */}
+      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 pointer-events-none z-10">
+        {label}
+      </div>
+    </div>
+  );
 }
 
 export function AboutContent({ aboutData, settings }: AboutContentProps) {
@@ -89,9 +131,7 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
   const title = aboutData?.title || 'Learning Enthusiast';
   const tagline = aboutData?.tagline || '';
   const profileImage = aboutData?.profileImage || '';
-  const location = aboutData?.location || '';
   const email = aboutData?.email || settings?.contact_email || '';
-  const website = aboutData?.website || '';
   const bio = aboutData?.bio || '';
   const cvUrl = aboutData?.cvUrl || '';
   const portfolioUrl = aboutData?.portfolioUrl || '';
@@ -102,358 +142,329 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
   const volunteering = aboutData?.volunteering || [];
   const educations = aboutData?.educations || [];
 
+  // Animation variants - updated for faster, snappier animations
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
+        staggerChildren: 0.05,
+        delayChildren: 0.1,
       },
     },
   };
 
   const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 12 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, ease: "easeOut" },
+      transition: { duration: 0.3, ease: "easeOut" },
     },
   };
 
   return (
-    <div className="py-16 lg:py-20 transition-colors duration-300 min-h-screen relative">
-      
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={containerVariants}
-        >
-          {/* Header */}
-          <motion.div variants={itemVariants} className="mx-auto max-w-3xl text-center mb-16">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl mb-6">
-              {t('title')}
-            </h1>
-            {(tagline || bio) && (
-              <p className="text-xl leading-8 text-gray-600 dark:text-gray-300">
-                {tagline || bio.split('\n')[0]}
-              </p>
-            )}
-          </motion.div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-20">
-            {/* Sidebar Info - GLASSMORPHISM CARD */}
-            <motion.div variants={itemVariants} className="lg:col-span-1">
-              <div className="lg:sticky lg:top-24 space-y-8">
-                <div className="rounded-2xl bg-white/80 dark:bg-gray-900/80 border-2 border-gray-200/60 dark:border-gray-700/60">
-                  {/* Top Section: Photo, Name, Icons */}
-                  <div className="p-8 md:p-10 pb-4 md:pb-4">
-                    {/* Profile Avatar - Large & Centered */}
-                    <div className="flex justify-center mb-6">
-                      <div className="relative w-40 h-40 rounded-2xl overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 ring-4 ring-white/10 dark:ring-white/5">
-                        {profileImage ? (
-                          <Image src={profileImage} alt={name} className="object-cover" fill unoptimized />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-white text-5xl font-bold">
-                            {name.charAt(0).toUpperCase()}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Name & Title */}
-                    <div className="text-center">
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{name}</h2>
-                      <p className="text-blue-600 dark:text-blue-400 font-medium text-lg mb-4">{title}</p>
-                      
-                      {/* Contact Icons - Centered below Title */}
-                      <div className="flex items-center justify-center gap-3 text-gray-600 dark:text-gray-300">
-                        {location && (
-                          <a 
-                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 transition-all hover:scale-110"
-                            title={location}
-                          >
-                            <MapPin className="h-5 w-5" />
-                          </a>
-                        )}
-                        {email && (
-                          <a 
-                            href={`mailto:${email}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 transition-all hover:scale-110"
-                            title={email}
-                          >
-                            <Mail className="h-5 w-5" />
-                          </a>
-                        )}
-                        {website && (
-                          <a 
-                            href={website.startsWith('http') ? website : `https://${website}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 transition-all hover:scale-110"
-                            title={website}
-                          >
-                            <Globe className="h-5 w-5" />
-                          </a>
-                        )}
-                        {settings?.social_instagram && (
-                          <a 
-                            href={settings.social_instagram}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 hover:bg-pink-50 dark:hover:bg-pink-900/20 hover:text-pink-600 transition-all hover:scale-110"
-                            title="Instagram"
-                          >
-                            <Instagram className="h-5 w-5" />
-                          </a>
-                        )}
-                        {settings?.social_whatsapp && (
-                          <a 
-                            href={`https://wa.me/${settings.social_whatsapp.replace(/[^0-9]/g, '')}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 transition-all hover:scale-110"
-                            title="WhatsApp"
-                          >
-                            <Phone className="h-5 w-5" />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Divider - Full Width */}
-                  <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent opacity-50" />
-
-                  {/* Action Buttons */}
-                  {(cvUrl || portfolioUrl) && (
-                    <div className="p-8 md:p-10 pt-4 md:pt-4 space-y-3">
-                      {cvUrl && (
-                        <a href={cvUrl} target="_blank" rel="noopener noreferrer" className="block w-full">
-                          <Button className="w-full py-6 text-base gap-3 hover:-translate-y-1 transition-all duration-300 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white border-none justify-center rounded-xl">
-                            <Download className="h-5 w-5" /> {t('downloadCV')}
-                          </Button>
-                        </a>
-                      )}
-                      {portfolioUrl && (
-                        <a href={portfolioUrl} target="_blank" rel="noopener noreferrer" className="block w-full">
-                          <Button variant="outline" className="w-full py-6 text-base gap-3 hover:border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:-translate-y-1 transition-all duration-300 justify-center rounded-xl border-2">
-                            <FileText className="h-5 w-5" /> Portfolio
-                          </Button>
-                        </a>
-                      )}
+    <div className="transition-colors duration-300 min-h-screen relative">
+      {/* Hero Section - Compact */}
+      <section className="relative pt-16 pb-3">
+        <div className="mx-auto max-w-5xl px-6 lg:px-8">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={itemVariants}
+            className={`bg-white dark:bg-gray-800 rounded-2xl ${SPACING.heroCard} shadow-xl`}
+          >
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-10 md:gap-12">
+              {/* Profile Image - Compact */}
+              <div className="flex-shrink-0">
+                <div className={`relative ${SPACING.profileImage} rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700`}>
+                  {profileImage ? (
+                    <Image src={profileImage} alt={name} className="object-cover" fill unoptimized />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 text-white text-4xl font-bold">
+                      {name.charAt(0).toUpperCase()}
                     </div>
                   )}
                 </div>
               </div>
-            </motion.div>
 
-            {/* Main Content - Transparent with High Contrast Border */}
-            <motion.div variants={itemVariants} className="lg:col-span-2">
-              <div className="rounded-2xl bg-white/80 dark:bg-gray-900/80 border-2 border-gray-200/60 dark:border-gray-700/60">
-                
-                {/* Bio */}
-                {bio && (
-                  <div className="p-8 md:p-10">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('bio')}</h2>
-                    <div className="prose prose-lg dark:prose-invert max-w-none">
-                      {bio.split('\n').map((paragraph, i) => (
-                        <p key={i} className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4 last:mb-0">
-                          {paragraph}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Education */}
-                {educations.length > 0 && (
-                  <>
-                    <div className="my-8 h-[1.5px] bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-800 to-transparent" />
-                    <div className="p-8 md:p-10">
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">{t('education')}</h2>
-                      <div className="space-y-8">
-                        {educations.map((edu) => (
-                          <div key={edu.id} className="relative pl-8 border-l-2 border-gray-200 dark:border-gray-700">
-                            <div className="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-gray-300 dark:bg-gray-600 ring-4 ring-white/30 dark:ring-gray-900/30" />
-                            <div className="mb-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                              <h3 className="text-lg font-bold text-gray-900 dark:text-white">{edu.degree}</h3>
-                              <span className="text-sm text-gray-500 dark:text-gray-400">{edu.period}</span>
-                            </div>
-                            <p className="text-blue-600 dark:text-blue-400 font-medium mb-3">{edu.institution}</p>
-                            <p className="text-gray-600 dark:text-gray-300">{edu.description}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {/* Experience - Accordion Style */}
-                {experiences.length > 0 && (
-                  <>
-                    <div className="my-8 h-[1.5px] bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-800 to-transparent" />
-                    <div className="p-8 md:p-10">
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">{t('experience')}</h2>
-                      <div className="space-y-4">
-                        {experiences.map((exp) => (
-                          <Accordion
-                            key={exp.id}
-                            helperText={t('clickToView')}
-                            trigger={
-                              <div className="flex items-center gap-4">
-                                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg shrink-0 hidden sm:block">
-                                  <Briefcase className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                                </div>
-                                <div className="flex-1">
-                                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">{exp.title}</h3>
-                                  <p className="text-blue-600 dark:text-blue-400 font-medium">{exp.company}</p>
-                                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    {formatPeriod(exp.startMonth, exp.startYear, exp.endMonth, exp.endYear, exp.isCurrent)}
-                                  </p>
-                                </div>
-                              </div>
-                            }
-                          >
-                            <p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
-                              {locale === 'id' ? exp.descriptionId : exp.descriptionEn}
-                            </p>
-                          </Accordion>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {/* Volunteering & Organization */}
-                {volunteering.length > 0 && (
-                  <>
-                    <div className="my-8 h-[1.5px] bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-800 to-transparent" />
-                    <div className="p-8 md:p-10">
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">{t('volunteering.title')}</h2>
-                      <div className="space-y-4">
-                        {volunteering.map((vol) => (
-                          <Accordion
-                            key={vol.id}
-                            helperText={t('clickToView')}
-                            trigger={
-                              <div className="flex items-center gap-4">
-                                <div className="p-2 bg-teal-100 dark:bg-teal-900/30 rounded-lg shrink-0 hidden sm:block">
-                                  <Users className="h-5 w-5 text-teal-600 dark:text-teal-400" />
-                                </div>
-                                <div className="flex-1">
-                                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">{vol.role}</h3>
-                                  <p className="text-teal-600 dark:text-teal-400 font-medium">{vol.organization}</p>
-                                  <p className="text-sm text-gray-500 dark:text-gray-400">{vol.period}</p>
-                                </div>
-                              </div>
-                            }
-                          >
-                            <p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
-                              {locale === 'id' ? vol.descriptionId : vol.descriptionEn}
-                            </p>
-                          </Accordion>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {/* Hobbies */}
-                {hobbies.length > 0 && (
-                  <>
-                    <div className="my-8 h-[1.5px] bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-800 to-transparent" />
-                    <div className="p-8 md:p-10">
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('hobbies')}</h2>
-                      <div className="flex flex-wrap gap-3">
-                        {hobbies.map((hobby) => (
-                          <span
-                            key={hobby}
-                            className="inline-flex items-center rounded-full bg-rose-50 dark:bg-rose-900/20 px-4 py-2 text-sm font-medium text-rose-700 dark:text-rose-300 border border-rose-100 dark:border-rose-800"
-                          >
-                            {hobby}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {/* Tech Stack */}
-                {techStack.length > 0 && (
-                  <>
-                    <div className="my-8 h-[1.5px] bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-800 to-transparent" />
-                    <div className="p-8 md:p-10">
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('techStack')}</h2>
-                      <div className="flex flex-wrap gap-3">
-                        {techStack.map((tech) => (
-                          <span
-                            key={tech}
-                            className="inline-flex items-center rounded-lg bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-800/50 px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-200 hover:scale-105"
-                          >
-                            {tech}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {/* Tools */}
-                {tools.length > 0 && (
-                  <>
-                    <div className="my-8 h-[1.5px] bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-800 to-transparent" />
-                    <div className="p-8 md:p-10">
-                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('tools')}</h2>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                        {tools.map((tool) => (
-                          <div
-                            key={tool}
-                            className="flex items-center gap-3 p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-lg transition-all duration-200 hover:scale-105"
-                          >
-                            <div className="flex-shrink-0 w-5 h-5 text-gray-700 dark:text-gray-300">
-                              {getToolIcon(tool)}
-                            </div>
-                            <span className="text-sm font-medium text-gray-900 dark:text-white">
-                              {tool}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Contact Section */}
-          <motion.section variants={itemVariants} className="border-t border-gray-200 dark:border-gray-800 pt-20 mt-20">
-            <div className="mx-auto max-w-3xl">
-              {/* Header */}
-              <div className="text-center mb-12">
-                <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                  {t('contact.title')}
-                </h2>
-                <p className="text-lg text-gray-600 dark:text-gray-400">
-                  {t('contact.description')}
+              {/* Info & CTAs - Compact */}
+              <div className="flex-1 text-center md:text-left">
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
+                  {name}
+                </h1>
+                <p className="text-lg md:text-xl text-blue-600 dark:text-blue-400 font-semibold mb-4">
+                  {title}
                 </p>
-              </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-6 opacity-90">
+                  {tagline || bio.split('\n')[0]}
+                </p>
 
-              {/* Contact Form */}
-              <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 lg:p-12 border border-gray-200 dark:border-gray-700 shadow-xl">
-                <ContactForm />
+                {/* Social Media Icons - Borderless Minimal */}
+                <div className="flex gap-3 justify-center md:justify-start mb-5">
+                  {email && (
+                    <div className="group relative">
+                      <a
+                        href={`mailto:${email}`}
+                        className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 transform hover:scale-110"
+                        aria-label="Email"
+                      >
+                        <Mail className="w-5 h-5" />
+                      </a>
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 pointer-events-none z-10">
+                        Email
+                      </div>
+                    </div>
+                  )}
+                  {settings?.social_instagram && (
+                    <div className="group relative">
+                      <a
+                        href={settings.social_instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 transform hover:scale-110"
+                        aria-label="Instagram"
+                      >
+                        <Instagram className="w-5 h-5" />
+                      </a>
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 pointer-events-none z-10">
+                        Instagram
+                      </div>
+                    </div>
+                  )}
+                  {settings?.social_whatsapp && (
+                    <div className="group relative">
+                      <a
+                        href={settings.social_whatsapp}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 transform hover:scale-110"
+                        aria-label="WhatsApp"
+                      >
+                        <MessageCircle className="w-5 h-5" />
+                      </a>
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 pointer-events-none z-10">
+                        WhatsApp
+                      </div>
+                    </div>
+                  )}
+                  {settings?.social_github && (
+                    <div className="group relative">
+                      <a
+                        href={settings.social_github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 transform hover:scale-110"
+                        aria-label="GitHub"
+                      >
+                        <Github className="w-5 h-5" />
+                      </a>
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 pointer-events-none z-10">
+                        GitHub
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Download Buttons - Row 2 */}
+                <div className="flex gap-3 justify-center md:justify-start">
+                  {portfolioUrl && (
+                    <a
+                      href={portfolioUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-gray-300 dark:border-gray-600 hover:border-blue-600 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-gray-900 dark:text-white rounded-lg font-medium transition-all duration-300"
+                    >
+                      <Briefcase className="w-4 h-4" />
+                      Portfolio
+                    </a>
+                  )}
+                  {cvUrl && (
+                    <a
+                      href={cvUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-blue-600 dark:border-blue-400 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-400 dark:hover:text-gray-900 text-blue-600 dark:text-blue-400 rounded-lg font-semibold transition-all duration-300"
+                    >
+                      <Download className="w-4 h-4" />
+                      Download CV
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
-          </motion.section>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Bento Grid Content Section */}
+      <div className="mx-auto max-w-5xl px-6 lg:px-8 pt-0">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+          className={`grid grid-cols-1 ${SPACING.cardGap} auto-rows-auto`}
+        >
+          {/* Education Timeline - Full width */}
+          {educations.length > 0 && (
+            <motion.div variants={itemVariants} className={`col-span-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 ${SPACING.card}`}>
+              <h2 className={`${TYPOGRAPHY.sectionTitle} ${SPACING.sectionTitle} pb-1.5 mb-4 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-3/4 after:h-[1px] after:bg-gray-400 dark:after:bg-gray-500`}>{t('education')}</h2>
+              <div className={SPACING.itemGap}>
+                {educations.map((edu) => (
+                  <div key={edu.id} className="relative pl-6 border-l-[1.5px] border-gray-200 dark:border-gray-700">
+                    <div className="absolute -left-[6.5px] top-0 h-3 w-3 rounded-full bg-gray-300 dark:bg-gray-600 ring-4 ring-white/30 dark:ring-gray-900/30" />
+                    <div className="mb-1 flex flex-col gap-1">
+                      <h3 className={TYPOGRAPHY.cardTitle}>{edu.degree}</h3>
+                      <span className={TYPOGRAPHY.meta}>{edu.period}</span>
+                    </div>
+                    <p className={`${TYPOGRAPHY.subtitle} text-blue-600 dark:text-blue-400 mb-2`}>{edu.institution}</p>
+                    <p className={`${TYPOGRAPHY.body} text-xs`}>{edu.description}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Experience Section - Full width */}
+          {experiences.length > 0 && (
+            <motion.div variants={itemVariants} className={`col-span-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 ${SPACING.card}`}>
+              <h2 className={`${TYPOGRAPHY.sectionTitle} ${SPACING.sectionTitle} pb-1.5 mb-4 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-3/4 after:h-[1px] after:bg-gray-400 dark:after:bg-gray-500`}>{t('experience')}</h2>
+              <div className={SPACING.itemGap}>
+                {experiences.map((exp) => (
+                  <div key={exp.id} className="bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-100 dark:border-gray-800">
+                    <Accordion
+                      helperText={t('clickToView')}
+                      trigger={
+                        <div className="flex items-center gap-3">
+                          <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg shrink-0">
+                            <Briefcase className={`${SPACING.iconSize} text-blue-600 dark:text-blue-400`} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className={TYPOGRAPHY.cardTitle}>{exp.title}</h3>
+                            <p className={`${TYPOGRAPHY.subtitle} text-blue-600 dark:text-blue-400`}>{exp.company}</p>
+                            <p className={TYPOGRAPHY.meta}>
+                              {formatPeriod(exp.startMonth, exp.startYear, exp.endMonth, exp.endYear, exp.isCurrent)}
+                            </p>
+                          </div>
+                        </div>
+                      }
+                    >
+                      <p className={`${TYPOGRAPHY.body} mt-2`}>
+                        {locale === 'id' ? exp.descriptionId : exp.descriptionEn}
+                      </p>
+                    </Accordion>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Volunteering - Full width */}
+          {volunteering.length > 0 && (
+            <motion.div variants={itemVariants} className={`col-span-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 ${SPACING.card}`}>
+              <h2 className={`${TYPOGRAPHY.sectionTitle} ${SPACING.sectionTitle} pb-1.5 mb-4 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-3/4 after:h-[1px] after:bg-gray-400 dark:after:bg-gray-500`}>{t('volunteering.title')}</h2>
+              <div className={SPACING.itemGap}>
+                {volunteering.map((vol) => (
+                  <div key={vol.id} className="bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-100 dark:border-gray-800">
+                    <Accordion
+                      helperText={t('clickToView')}
+                      trigger={
+                        <div className="flex items-center gap-3">
+                          <div className="p-1.5 bg-teal-100 dark:bg-teal-900/30 rounded-lg shrink-0">
+                            <Users className={`${SPACING.iconSize} text-teal-600 dark:text-teal-400`} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className={TYPOGRAPHY.cardTitle}>{vol.role}</h3>
+                            <p className={`${TYPOGRAPHY.subtitle} text-teal-600 dark:text-teal-400`}>{vol.organization}</p>
+                            <p className={TYPOGRAPHY.meta}>{vol.period}</p>
+                          </div>
+                        </div>
+                      }
+                    >
+                      <p className={`${TYPOGRAPHY.body} mt-2`}>
+                        {locale === 'id' ? vol.descriptionId : vol.descriptionEn}
+                      </p>
+                    </Accordion>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Hobbies - Full width */}
+          {hobbies.length > 0 && (
+            <motion.div variants={itemVariants} className={`col-span-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 ${SPACING.card}`}>
+              <h2 className={`${TYPOGRAPHY.sectionTitle} ${SPACING.sectionTitle} pb-1.5 mb-4 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-3/4 after:h-[1px] after:bg-gray-400 dark:after:bg-gray-500`}>{t('hobbies')}</h2>
+              <div className="flex flex-wrap gap-2">
+                {hobbies.map((hobby) => (
+                  <span
+                    key={hobby}
+                    className="inline-flex items-center rounded-full bg-rose-50 dark:bg-rose-900/20 px-3 py-1.5 text-xs font-medium text-rose-700 dark:text-rose-300 border border-rose-100 dark:border-rose-800"
+                  >
+                    {hobby}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Tech Stack - Icon Only */}
+          {techStack.length > 0 && (
+            <motion.div variants={itemVariants} className={`col-span-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 ${SPACING.card}`}>
+              <h2 className={`${TYPOGRAPHY.sectionTitle} ${SPACING.sectionTitle} pb-1.5 mb-4 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-3/4 after:h-[1px] after:bg-gray-400 dark:after:bg-gray-500`}>{t('techStack')}</h2>
+              <div className="flex flex-wrap gap-2">
+                {techStack.map((tech) => (
+                  <IconBadge
+                    key={tech}
+                    icon={getToolIcon(tech)}
+                    label={tech}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Tools - Icon Only */}
+          {tools.length > 0 && (
+            <motion.div variants={itemVariants} className={`col-span-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 ${SPACING.card}`}>
+              <h2 className={`${TYPOGRAPHY.sectionTitle} ${SPACING.sectionTitle} pb-1.5 mb-4 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-3/4 after:h-[1px] after:bg-gray-400 dark:after:bg-gray-500`}>{t('tools')}</h2>
+              <div className="flex flex-wrap gap-2">
+                {tools.map((tool) => (
+                  <IconBadge
+                    key={tool}
+                    icon={getToolIcon(tool)}
+                    label={tool}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          )}
         </motion.div>
+
+        {/* Contact Section - Separate */}
+        <motion.section
+          initial="hidden"
+          animate="visible"
+          variants={itemVariants}
+          className="border-t border-gray-200 dark:border-gray-800 pt-16 mt-16"
+        >
+          <div className="mx-auto max-w-3xl">
+            {/* Header */}
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
+                {t('contact.title')}
+              </h2>
+              <p className="text-base text-gray-600 dark:text-gray-400">
+                {t('contact.description')}
+              </p>
+            </div>
+
+            {/* Contact Form */}
+            <div className={`bg-white dark:bg-gray-800 rounded-2xl ${SPACING.heroCard} border border-gray-200 dark:border-gray-700 shadow-xl`}>
+              <ContactForm />
+            </div>
+          </div>
+        </motion.section>
       </div>
     </div>
   );

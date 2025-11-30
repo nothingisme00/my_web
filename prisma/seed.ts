@@ -6,9 +6,23 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Starting database seed...');
 
-  // Create admin user
-  const adminEmail = 'admin@example.com';
-  const adminPassword = 'admin123'; // Change this to a secure password
+  // Get admin credentials from environment variables
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  // Validate admin password is set
+  if (!adminPassword) {
+    throw new Error(
+      'ADMIN_PASSWORD must be set in .env file for security. ' +
+      'Please add: ADMIN_PASSWORD="your-strong-password-here"'
+    );
+  }
+
+  // Warn if using default email
+  if (adminEmail === 'admin@example.com') {
+    console.warn('⚠️  WARNING: Using default admin email. Set ADMIN_EMAIL in .env for production!');
+  }
+
   const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
   const existingAdmin = await prisma.user.findUnique({

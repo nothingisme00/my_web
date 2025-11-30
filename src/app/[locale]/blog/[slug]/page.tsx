@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { ArrowLeft, Eye, Clock, Calendar, ArrowRight } from "lucide-react";
+import { ArrowLeft, Eye, Clock, Calendar } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import { incrementPostViews, getRelatedPosts, getAboutContent } from "@/lib/actions";
+import { incrementPostViews, getRelatedPosts } from "@/lib/actions";
 import { formatDate, formatViewCount } from "@/lib/utils";
 import { ShareButtons } from "@/components/blog/ShareButtons";
 import { Metadata } from "next";
@@ -79,16 +79,13 @@ export async function generateStaticParams() {
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
-  const [post, aboutData] = await Promise.all([
-    prisma.post.findUnique({
-      where: { slug },
-      include: {
-        category: true,
-        tags: true,
-      },
-    }),
-    getAboutContent(),
-  ]);
+  const post = await prisma.post.findUnique({
+    where: { slug },
+    include: {
+      category: true,
+      tags: true,
+    },
+  });
 
   if (!post) {
     notFound();
@@ -232,58 +229,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             )}
           </article>
         </div>
-
-        {/* Author Bio */}
-        {post.author && (
-          <div className="mt-16 pt-12 border-t border-gray-200 dark:border-gray-800">
-            <div className="group relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 bg-gradient-to-br from-gray-50/50 to-white dark:from-gray-800/30 dark:to-gray-900/30 p-8 transition-all duration-300 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-lg">
-              {/* Subtle gradient overlay on hover */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50/0 to-blue-50/0 dark:from-blue-900/0 dark:to-blue-900/0 group-hover:from-blue-50/30 group-hover:to-transparent dark:group-hover:from-blue-900/10 dark:group-hover:to-transparent transition-all duration-500" />
-              
-              <div className="relative flex items-start gap-6">
-                {/* Avatar */}
-                <div className="relative w-20 h-20 rounded-full overflow-hidden ring-2 ring-gray-200 dark:ring-gray-700 group-hover:ring-blue-400 dark:group-hover:ring-blue-600 transition-all duration-300 shrink-0">
-                  {aboutData?.profileImage ? (
-                    <Image
-                      src={aboutData.profileImage}
-                      alt={post.author}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-2xl font-bold">
-                      {post.author.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="mb-4">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1.5">
-                      {aboutData?.name || post.author}
-                    </h3>
-                    <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                      {aboutData?.tagline || aboutData?.title || 'Learning Enthusiast'}
-                    </p>
-                  </div>
-                  
-                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-5">
-                    {aboutData?.bio ? aboutData.bio.split('\n')[0].slice(0, 160) + '...' : 'Passionate about creating beautiful web experiences and sharing knowledge through writing.'}
-                  </p>
-                  
-                  <Link 
-                    href="/about"
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors group/link"
-                  >
-                    View Full Profile 
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover/link:translate-x-1" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Related Posts */}
         {relatedPosts.length > 0 && (

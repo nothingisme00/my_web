@@ -6,28 +6,50 @@ import { logout } from '@/lib/actions';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Breadcrumbs } from '@/components/admin/Breadcrumbs';
+import { ToastContainer } from '@/components/ui/Toast';
+import { useToast } from '@/hooks/useToast';
 import { usePathname } from 'next/navigation';
 import { clsx } from 'clsx';
 import { useState, useEffect } from 'react';
 
 function NavLink({ href, icon: Icon, children, pathname }: { href: string; icon: React.ComponentType<{ className?: string }>; children: React.ReactNode; pathname: string }) {
   // Special case for dashboard: only active when exactly /admin
-  const isActive = href === '/admin' 
-    ? pathname === '/admin' 
+  const isActive = href === '/admin'
+    ? pathname === '/admin'
     : pathname === href || pathname.startsWith(href + '/');
-  
+
   return (
     <Link
       href={href}
       className={clsx(
-        'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
+        'group relative flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 touch-manipulation overflow-hidden',
         isActive
-          ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/20'
-          : 'text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-1'
+          ? 'bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/30'
+          : 'text-gray-300 hover:bg-gray-800/80 hover:text-white active:bg-gray-800'
       )}
     >
-      <Icon className={clsx('h-5 w-5 transition-transform', isActive && 'scale-110')} />
-      <span className="font-medium">{children}</span>
+      {/* Animated background on hover */}
+      {!isActive && (
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/0 via-purple-600/0 to-blue-600/0 group-hover:from-blue-600/10 group-hover:via-purple-600/10 group-hover:to-blue-600/10 transition-all duration-500 rounded-xl" />
+      )}
+
+      {/* Icon with animation */}
+      <div className={clsx(
+        'relative z-10 transition-all duration-300',
+        isActive ? 'scale-110' : 'group-hover:scale-110 group-hover:rotate-6'
+      )}>
+        <Icon className="h-5 w-5 flex-shrink-0" />
+      </div>
+
+      {/* Text */}
+      <span className="relative z-10 font-medium transition-all duration-300 group-hover:translate-x-0.5">
+        {children}
+      </span>
+
+      {/* Active indicator */}
+      {isActive && (
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-l-full shadow-lg" />
+      )}
     </Link>
   );
 }
@@ -39,61 +61,147 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { toasts, removeToast } = useToast();
 
   // Close sidebar on route change
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsSidebarOpen(false);
+  }, [pathname]);
+
+  // Prevent body scroll when sidebar is open on mobile
+  useEffect(() => {
     if (isSidebarOpen) {
-      const timer = setTimeout(() => setIsSidebarOpen(false), 0);
-      return () => clearTimeout(timer);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
     }
-  }, [pathname, isSidebarOpen]);
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isSidebarOpen]);
 
   return (
     <html suppressHydrationWarning>
       <body suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="theme">
           <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">
+            {/* Overlay with smooth animation */}
+            <div
+              className={clsx(
+                "fixed inset-0 z-20 lg:hidden backdrop-blur-sm transition-all duration-300",
+                isSidebarOpen
+                  ? "bg-black/60 opacity-100 pointer-events-auto"
+                  : "bg-black/0 opacity-0 pointer-events-none"
+              )}
+              onClick={() => setIsSidebarOpen(false)}
+              aria-hidden="true"
+            />
+
             {/* Mobile Header */}
-            <div className="lg:hidden fixed top-0 left-0 right-0 z-20 bg-gray-900 dark:bg-gray-950 text-white border-b border-gray-800">
+            <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-gradient-to-r from-gray-900 via-gray-900 to-gray-800 border-b border-gray-700/50 shadow-xl">
               <div className="flex items-center justify-between h-16 px-4">
-                <button 
+                <button
                   onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                  className="p-2 -ml-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+                  className={clsx(
+                    "relative p-2.5 rounded-xl transition-all duration-300 touch-manipulation group",
+                    isSidebarOpen
+                      ? "bg-blue-600 text-white shadow-lg shadow-blue-500/50"
+                      : "text-gray-400 hover:text-white hover:bg-gray-800/80"
+                  )}
                   aria-label="Toggle menu"
+                  aria-expanded={isSidebarOpen}
                 >
-                  {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                  <div className="relative w-6 h-6">
+                    <Menu
+                      className={clsx(
+                        "absolute inset-0 transition-all duration-300",
+                        isSidebarOpen
+                          ? "opacity-0 rotate-180 scale-50"
+                          : "opacity-100 rotate-0 scale-100"
+                      )}
+                    />
+                    <X
+                      className={clsx(
+                        "absolute inset-0 transition-all duration-300",
+                        isSidebarOpen
+                          ? "opacity-100 rotate-0 scale-100"
+                          : "opacity-0 -rotate-180 scale-50"
+                      )}
+                    />
+                  </div>
                 </button>
-                
-                <div className="absolute left-1/2 transform -translate-x-1/2 font-bold text-lg bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                  CMS Admin
+
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
+                    <LayoutDashboard className="h-4 w-4 text-white" />
+                  </div>
+                  <div className="font-bold text-lg bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    CMS Admin
+                  </div>
                 </div>
-                
-                {/* Spacer for balance */}
-                <div className="w-10"></div>
+
+                {/* Theme toggle on mobile */}
+                <div className="p-1">
+                  <ThemeToggle />
+                </div>
               </div>
             </div>
 
-            {/* Overlay */}
-            {isSidebarOpen && (
-              <div 
-                className="fixed inset-0 z-20 bg-black/50 lg:hidden backdrop-blur-sm"
-                onClick={() => setIsSidebarOpen(false)}
-              />
-            )}
-
-            {/* Sidebar */}
+            {/* Sidebar with smooth slide animation */}
             <aside className={clsx(
-              "fixed inset-y-0 left-0 z-30 w-64 bg-gray-900 dark:bg-gray-950 text-white flex-shrink-0 border-r border-gray-800 transition-transform duration-300 ease-in-out lg:translate-x-0",
-              isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+              "fixed top-0 left-0 h-full z-30 w-[280px] sm:w-72 lg:w-64 bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950 text-white flex-shrink-0 border-r border-gray-700/50 transition-all duration-500 ease-out flex flex-col backdrop-blur-xl",
+              // Mobile/Tablet: controlled by state
+              isSidebarOpen ? "translate-x-0 shadow-2xl shadow-black/50" : "-translate-x-full lg:translate-x-0 shadow-none lg:shadow-none"
             )}>
-              <div className="p-6 border-b border-gray-800 hidden lg:block">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                  CMS Admin
-                </h1>
-                <p className="text-xs text-gray-400 mt-1">Content Management</p>
+              {/* Gradient overlay for depth */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-transparent to-purple-600/5 pointer-events-none" />
+
+              {/* Desktop Header - Hidden on mobile */}
+              <div className="hidden lg:block relative p-6 border-b border-gray-700/50 flex-shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                    <LayoutDashboard className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                      CMS Admin
+                    </h1>
+                    <p className="text-xs text-gray-400 mt-0.5">Content Management</p>
+                  </div>
+                </div>
               </div>
 
-              <nav className="mt-6 px-4 space-y-1 overflow-y-auto h-[calc(100vh-200px)]">
+              {/* Mobile Header with stagger animation */}
+              <div className={clsx(
+                "lg:hidden relative flex items-center justify-between p-5 border-b border-gray-700/50 flex-shrink-0 transition-all duration-500",
+                isSidebarOpen ? "opacity-100 translate-y-0 delay-100" : "opacity-0 -translate-y-4"
+              )}>
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-blue-500/30 animate-pulse">
+                    <LayoutDashboard className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-lg font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                      CMS Admin
+                    </h1>
+                    <p className="text-xs text-gray-400">Content Management</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsSidebarOpen(false)}
+                  className="p-2 text-gray-400 hover:text-white hover:bg-red-500/20 hover:border-red-500/50 border border-gray-700/50 rounded-xl transition-all duration-300 active:scale-90 touch-manipulation group"
+                  aria-label="Close menu"
+                >
+                  <X className="h-5 w-5 group-hover:rotate-90 transition-transform duration-300" />
+                </button>
+              </div>
+
+              {/* Scrollable Navigation with stagger */}
+              <nav className={clsx(
+                "admin-sidebar-nav relative flex-1 px-4 py-6 space-y-2 overflow-y-auto overscroll-contain transition-all duration-700",
+                isSidebarOpen ? "opacity-100 delay-200" : "opacity-0 lg:opacity-100"
+              )}>
                 <NavLink href="/admin" icon={LayoutDashboard} pathname={pathname}>
                   Dashboard
                 </NavLink>
@@ -117,36 +225,49 @@ export default function AdminLayout({
                 </NavLink>
               </nav>
 
-              <div className="absolute bottom-0 w-64 p-4 border-t border-gray-800 space-y-2 bg-gray-900 dark:bg-gray-950">
-                <div className="flex items-center justify-between px-4 py-2">
-                  <span className="text-sm text-gray-400">Theme</span>
+              {/* Bottom Actions with gradient border */}
+              <div className={clsx(
+                "relative flex-shrink-0 p-4 border-t border-gray-700/50 space-y-3 bg-gradient-to-t from-gray-950 to-transparent transition-all duration-700",
+                isSidebarOpen ? "opacity-100 translate-y-0 delay-300" : "opacity-0 lg:opacity-100 translate-y-4 lg:translate-y-0"
+              )}>
+                {/* Theme Toggle - Hidden on mobile (shown in header) */}
+                <div className="hidden lg:flex items-center justify-between px-4 py-2.5 bg-gray-800/50 rounded-xl border border-gray-700/50 hover:border-gray-600/50 transition-all duration-300">
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+                    <span className="text-sm text-gray-300 font-medium">Theme</span>
+                  </div>
                   <ThemeToggle />
                 </div>
+
+                {/* Logout Button */}
                 <form action={logout} className="w-full">
                   <button
                     type="submit"
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-red-400 hover:bg-red-900/20 hover:text-red-300"
+                    className="group w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 text-red-400 hover:text-white bg-red-900/0 hover:bg-red-600 border border-red-900/30 hover:border-red-600 active:scale-95 touch-manipulation shadow-lg shadow-red-900/0 hover:shadow-red-600/30"
                   >
-                    <LogOut className="h-5 w-5" />
-                    Logout
+                    <LogOut className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
+                    <span className="font-medium">Logout</span>
                   </button>
                 </form>
               </div>
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 lg:ml-64 min-h-screen flex flex-col">
+            <main className="flex-1 lg:ml-64 min-h-screen flex flex-col w-full">
               {/* Breadcrumbs Bar */}
-              <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 lg:px-8 py-4 sticky top-16 lg:top-0 z-10 mt-16 lg:mt-0">
+              <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 sm:px-6 lg:px-8 py-4 sticky top-16 lg:top-0 z-10 mt-16 lg:mt-0">
                 <Breadcrumbs />
               </header>
 
               {/* Page Content */}
-              <div className="p-4 lg:p-8 flex-1 overflow-x-hidden">
+              <div className="p-4 sm:p-6 lg:p-8 flex-1 overflow-x-hidden">
                 {children}
               </div>
             </main>
           </div>
+
+          {/* Toast Notifications */}
+          <ToastContainer toasts={toasts} onClose={removeToast} />
         </ThemeProvider>
       </body>
     </html>

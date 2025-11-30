@@ -27,7 +27,7 @@ export function LayoutWrapper({ children, settings, footer }: LayoutWrapperProps
       {/* Only show Navbar/Footer for public pages */}
       {!isCMSPage && <Navbar settings={settings} />}
       
-      <div className="relative z-10 flex flex-col flex-grow w-full">
+      <div className="relative z-10 flex flex-col flex-grow w-full bg-gradient-to-b from-gray-50/50 via-transparent to-gray-50/30 dark:from-gray-950/50 dark:via-transparent dark:to-gray-950/30">
         {isCMSPage ? (
           <main>{children}</main>
         ) : (

@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { Plus, Trash2, Image as ImageIcon, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
+import { toast } from '@/hooks/useToast';
 
 interface GalleryPhoto {
   id: string;
@@ -20,6 +22,11 @@ export default function AdminGalleryPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; photo: GalleryPhoto | null }>({
+    isOpen: false,
+    photo: null,
+  });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchPhotos = useCallback(async () => {
     try {
@@ -44,23 +51,53 @@ export default function AdminGalleryPage() {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    await fetch('/api/gallery', {
-      method: 'POST',
-      body: formData,
-    });
+    try {
+      const res = await fetch('/api/gallery', {
+        method: 'POST',
+        body: formData,
+      });
 
-    setIsModalOpen(false);
-    setIsSubmitting(false);
-    form.reset();
-    fetchPhotos();
+      if (res.ok) {
+        toast.success('Photo uploaded successfully!');
+        setIsModalOpen(false);
+        form.reset();
+        fetchPhotos();
+      } else {
+        toast.error('Failed to upload photo.');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Failed to upload photo. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('Delete this photo?')) return;
+  const handleDeleteClick = (photo: GalleryPhoto) => {
+    setDeleteModal({ isOpen: true, photo });
+  };
 
-    await fetch(`/api/gallery/${id}`, { method: 'DELETE' });
-    fetchPhotos();
-  }
+  const handleDeleteConfirm = async () => {
+    if (!deleteModal.photo) return;
+
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/gallery/${deleteModal.photo.id}`, { method: 'DELETE' });
+
+      if (res.ok) {
+        toast.success('Photo deleted successfully!');
+        setDeleteModal({ isOpen: false, photo: null });
+        fetchPhotos();
+      } else {
+        toast.error('Failed to delete photo.');
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      toast.error('Failed to delete photo. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <div>
@@ -106,7 +143,7 @@ export default function AdminGalleryPage() {
                   )}
                 </div>
                 <button
-                  onClick={() => handleDelete(photo.id)}
+                  onClick={() => handleDeleteClick(photo)}
                   className="self-end p-2 bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
                 >
                   <Trash2 className="h-4 w-4 text-white" />
@@ -205,6 +242,16 @@ export default function AdminGalleryPage() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, photo: null })}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Photo"
+        itemName={deleteModal.photo?.title}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }

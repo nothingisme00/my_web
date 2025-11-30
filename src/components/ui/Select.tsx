@@ -3,6 +3,7 @@
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { SelectHTMLAttributes, forwardRef } from 'react';
+import { ChevronDown } from 'lucide-react';
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
@@ -21,34 +22,50 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             {props.required && <span className="text-red-500 ml-1">*</span>}
           </label>
         )}
-        <select
-          ref={ref}
-          className={twMerge(
-            clsx(
-              'w-full px-4 py-2 rounded-lg border transition-all duration-200 ease-out',
-              'bg-white dark:bg-gray-900',
-              'text-gray-900 dark:text-white',
-              'border-gray-300 dark:border-gray-700',
-              'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:shadow-sm',
-              'hover:border-gray-400 dark:hover:border-gray-600',
-              'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-gray-300',
-              error && 'border-red-500 focus:ring-red-500 focus:border-red-500',
-              className
-            )
-          )}
-          {...props}
-        >
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            ref={ref}
+            className={twMerge(
+              clsx(
+                'w-full px-4 py-2.5 pr-10 rounded-lg border transition-all duration-200 ease-out appearance-none cursor-pointer',
+                'bg-white dark:bg-gray-900',
+                'text-gray-900 dark:text-white',
+                'border-gray-300 dark:border-gray-700',
+                'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:shadow-sm',
+                'hover:border-gray-400 dark:hover:border-gray-600',
+                'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-gray-300',
+                error && 'border-red-500 focus:ring-red-500 focus:border-red-500',
+                className
+              )
+            )}
+            {...props}
+          >
+            {options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+
+          {/* Custom Arrow Icon */}
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+            <ChevronDown
+              className={clsx(
+                'h-5 w-5 transition-colors',
+                error ? 'text-red-500' : 'text-gray-400 dark:text-gray-500',
+                props.disabled && 'opacity-50'
+              )}
+            />
+          </div>
+        </div>
         {error && (
-          <p className="mt-1 text-sm text-red-500">{error}</p>
+          <p className="mt-1.5 text-sm text-red-500 flex items-center gap-1">
+            <span className="inline-block w-1 h-1 rounded-full bg-red-500"></span>
+            {error}
+          </p>
         )}
         {helperText && !error && (
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{helperText}</p>
+          <p className="mt-1.5 text-sm text-gray-500 dark:text-gray-400">{helperText}</p>
         )}
       </div>
     );

@@ -27,32 +27,30 @@
   },
   "home": {
     "hero": {
-      "badge": "Halo! Ini saya",
-      "greeting": "Saya seorang",
-      "typewriter": {
-        "learning": "Pembelajar",
-        "creative": "Kreatif",
-        "tech": "Teknologi",
-        "art": "Seni"
-      },
-      "enthusiast": "Enthusiast",
-      "description": "Berbagi pengalaman dan hal-hal menarik yang ingin saya sampaikan",
-      "title": "Selamat Datang di Portfolio Saya",
-      "subtitle": "Full Stack Developer & Pemecah Masalah Kreatif",
-      "cta": "Hubungi Saya",
-      "learnMore": "Pelajari Lebih Lanjut Tentang Saya"
+      "title": "Artikel Terbaru",
+      "subtitle": "Menjelajahi software testing, pengembangan, dan teknologi"
     },
     "articles": {
-      "featured": "Unggulan",
+      "featured": "Artikel Unggulan",
       "recentTitle": "Artikel Terbaru",
       "viewAll": "Lihat semua",
-      "noArticles": "Belum ada artikel tersedia.",
-      "createFirst": "Buat artikel pertama"
+      "noArticles": "Belum ada artikel tersedia. Segera hadir!",
+      "readArticle": "Baca Artikel",
+      "loadMore": "Muat Artikel Lainnya"
     },
-    "aboutCta": {
-      "title": "Hei, salam kenal!",
-      "description": "Saya {name} — suka ngulik hal-hal baru dan berbagi cerita lewat tulisan. Kalau kamu penasaran siapa di balik blog ini, yuk kenalan!",
-      "button": "Kenalan yuk"
+    "newsletter": {
+      "title": "Tetap Terhubung",
+      "description": "Berlangganan newsletter saya untuk mendapatkan artikel terbaru, tutorial, dan wawasan langsung ke inbox Anda.",
+      "emailPlaceholder": "Masukkan email Anda",
+      "subscribe": "Berlangganan",
+      "subscribing": "Memproses...",
+      "success": "Berhasil berlangganan! Periksa email Anda untuk konfirmasi.",
+      "error": "Gagal berlangganan. Silakan coba lagi.",
+      "invalidEmail": "Mohon masukkan alamat email yang valid"
+    },
+    "aboutMini": {
+      "title": "Tentang Saya",
+      "learnMore": "Pelajari Lebih Lanjut Tentang Saya"
     },
     "about": {
       "title": "Tentang Saya",
@@ -66,13 +64,47 @@
       "title": "Proyek Unggulan",
       "viewAll": "Lihat Semua Proyek"
     },
-    "blog": {
+    "blogSection": {
       "title": "Posting Blog Terbaru",
       "viewAll": "Lihat Semua Posting"
     },
     "contact": {
       "title": "Mari Berkomunikasi",
       "description": "Punya proyek yang ingin dikerjakan? Mari bekerja sama!"
+    }
+  },
+  "blog": {
+    "search": {
+      "placeholder": "Cari artikel...",
+      "searching": "Mencari..."
+    },
+    "filters": {
+      "category": {
+        "label": "Kategori",
+        "all": "Semua Kategori",
+        "select": "Pilih kategori"
+      },
+      "tags": {
+        "label": "Tag",
+        "select": "Pilih tag",
+        "none": "Tidak ada tag dipilih"
+      },
+      "sort": {
+        "label": "Urutkan",
+        "newest": "Terbaru",
+        "oldest": "Terlama",
+        "mostViewed": "Paling Banyak Dilihat",
+        "readingTime": "Waktu Baca"
+      },
+      "clearAll": "Hapus Semua",
+      "active": "Filter Aktif"
+    },
+    "results": {
+      "showing": "Menampilkan {count} dari {total} artikel",
+      "noResults": "Artikel tidak ditemukan",
+      "noResultsDescription": "Coba sesuaikan filter Anda untuk menemukan lebih banyak artikel",
+      "totalArticles": "{count} artikel",
+      "clearAll": "Hapus Semua Filter"
     }
   },
   "about": {

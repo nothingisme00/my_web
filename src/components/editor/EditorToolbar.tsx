@@ -16,7 +16,10 @@ import {
   Redo,
   Link as LinkIcon,
   Image as ImageIcon,
+  Upload,
+  Minus,
 } from 'lucide-react'
+import { AVAILABLE_LANGUAGES, AVAILABLE_THEMES } from '@/lib/highlightjs-config'
 
 interface EditorToolbarProps {
   editor: Editor | null
@@ -64,6 +67,47 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
     if (url) {
       editor.chain().focus().setImage({ src: url }).run()
     }
+  }
+
+  const uploadImage = async () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (!file) return
+
+      try {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        const response = await fetch('/api/about/upload', {
+          method: 'POST',
+          body: formData,
+        })
+
+        if (!response.ok) {
+          const error = await response.json()
+          alert(`Upload failed: ${error.error || 'Unknown error'}`)
+          return
+        }
+
+        const result = await response.json()
+
+        if (result.url) {
+          editor.chain().focus().setImage({ src: result.url }).run()
+        }
+      } catch (error) {
+        alert('Upload failed: ' + (error instanceof Error ? error.message : 'Unknown error'))
+      }
+    }
+
+    input.click()
+  }
+
+  const addHorizontalRule = () => {
+    editor.chain().focus().setHorizontalRule().run()
   }
 
   const addLink = () => {
@@ -149,6 +193,44 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 
       <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 self-center" />
 
+      {/* Font Size Dropdown */}
+      <div className="relative">
+        <select
+          value={editor.getAttributes('textStyle').fontSize || 'default'}
+          onChange={(e) => {
+            if (e.target.value === 'default') {
+              editor.chain().focus().unsetFontSize().run()
+            } else {
+              editor.chain().focus().setFontSize(e.target.value).run()
+            }
+          }}
+          className="h-8 px-2 pr-6 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer"
+          onClick={(e) => e.preventDefault()}
+        >
+          <option value="default">Default</option>
+          <option value="12px">12px - Tiny</option>
+          <option value="14px">14px - Small</option>
+          <option value="16px">16px - Normal</option>
+          <option value="18px">18px - Medium</option>
+          <option value="20px">20px - Large</option>
+          <option value="24px">24px - XL</option>
+          <option value="32px">32px - 2XL</option>
+          <option value="36px">36px - 3XL</option>
+          <option value="48px">48px - 4XL</option>
+          <option value="64px">64px - 5XL</option>
+        </select>
+        <svg
+          className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none text-gray-500"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+
+      <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 self-center" />
+
       {/* Lists */}
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBulletList().run()}
@@ -168,11 +250,67 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        isActive={editor.isActive('blockquote')}    
+        isActive={editor.isActive('blockquote')}
         title="Quote"
       >
         <Quote className="w-4 h-4" />
       </ToolbarButton>
+
+      <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 self-center" />
+
+      {/* Code Block Section */}
+      <ToolbarButton
+        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+        isActive={editor.isActive('codeBlock')}
+        title="Code Block"
+      >
+        <Code className="w-4 h-4" />
+      </ToolbarButton>
+
+      {/* Language & Theme Selectors - Only show when in code block */}
+      {editor.isActive('codeBlock') && (
+        <>
+          <select
+            value={editor.getAttributes('codeBlock').language || 'javascript'}
+            onChange={(e) => {
+              e.preventDefault()
+              editor.chain().focus().setCodeBlockLanguage(e.target.value).run()
+            }}
+            className="h-8 px-2 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onClick={(e) => e.preventDefault()}
+          >
+            {AVAILABLE_LANGUAGES.map((lang) => (
+              <option key={lang.value} value={lang.value}>
+                {lang.label}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={editor.getAttributes('codeBlock').theme || 'github-dark'}
+            onChange={(e) => {
+              e.preventDefault()
+              editor.chain().focus().setCodeBlockTheme(e.target.value).run()
+            }}
+            className="h-8 px-2 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onClick={(e) => e.preventDefault()}
+          >
+            {AVAILABLE_THEMES.map((theme) => (
+              <option key={theme.value} value={theme.value}>
+                {theme.label}
+              </option>
+            ))}
+          </select>
+
+          <ToolbarButton
+            onClick={() => editor.chain().focus().toggleLineNumbers().run()}
+            isActive={editor.getAttributes('codeBlock').showLineNumbers}
+            title="Toggle Line Numbers"
+          >
+            <ListOrdered className="w-4 h-4" />
+          </ToolbarButton>
+        </>
+      )}
 
       <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 self-center" />
 
@@ -181,8 +319,16 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         <LinkIcon className="w-4 h-4" />
       </ToolbarButton>
 
-      <ToolbarButton onClick={addImage} title="Add Image">
+      <ToolbarButton onClick={addImage} title="Add Image from URL">
         <ImageIcon className="w-4 h-4" />
+      </ToolbarButton>
+
+      <ToolbarButton onClick={uploadImage} title="Upload Image File">
+        <Upload className="w-4 h-4" />
+      </ToolbarButton>
+
+      <ToolbarButton onClick={addHorizontalRule} title="Insert Horizontal Rule">
+        <Minus className="w-4 h-4" />
       </ToolbarButton>
 
       <div className="w-px h-6 bg-gray-300 dark:bg-gray-700 mx-1 self-center" />

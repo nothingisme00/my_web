@@ -52,6 +52,21 @@ export async function POST(request: NextRequest) {
     const filepath = join(uploadDir, filename);
     await writeFile(filepath, buffer);
 
+    // Auto-optimize image (compress and resize if needed)
+    if (file.type.startsWith('image/')) {
+      try {
+        const { optimizeImage } = await import('@/lib/image-optimizer');
+        const result = await optimizeImage(filepath);
+
+        if (result.success && result.savedBytes > 0) {
+          console.log(`✅ Profile image optimized: ${result.savedPercent}% reduction`);
+        }
+      } catch {
+        console.warn('⚠️  Image optimization failed, using original file');
+        // Continue with original file if optimization fails
+      }
+    }
+
     return NextResponse.json({ url: `/uploads/${filename}` });
   } catch (error) {
     if (error instanceof Error && error.message === 'Unauthorized') {
