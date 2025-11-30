@@ -137,17 +137,17 @@ export function BlogClientWrapper({
     <>
       {/* Hero Section with Filters */}
       <section className="relative -mt-24 pt-24 border-b border-gray-200/50 dark:border-gray-800/50 backdrop-blur-sm">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8 py-16 lg:py-24">
-          <div className="text-center max-w-3xl mx-auto mb-8">
-            <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8 py-10 lg:py-16">
+          <div className="text-center max-w-3xl mx-auto mb-6">
+            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3">
               Blog
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+            <p className="text-base text-gray-600 dark:text-gray-400 mb-6">
               Artikel dan tulisan tentang web development, programming, dan teknologi
             </p>
 
             {/* Stats */}
-            <div className="flex items-center justify-center gap-6 text-sm text-gray-500 dark:text-gray-400 mb-8">
+            <div className="flex items-center justify-center gap-6 text-sm text-gray-500 dark:text-gray-400 mb-6">
               <div className="flex items-center gap-2">
                 <BookOpen className="h-4 w-4" />
                 <span>{totalPosts} artikel</span>

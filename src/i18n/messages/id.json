@@ -74,6 +74,15 @@
     }
   },
   "blog": {
+    "title": "Blog",
+    "subtitle": "Pemikiran, tutorial, dan wawasan",
+    "readMore": "Baca Selengkapnya",
+    "readTime": "{minutes} menit baca",
+    "publishedOn": "Dipublikasikan pada",
+    "category": "Kategori",
+    "tags": "Tag",
+    "relatedPosts": "Posting Terkait",
+    "noPosts": "Belum ada posting blog",
     "search": {
       "placeholder": "Cari artikel...",
       "searching": "Mencari..."
@@ -105,6 +114,11 @@
       "noResultsDescription": "Coba sesuaikan filter Anda untuk menemukan lebih banyak artikel",
       "totalArticles": "{count} artikel",
       "clearAll": "Hapus Semua Filter"
+    },
+    "filter": {
+      "all": "Semua",
+      "category": "Kategori",
+      "tag": "Tag"
     }
   },
   "about": {
@@ -207,23 +221,6 @@
         "privacy": "Informasi Anda aman dan tidak akan pernah dibagikan kepada pihak ketiga.",
         "protected": "Dilindungi oleh reCAPTCHA"
       }
-    }
-  },
-  "blog": {
-    "title": "Blog",
-    "subtitle": "Pemikiran, tutorial, dan wawasan",
-    "readMore": "Baca Selengkapnya",
-    "readTime": "{minutes} menit baca",
-    "publishedOn": "Dipublikasikan pada",
-    "category": "Kategori",
-    "tags": "Tag",
-    "relatedPosts": "Posting Terkait",
-    "noPosts": "Belum ada posting blog",
-    "search": "Cari posting...",
-    "filter": {
-      "all": "Semua",
-      "category": "Kategori",
-      "tag": "Tag"
     }
   },
   "projects": {

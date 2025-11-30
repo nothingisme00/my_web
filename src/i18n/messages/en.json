@@ -74,6 +74,15 @@
     }
   },
   "blog": {
+    "title": "Blog",
+    "subtitle": "Thoughts, tutorials, and insights",
+    "readMore": "Read More",
+    "readTime": "{minutes} min read",
+    "publishedOn": "Published on",
+    "category": "Category",
+    "tags": "Tags",
+    "relatedPosts": "Related Posts",
+    "noPosts": "No blog posts yet",
     "search": {
       "placeholder": "Search articles...",
       "searching": "Searching..."
@@ -105,6 +114,11 @@
       "noResultsDescription": "Try adjusting your filters to find more articles",
       "totalArticles": "{count} articles",
       "clearAll": "Clear All Filters"
+    },
+    "filter": {
+      "all": "All",
+      "category": "Category",
+      "tag": "Tag"
     }
   },
   "about": {
@@ -207,23 +221,6 @@
         "privacy": "Your information is secure and will never be shared with third parties.",
         "protected": "Protected by reCAPTCHA"
       }
-    }
-  },
-  "blog": {
-    "title": "Blog",
-    "subtitle": "Thoughts, tutorials, and insights",
-    "readMore": "Read More",
-    "readTime": "{minutes} min read",
-    "publishedOn": "Published on",
-    "category": "Category",
-    "tags": "Tags",
-    "relatedPosts": "Related Posts",
-    "noPosts": "No blog posts yet",
-    "search": "Search posts...",
-    "filter": {
-      "all": "All",
-      "category": "Category",
-      "tag": "Tag"
     }
   },
   "projects": {

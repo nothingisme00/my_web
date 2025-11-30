@@ -27,12 +27,12 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ref={ref}
             className={twMerge(
               clsx(
-                'w-full px-4 py-2.5 pr-10 rounded-lg border transition-all duration-200 ease-out appearance-none cursor-pointer',
+                'w-full px-4 py-3 pr-10 rounded-2xl border transition-all duration-200 ease-out appearance-none cursor-pointer',
                 'bg-white dark:bg-gray-900',
-                'text-gray-900 dark:text-white',
-                'border-gray-300 dark:border-gray-700',
+                'text-gray-900 dark:text-white text-sm font-medium',
+                'border-gray-200 dark:border-gray-700',
                 'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:shadow-sm',
-                'hover:border-gray-400 dark:hover:border-gray-600',
+                'hover:border-blue-400 dark:hover:border-blue-600',
                 'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-gray-300',
                 error && 'border-red-500 focus:ring-red-500 focus:border-red-500',
                 className
@@ -51,7 +51,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
             <ChevronDown
               className={clsx(
-                'h-5 w-5 transition-colors',
+                'h-4 w-4 transition-colors',
                 error ? 'text-red-500' : 'text-gray-400 dark:text-gray-500',
                 props.disabled && 'opacity-50'
               )}

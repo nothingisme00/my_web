@@ -13,6 +13,8 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@floating-ui/react": "^0.27.16",
+    "@headlessui/react": "^2.2.9",
     "@iconify/react": "^6.0.2",
     "@prisma/client": "5.10.0",
     "@tailwindcss/typography": "^0.5.19",

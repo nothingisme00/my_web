@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
-import { Search, X, ChevronDown } from 'lucide-react';
-import { Select } from '@/components/ui/Select';
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { Search, X, SlidersHorizontal } from 'lucide-react';
+import { Select } from '@/components/ui/HeadlessSelect';
+import { MultiSelect } from '@/components/ui/HeadlessMultiSelect';
 import { useTranslations } from 'next-intl';
 import { Prisma } from '@prisma/client';
 
@@ -32,91 +33,6 @@ interface BlogFilterControlsProps {
   filteredCount: number;
 }
 
-// TagsMultiSelect Component
-interface TagsMultiSelectProps {
-  selectedTags: string[];
-  tags: Tag[];
-  onChange: (tagIds: string[]) => void;
-  label: string;
-}
-
-function TagsMultiSelect({ selectedTags, tags, onChange, label }: TagsMultiSelectProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [isOpen]);
-
-  const handleToggle = (tagId: string) => {
-    if (selectedTags.includes(tagId)) {
-      onChange(selectedTags.filter(id => id !== tagId));
-    } else {
-      onChange([...selectedTags, tagId]);
-    }
-  };
-
-  const selectedTagNames = tags
-    .filter(tag => selectedTags.includes(tag.id))
-    .map(tag => tag.name)
-    .join(', ');
-
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-4 py-2.5 pr-10 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-left text-gray-900 dark:text-white flex items-center justify-between hover:border-gray-400 dark:hover:border-gray-600 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-      >
-        <span className="truncate text-sm">
-          {selectedTags.length > 0 ? selectedTagNames : label}
-        </span>
-        <ChevronDown className={`h-5 w-5 text-gray-400 dark:text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
-
-      {isOpen && (
-        <div className="absolute z-20 mt-2 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-          {tags.length > 0 ? (
-            tags.map(tag => (
-              <button
-                key={tag.id}
-                type="button"
-                onClick={() => handleToggle(tag.id)}
-                className="w-full px-4 py-2.5 text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors"
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedTags.includes(tag.id)}
-                  onChange={() => {}}
-                  className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
-                />
-                <span className="flex-1 text-gray-900 dark:text-white">{tag.name}</span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  ({tag._count?.posts || 0})
-                </span>
-              </button>
-            ))
-          ) : (
-            <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 text-center">
-              Tidak ada tag
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
 // FilterChip Component
 interface FilterChipProps {
   label: string;
@@ -126,20 +42,20 @@ interface FilterChipProps {
 
 function FilterChip({ label, onRemove, color }: FilterChipProps) {
   const colorClasses = {
-    blue: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-    purple: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
-    green: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+    blue: 'bg-blue-50/80 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-300 dark:hover:bg-blue-900/30',
+    purple: 'bg-purple-50/80 text-purple-700 hover:bg-purple-100 dark:bg-purple-900/20 dark:text-purple-300 dark:hover:bg-purple-900/30',
+    green: 'bg-green-50/80 text-green-700 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-300 dark:hover:bg-green-900/30'
   };
 
   return (
-    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium ${colorClasses[color]} animate-in fade-in slide-in-from-top-2 duration-200`}>
+    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium ${colorClasses[color]} transition-colors`}>
       {label}
       <button
         onClick={onRemove}
-        className="hover:bg-black/10 dark:hover:bg-white/10 rounded-full p-0.5 transition-colors"
+        className="hover:opacity-70 transition-opacity"
         aria-label={`Remove ${label} filter`}
       >
-        <X className="h-3.5 w-3.5" />
+        <X className="h-3 w-3" />
       </button>
     </span>
   );
@@ -172,17 +88,15 @@ function ActiveFilters({
   if (!hasFilters) return null;
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {/* Search chip */}
+    <div className="flex flex-wrap gap-1.5">
       {searchQuery.trim() && (
         <FilterChip
-          label={`Search: "${searchQuery}"`}
+          label={`"${searchQuery}"`}
           onRemove={onRemoveSearch}
           color="blue"
         />
       )}
 
-      {/* Category chip */}
       {selectedCategory && (
         <FilterChip
           label={categories.find(c => c.id === selectedCategory)?.name || ''}
@@ -191,7 +105,6 @@ function ActiveFilters({
         />
       )}
 
-      {/* Tag chips */}
       {selectedTags.map(tagId => {
         const tag = tags.find(t => t.id === tagId);
         return tag ? (
@@ -228,6 +141,7 @@ export function BlogFilterControls({
 
   const [localSearch, setLocalSearch] = useState(searchQuery);
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   // Debounced search
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -263,6 +177,15 @@ export function BlogFilterControls({
     }))
   ], [categories, t]);
 
+  // Tags options
+  const tagsOptions = useMemo(() =>
+    tags.map(tag => ({
+      value: tag.id,
+      label: tag.name,
+      count: tag._count?.posts || 0
+    }))
+  , [tags]);
+
   // Sort options
   const sortOptions = useMemo(() => [
     { value: 'newest', label: t('sort.newest') },
@@ -278,75 +201,111 @@ export function BlogFilterControls({
     sortBy !== 'newest';
 
   return (
-    <div className="space-y-4">
-      {/* Search Input */}
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
-        <input
-          type="text"
-          value={localSearch}
-          onChange={handleSearchChange}
-          placeholder={tSearch('placeholder')}
-          className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-        />
-      </div>
+    <div className="space-y-3">
+      {/* Minimalist Search & Filters */}
+      <div className="space-y-2.5">
+        {/* Search Bar - Clean & Simple */}
+        <div className="relative">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
+          <input
+            type="text"
+            value={localSearch}
+            onChange={handleSearchChange}
+            placeholder={tSearch('placeholder')}
+            className="w-full pl-10 pr-11 py-2.5 bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm border border-gray-200/80 dark:border-gray-700/80 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-gray-300 dark:focus:border-gray-600 focus:bg-white dark:focus:bg-gray-900 transition-all"
+          />
+          
+          {/* Minimal Filter Toggle */}
+          <button
+            onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+            className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all ${
+              isFiltersOpen 
+                ? 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300' 
+                : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-500'
+            }`}
+            aria-label="Toggle filters"
+            title={isFiltersOpen ? 'Hide filters' : 'Show filters'}
+          >
+            <SlidersHorizontal className="h-3.5 w-3.5 transition-colors" />
+          </button>
+        </div>
 
-      {/* Filter Controls Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-        {/* Category Select */}
-        <Select
-          value={selectedCategory || ''}
-          onChange={(e) => onCategoryChange(e.target.value || null)}
-          options={categoryOptions}
-        />
-
-        {/* Tags Multi-Select */}
-        <TagsMultiSelect
-          selectedTags={selectedTags}
-          tags={tags}
-          onChange={onTagsChange}
-          label={t('tags.select')}
-        />
-
-        {/* Sort Select */}
-        <Select
-          value={sortBy}
-          onChange={(e) => onSortChange(e.target.value as SortOption)}
-          options={sortOptions}
-        />
-
-        {/* Clear All Button */}
-        <button
-          onClick={onClearAll}
-          disabled={!hasActiveFilters}
-          className="px-4 py-2.5 border-2 border-gray-300 dark:border-gray-700 hover:border-blue-600 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-gray-900 dark:text-white rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-gray-300 dark:disabled:hover:border-gray-700 disabled:hover:bg-transparent flex items-center justify-center gap-2"
+        {/* Collapsible Filters */}
+        <div 
+          className={`grid transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+            isFiltersOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+          }`}
         >
-          <X className="h-4 w-4" />
-          {t('clearAll')}
-        </button>
+          <div className="overflow-hidden">
+            <div className="space-y-2">
+              <div className="flex flex-col sm:flex-row gap-2">
+                <div className="flex-1">
+                  <Select
+                    value={selectedCategory || ''}
+                    onChange={(value) => onCategoryChange(value || null)}
+                    options={categoryOptions}
+                    placeholder={t('category.all')}
+                  />
+                </div>
+
+                <div className="flex-1">
+                  <MultiSelect
+                    value={selectedTags}
+                    onChange={onTagsChange}
+                    options={tagsOptions}
+                    placeholder={t('tags.select')}
+                  />
+                </div>
+
+                <div className="flex-1">
+                  <Select
+                    value={sortBy}
+                    onChange={(value) => onSortChange(value as SortOption)}
+                    options={sortOptions}
+                    placeholder={t('sort.label')}
+                  />
+                </div>
+              </div>
+
+              {/* Subtle Clear Button */}
+              {hasActiveFilters && (
+                <button
+                  onClick={onClearAll}
+                  className="w-full px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                >
+                  <X className="h-3 w-3" />
+                  {t('clearAll')}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Active Filters Row */}
+        {(searchQuery.trim() || selectedCategory || selectedTags.length > 0) && (
+          <ActiveFilters
+            searchQuery={searchQuery}
+            selectedCategory={selectedCategory}
+            selectedTags={selectedTags}
+            categories={categories}
+            tags={tags}
+            onRemoveSearch={() => onSearchChange('')}
+            onRemoveCategory={() => onCategoryChange(null)}
+            onRemoveTag={(tagId) => onTagsChange(selectedTags.filter(id => id !== tagId))}
+          />
+        )}
       </div>
 
-      {/* Active Filters */}
-      {(searchQuery.trim() || selectedCategory || selectedTags.length > 0) && (
-        <ActiveFilters
-          searchQuery={searchQuery}
-          selectedCategory={selectedCategory}
-          selectedTags={selectedTags}
-          categories={categories}
-          tags={tags}
-          onRemoveSearch={() => onSearchChange('')}
-          onRemoveCategory={() => onCategoryChange(null)}
-          onRemoveTag={(tagId) => onTagsChange(selectedTags.filter(id => id !== tagId))}
-        />
-      )}
-
-      {/* Results Count */}
-      <div className="text-sm text-gray-600 dark:text-gray-400 text-center">
-        {filteredCount === totalPosts ? (
-          <span>{totalPosts} artikel</span>
-        ) : (
-          <span>Menampilkan {filteredCount} dari {totalPosts} artikel</span>
-        )}
+      {/* Minimal Results Count */}
+      <div className="flex items-center justify-center">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50/80 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 rounded-lg text-xs font-medium">
+          <SlidersHorizontal className="h-3 w-3" />
+          {filteredCount === totalPosts ? (
+            <span>{totalPosts} artikel</span>
+          ) : (
+            <span>{filteredCount} dari {totalPosts} artikel</span>
+          )}
+        </div>
       </div>
     </div>
   );

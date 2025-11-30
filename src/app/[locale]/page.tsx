@@ -1,11 +1,9 @@
 import { getFeaturedPosts } from "@/lib/actions";
-import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { QuotesCarousel } from "@/components/home/QuotesCarousel";
 import { FeaturedPostsCarousel } from "@/components/home/FeaturedPostsCarousel";
 import { ArticleFeed } from "@/components/home/ArticleFeed";
 import { NewsletterCTA } from "@/components/home/NewsletterCTA";
-import { AboutMini } from "@/components/home/AboutMini";
 
 type PostWithRelations = Prisma.PostGetPayload<{
   include: {
@@ -14,23 +12,8 @@ type PostWithRelations = Prisma.PostGetPayload<{
   }
 }>;
 
-async function getAboutData() {
-  const setting = await prisma.settings.findUnique({
-    where: { key: 'about_page_content' },
-  });
-  if (!setting) return null;
-  try {
-    return JSON.parse(setting.value);
-  } catch {
-    return null;
-  }
-}
-
 export default async function Home() {
-  const [allPosts, aboutData] = await Promise.all([
-    getFeaturedPosts(12) as Promise<PostWithRelations[]>,
-    getAboutData(),
-  ]);
+  const allPosts = await getFeaturedPosts(12) as PostWithRelations[];
 
   // First 3 posts for carousel, next 9 for article feed
   const featuredPosts = allPosts.slice(0, 3);
@@ -60,9 +43,6 @@ export default async function Home() {
 
       {/* Newsletter CTA */}
       <NewsletterCTA />
-
-      {/* About Me Mini */}
-      <AboutMini aboutData={aboutData} />
     </div>
   );
 }

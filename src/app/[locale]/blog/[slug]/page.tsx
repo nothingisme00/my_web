@@ -12,6 +12,7 @@ import { Prisma } from "@prisma/client";
 import { ReadingProgress } from '@/components/blog/ReadingProgress';
 import { BlogContent } from '@/components/blog/BlogContent';
 import { ReactionButtons } from '@/components/blog/ReactionButtons';
+import { RelatedArticles } from '@/components/blog/RelatedArticles';
 
 // Enable ISR - revalidate every hour
 export const revalidate = 3600;
@@ -230,63 +231,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           </article>
         </div>
 
-        {/* Related Posts */}
-        {relatedPosts.length > 0 && (
-          <div className="mt-16 pt-12 border-t border-gray-200 dark:border-gray-800">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
-              Read More
-            </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {relatedPosts.map((relatedPost) => (
-                <Link key={relatedPost.id} href={`/blog/${relatedPost.slug}`} className="group">
-                  <article className="flex flex-col h-full">
-                    {relatedPost.image && (
-                      <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 mb-4">
-                        <Image
-                          src={relatedPost.image}
-                          alt={relatedPost.title}
-                          className="object-cover img-zoom"
-                          fill
-                          unoptimized
-                        />
-                      </div>
-                    )}
-
-                    {relatedPost.category && (
-                      <span className="inline-flex items-center w-fit rounded-md bg-gray-100 dark:bg-gray-800 px-2 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 mb-3">
-                        {relatedPost.category.name}
-                      </span>
-                    )}
-
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2 leading-tight">
-                      {relatedPost.title}
-                    </h3>
-
-                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 flex-grow">
-                      {relatedPost.excerpt || ""}
-                    </p>
-
-                    <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mt-4">
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        <span>{relatedPost.readingTime} min</span>
-                      </div>
-                      {relatedPost.views > 0 && (
-                        <>
-                          <span>·</span>
-                          <div className="flex items-center gap-1">
-                            <Eye className="h-3 w-3" />
-                            <span>{formatViewCount(relatedPost.views)}</span>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </article>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Related Articles */}
+        <RelatedArticles posts={relatedPosts} />
       </div>
     </div>
     </>
