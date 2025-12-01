@@ -1,23 +1,79 @@
 "use client";
 
-import { motion, Variants } from "framer-motion";
+import { useState } from "react";
+import { motion, Variants, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { Mail, Download, Briefcase, Users, Instagram, MessageCircle, Github } from "lucide-react";
+import {
+  ArrowLeft,
+  Download,
+  Briefcase,
+  Users,
+  Instagram,
+  MessageCircle,
+  Github,
+  GraduationCap,
+  Heart,
+  Code,
+  Wrench,
+  ExternalLink,
+  ChevronDown,
+  MapPin,
+} from "lucide-react";
 import { ContactForm } from "@/components/contact/ContactForm";
-import { Accordion } from "@/components/ui/Accordion";
 import { getToolIcon } from "@/lib/tool-icons";
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations, useLocale } from "next-intl";
+import { clsx } from "clsx";
 
-const monthNames: Record<string, string> = {
-  '01': 'Jan', '02': 'Feb', '03': 'Mar', '04': 'Apr',
-  '05': 'Mei', '06': 'Jun', '07': 'Jul', '08': 'Agu',
-  '09': 'Sep', '10': 'Okt', '11': 'Nov', '12': 'Des',
+const monthNamesEn: Record<string, string> = {
+  "01": "Jan",
+  "02": "Feb",
+  "03": "Mar",
+  "04": "Apr",
+  "05": "May",
+  "06": "Jun",
+  "07": "Jul",
+  "08": "Aug",
+  "09": "Sep",
+  "10": "Oct",
+  "11": "Nov",
+  "12": "Dec",
 };
 
-function formatPeriod(startMonth: string, startYear: string, endMonth: string, endYear: string, isCurrent: boolean): string {
-  const start = startMonth && startYear ? `${monthNames[startMonth] || ''} ${startYear}` : startYear || '';
-  const end = isCurrent ? 'Sekarang' : (endMonth && endYear ? `${monthNames[endMonth] || ''} ${endYear}` : endYear || '');
-  return start && end ? `${start} - ${end}` : start || end || '';
+const monthNamesId: Record<string, string> = {
+  "01": "Jan",
+  "02": "Feb",
+  "03": "Mar",
+  "04": "Apr",
+  "05": "Mei",
+  "06": "Jun",
+  "07": "Jul",
+  "08": "Agu",
+  "09": "Sep",
+  "10": "Okt",
+  "11": "Nov",
+  "12": "Des",
+};
+
+function formatPeriod(
+  startMonth: string,
+  startYear: string,
+  endMonth: string,
+  endYear: string,
+  isCurrent: boolean,
+  locale: string,
+  presentText: string
+): string {
+  const monthNames = locale === "id" ? monthNamesId : monthNamesEn;
+  const start =
+    startMonth && startYear
+      ? `${monthNames[startMonth] || ""} ${startYear}`
+      : startYear || "";
+  const end = isCurrent
+    ? presentText
+    : endMonth && endYear
+    ? `${monthNames[endMonth] || ""} ${endYear}`
+    : endYear || "";
+  return start && end ? `${start} - ${end}` : start || end || "";
 }
 
 interface Experience {
@@ -46,8 +102,15 @@ interface Education {
   id: string;
   degree: string;
   institution: string;
-  period: string;
+  period?: string; // Legacy field
+  startYear?: string;
+  endYear?: string;
   description: string;
+  gpa?: string;
+  thesis?: string;
+  achievements?: string;
+  activities?: string;
+  locationUrl?: string;
 }
 
 interface AboutData {
@@ -80,41 +143,51 @@ interface AboutContentProps {
   };
 }
 
-// Spacing and typography constants for bento grid
-const SPACING = {
-  heroCard: "p-8 md:p-10",
-  card: "p-5 md:p-6",
-  cardCompact: "p-4 md:p-5",
-  cardGap: "gap-3",
-  sectionTitle: "mb-4",
-  itemGap: "space-y-3",
-  iconSize: "w-4 h-4",
-  profileImage: "w-48 h-48", // 192px
-};
-
-const TYPOGRAPHY = {
-  sectionTitle: "text-xl font-bold text-gray-900 dark:text-white",
-  cardTitle: "text-base font-bold text-gray-900 dark:text-white",
-  subtitle: "text-sm font-medium",
-  meta: "text-xs text-gray-500 dark:text-gray-400",
-  body: "text-sm text-gray-700 dark:text-gray-300 leading-relaxed",
-};
-
-// Icon-only badge component with grayscale + color on hover
-interface IconBadgeProps {
+// Card configuration for "Know More" section
+interface InfoCardProps {
   icon: React.ReactNode;
-  label: string;
+  title: string;
+  bgColor: string;
+  children: React.ReactNode;
+  className?: string;
 }
 
-function IconBadge({ icon, label }: IconBadgeProps) {
+// Static Info Card Component - displays content directly
+function InfoCard({
+  icon,
+  title,
+  bgColor,
+  children,
+  className,
+}: InfoCardProps) {
   return (
-    <div className="group relative inline-flex items-center justify-center p-2">
-      {/* Icon - grayscale by default, colored on hover with smooth transition */}
-      <div className="grayscale group-hover:grayscale-0 opacity-60 group-hover:opacity-100 transition-all duration-500 ease-out transform group-hover:scale-110">
+    <div
+      className={clsx(
+        "bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col",
+        className
+      )}>
+      {/* Card Header */}
+      <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+        <div className="flex items-center gap-3">
+          <div className={clsx("p-2 rounded-xl", bgColor)}>{icon}</div>
+          <h3 className="text-base font-bold text-gray-900 dark:text-white">
+            {title}
+          </h3>
+        </div>
+      </div>
+      {/* Card Content */}
+      <div className="p-4 flex-1">{children}</div>
+    </div>
+  );
+}
+
+// Icon Badge for Tech Stack & Tools - Icon only without frame
+function IconBadge({ icon, label }: { icon: React.ReactNode; label: string }) {
+  return (
+    <div className="group relative inline-flex items-center justify-center p-1.5 hover:scale-110 transition-transform duration-300">
+      <div className="grayscale group-hover:grayscale-0 opacity-70 group-hover:opacity-100 transition-all duration-500 ease-out">
         {icon}
       </div>
-
-      {/* Tooltip on hover */}
       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 pointer-events-none z-10">
         {label}
       </div>
@@ -122,350 +195,718 @@ function IconBadge({ icon, label }: IconBadgeProps) {
   );
 }
 
+// Experience Card with Accordion for job descriptions
+interface ExperienceCardProps {
+  experiences: Experience[];
+  t: ReturnType<typeof useTranslations<"about">>;
+  locale: string;
+}
+
+function ExperienceCard({ experiences, t, locale }: ExperienceCardProps) {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const toggleExpand = (id: string) => {
+    setExpandedId(expandedId === id ? null : id);
+  };
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col md:col-span-3">
+      {/* Card Header */}
+      <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-blue-100 dark:bg-blue-900/30">
+            <Briefcase className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          </div>
+          <h3 className="text-base font-bold text-gray-900 dark:text-white">
+            {t("experience")}
+          </h3>
+        </div>
+      </div>
+      {/* Card Content */}
+      <div className="p-4 flex-1">
+        <div className="space-y-3">
+          {experiences.map((exp) => {
+            const isExpanded = expandedId === exp.id;
+            const description =
+              locale === "id" ? exp.descriptionId : exp.descriptionEn;
+            const hasDescription = description && description.trim().length > 0;
+
+            return (
+              <div
+                key={exp.id}
+                className="relative p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
+                <div className="pl-4 border-l-3 border-blue-400 dark:border-blue-500">
+                  {/* Main Info - Always visible */}
+                  <div
+                    className={clsx(
+                      "cursor-pointer",
+                      hasDescription && "hover:opacity-80"
+                    )}
+                    onClick={() => hasDescription && toggleExpand(exp.id)}>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h4 className="text-lg font-bold text-gray-900 dark:text-white leading-snug">
+                            {exp.title}
+                          </h4>
+                          {exp.isCurrent && (
+                            <span className="px-2.5 py-1 text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full">
+                              {t("currentlyWorking")}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-base text-blue-600 dark:text-blue-400 font-medium mt-1">
+                          {exp.company}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                          {formatPeriod(
+                            exp.startMonth,
+                            exp.startYear,
+                            exp.endMonth,
+                            exp.endYear,
+                            exp.isCurrent,
+                            locale,
+                            t("present")
+                          )}
+                        </p>
+                      </div>
+                      {hasDescription && (
+                        <button
+                          type="button"
+                          className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                          aria-label={isExpanded ? "Collapse" : "Expand"}>
+                          <ChevronDown
+                            className={clsx(
+                              "h-5 w-5 text-gray-400 transition-transform duration-300",
+                              isExpanded && "rotate-180"
+                            )}
+                          />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Expandable Description */}
+                  <AnimatePresence>
+                    {isExpanded && hasDescription && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="overflow-hidden">
+                        <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                          <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-line">
+                            {description}
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Education Card with Accordion for details
+interface EducationCardProps {
+  educations: Education[];
+  t: ReturnType<typeof useTranslations<"about">>;
+}
+
+function EducationCard({ educations, t }: EducationCardProps) {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const toggleExpand = (id: string) => {
+    setExpandedId(expandedId === id ? null : id);
+  };
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col md:col-span-3">
+      {/* Card Header */}
+      <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-orange-100 dark:bg-orange-900/30">
+            <GraduationCap className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+          </div>
+          <h3 className="text-base font-bold text-gray-900 dark:text-white">
+            {t("education")}
+          </h3>
+        </div>
+      </div>
+      {/* Card Content */}
+      <div className="p-4 flex-1">
+        <div className="space-y-3">
+          {educations.map((edu) => {
+            const isExpanded = expandedId === edu.id;
+            // Check for expandable details (excluding GPA since it's shown outside)
+            const hasDetails =
+              edu.thesis ||
+              edu.achievements ||
+              edu.activities ||
+              edu.locationUrl;
+
+            // Format period from startYear and endYear, fallback to legacy period field
+            const periodDisplay = edu.startYear
+              ? `${edu.startYear} - ${edu.endYear || "Present"}`
+              : edu.period || "";
+
+            return (
+              <div
+                key={edu.id}
+                className="relative p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
+                <div className="pl-4 border-l-3 border-orange-400 dark:border-orange-500">
+                  {/* Main Info - Always visible */}
+                  <div
+                    className={clsx(
+                      hasDetails && "cursor-pointer hover:opacity-80"
+                    )}
+                    onClick={() => hasDetails && toggleExpand(edu.id)}>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        {/* 1. Institution Name */}
+                        <h4 className="text-lg font-bold text-gray-900 dark:text-white leading-snug">
+                          {edu.institution}
+                        </h4>
+                        {/* 2. Degree */}
+                        <p className="text-base text-orange-600 dark:text-orange-400 font-medium mt-1">
+                          {edu.degree}
+                        </p>
+                        {/* 3. GPA - Always visible, subtle */}
+                        {edu.gpa && (
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            GPA:{" "}
+                            <span className="font-medium text-gray-600 dark:text-gray-300">
+                              {edu.gpa}
+                            </span>
+                          </p>
+                        )}
+                        {/* 4. Period */}
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
+                          {periodDisplay}
+                        </p>
+                      </div>
+                      {hasDetails && (
+                        <button
+                          type="button"
+                          className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                          aria-label={isExpanded ? "Collapse" : "Expand"}>
+                          <ChevronDown
+                            className={clsx(
+                              "h-5 w-5 text-gray-400 transition-transform duration-300",
+                              isExpanded && "rotate-180"
+                            )}
+                          />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Expandable Details */}
+                  <AnimatePresence>
+                    {isExpanded && hasDetails && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="overflow-hidden">
+                        <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
+                          {edu.thesis && (
+                            <div>
+                              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                Thesis:
+                              </span>
+                              <p className="text-sm text-gray-700 dark:text-gray-300 mt-0.5">
+                                {edu.thesis}
+                              </p>
+                            </div>
+                          )}
+                          {edu.achievements && (
+                            <div>
+                              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                Achievements:
+                              </span>
+                              <p className="text-sm text-gray-700 dark:text-gray-300 mt-0.5 whitespace-pre-line">
+                                {edu.achievements}
+                              </p>
+                            </div>
+                          )}
+                          {edu.activities && (
+                            <div>
+                              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                Activities:
+                              </span>
+                              <p className="text-sm text-gray-700 dark:text-gray-300 mt-0.5 whitespace-pre-line">
+                                {edu.activities}
+                              </p>
+                            </div>
+                          )}
+                          {edu.locationUrl && (
+                            <a
+                              href={edu.locationUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 text-sm text-orange-600 dark:text-orange-400 hover:underline mt-1">
+                              <MapPin className="h-4 w-4" />
+                              View Location
+                            </a>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Volunteering Card with Accordion for descriptions
+interface VolunteeringCardProps {
+  volunteering: Volunteer[];
+  t: ReturnType<typeof useTranslations<"about">>;
+  locale: string;
+}
+
+function VolunteeringCard({ volunteering, t, locale }: VolunteeringCardProps) {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const toggleExpand = (id: string) => {
+    setExpandedId(expandedId === id ? null : id);
+  };
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col md:col-span-3">
+      {/* Card Header */}
+      <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-teal-100 dark:bg-teal-900/30">
+            <Users className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+          </div>
+          <h3 className="text-base font-bold text-gray-900 dark:text-white">
+            {t("volunteering.title")}
+          </h3>
+        </div>
+      </div>
+      {/* Card Content */}
+      <div className="p-4 flex-1">
+        <div className="space-y-3">
+          {volunteering.map((vol) => {
+            const isExpanded = expandedId === vol.id;
+            const description =
+              locale === "id" ? vol.descriptionId : vol.descriptionEn;
+            const hasDescription = description && description.trim().length > 0;
+
+            return (
+              <div
+                key={vol.id}
+                className="relative p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
+                <div className="pl-4 border-l-3 border-teal-400 dark:border-teal-500">
+                  {/* Main Info - Always visible */}
+                  <div
+                    className={clsx(
+                      hasDescription && "cursor-pointer hover:opacity-80"
+                    )}
+                    onClick={() => hasDescription && toggleExpand(vol.id)}>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <h4 className="text-lg font-bold text-gray-900 dark:text-white leading-snug">
+                          {vol.role}
+                        </h4>
+                        <p className="text-base text-teal-600 dark:text-teal-400 font-medium mt-1">
+                          {vol.organization}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                          {vol.period}
+                        </p>
+                      </div>
+                      {hasDescription && (
+                        <button
+                          type="button"
+                          className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                          aria-label={isExpanded ? "Collapse" : "Expand"}>
+                          <ChevronDown
+                            className={clsx(
+                              "h-5 w-5 text-gray-400 transition-transform duration-300",
+                              isExpanded && "rotate-180"
+                            )}
+                          />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Expandable Description */}
+                  <AnimatePresence>
+                    {isExpanded && hasDescription && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="overflow-hidden">
+                        <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                          <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-line">
+                            {description}
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function AboutContent({ aboutData, settings }: AboutContentProps) {
-  const t = useTranslations('about');
+  const t = useTranslations("about");
   const locale = useLocale();
 
   // Use aboutData or fallback to settings/defaults
-  const name = aboutData?.name || settings?.owner_name || 'Alfattah';
-  const title = aboutData?.title || 'Learning Enthusiast';
-  const tagline = aboutData?.tagline || '';
-  const profileImage = aboutData?.profileImage || '';
-  const email = aboutData?.email || settings?.contact_email || '';
-  const bio = aboutData?.bio || '';
-  const cvUrl = aboutData?.cvUrl || '';
-  const portfolioUrl = aboutData?.portfolioUrl || '';
-  const techStack = aboutData?.techStack ? aboutData.techStack.split(',').map(t => t.trim()) : [];
-  const tools = aboutData?.tools ? aboutData.tools.split(',').map(t => t.trim()) : [];
-  const hobbies = aboutData?.hobbies ? aboutData.hobbies.split(',').map(t => t.trim()) : [];
+  const name = aboutData?.name || settings?.owner_name || "Alfattah";
+  const title = aboutData?.title || "Learning Enthusiast";
+  const tagline = aboutData?.tagline || "";
+  const profileImage = aboutData?.profileImage || "";
+  const bio = aboutData?.bio || "";
+  const cvUrl = aboutData?.cvUrl || "";
+  const portfolioUrl = aboutData?.portfolioUrl || "";
+  const techStack = aboutData?.techStack
+    ? aboutData.techStack
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean)
+    : [];
+  const tools = aboutData?.tools
+    ? aboutData.tools
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean)
+    : [];
+  const hobbies = aboutData?.hobbies
+    ? aboutData.hobbies
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean)
+    : [];
   const experiences = aboutData?.experiences || [];
   const volunteering = aboutData?.volunteering || [];
   const educations = aboutData?.educations || [];
 
-  // Animation variants - updated for faster, snappier animations
+  // Animation variants
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.05,
+        staggerChildren: 0.08,
         delayChildren: 0.1,
       },
     },
   };
 
   const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 12 },
+    hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.3, ease: "easeOut" },
+      transition: { duration: 0.4, ease: "easeOut" },
     },
   };
 
+  // Check if Know More section should be shown
+  const hasKnowMoreContent =
+    educations.length > 0 ||
+    experiences.length > 0 ||
+    volunteering.length > 0 ||
+    hobbies.length > 0 ||
+    techStack.length > 0 ||
+    tools.length > 0;
+
   return (
-    <div className="transition-colors duration-300 min-h-screen relative">
-      {/* Hero Section - Compact */}
-      <section className="relative pt-16 pb-3">
-        <div className="mx-auto max-w-5xl px-6 lg:px-8">
+    <div className="transition-colors duration-300 min-h-screen">
+      {/* Hero Section - Split Layout */}
+      <section className="relative pt-20 pb-16">
+        <div className="mx-auto max-w-6xl px-6 lg:px-8">
           <motion.div
             initial="hidden"
             animate="visible"
-            variants={itemVariants}
-            className={`bg-white dark:bg-gray-800 rounded-2xl ${SPACING.heroCard} shadow-xl`}
-          >
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-10 md:gap-12">
-              {/* Profile Image - Compact */}
-              <div className="flex-shrink-0">
-                <div className={`relative ${SPACING.profileImage} rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700`}>
-                  {profileImage ? (
-                    <Image src={profileImage} alt={name} className="object-cover" fill unoptimized />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 text-white text-4xl font-bold">
-                      {name.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                </div>
-              </div>
+            variants={containerVariants}>
+            {/* Back/Title Label */}
+            <motion.div variants={itemVariants} className="mb-8">
+              <span className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                <ArrowLeft className="h-4 w-4" />
+                {t("title")}
+              </span>
+            </motion.div>
 
-              {/* Info & CTAs - Compact */}
-              <div className="flex-1 text-center md:text-left">
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
-                  {name}
+            {/* Hero Content */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+              {/* Left - Text Content */}
+              <motion.div
+                variants={itemVariants}
+                className="order-2 lg:order-1">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight mb-6">
+                  {locale === "id" ? "Saya " : "I'm "}
+                  <span className="text-blue-600 dark:text-blue-400">
+                    {name}
+                  </span>
+                  {locale === "id" ? "," : ","}
+                  <br />
+                  <span className="text-gray-700 dark:text-gray-300">
+                    {title}
+                  </span>
                 </h1>
-                <p className="text-lg md:text-xl text-blue-600 dark:text-blue-400 font-semibold mb-4">
-                  {title}
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-6 opacity-90">
-                  {tagline || bio.split('\n')[0]}
-                </p>
 
-                {/* Social Media Icons - Borderless Minimal */}
-                <div className="flex gap-3 justify-center md:justify-start mb-5">
-                  {email && (
-                    <div className="group relative">
-                      <a
-                        href={`mailto:${email}`}
-                        className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 transform hover:scale-110"
-                        aria-label="Email"
-                      >
-                        <Mail className="w-5 h-5" />
-                      </a>
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 pointer-events-none z-10">
-                        Email
-                      </div>
-                    </div>
-                  )}
-                  {settings?.social_instagram && (
-                    <div className="group relative">
-                      <a
-                        href={settings.social_instagram}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 transform hover:scale-110"
-                        aria-label="Instagram"
-                      >
-                        <Instagram className="w-5 h-5" />
-                      </a>
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 pointer-events-none z-10">
-                        Instagram
-                      </div>
-                    </div>
-                  )}
-                  {settings?.social_whatsapp && (
-                    <div className="group relative">
-                      <a
-                        href={settings.social_whatsapp}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 transform hover:scale-110"
-                        aria-label="WhatsApp"
-                      >
-                        <MessageCircle className="w-5 h-5" />
-                      </a>
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 pointer-events-none z-10">
-                        WhatsApp
-                      </div>
-                    </div>
-                  )}
-                  {settings?.social_github && (
-                    <div className="group relative">
-                      <a
-                        href={settings.social_github}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 transform hover:scale-110"
-                        aria-label="GitHub"
-                      >
-                        <Github className="w-5 h-5" />
-                      </a>
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 pointer-events-none z-10">
-                        GitHub
-                      </div>
-                    </div>
-                  )}
-                </div>
+                {tagline && (
+                  <p className="text-xl text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+                    {tagline}
+                  </p>
+                )}
 
-                {/* Download Buttons - Row 2 */}
-                <div className="flex gap-3 justify-center md:justify-start">
-                  {portfolioUrl && (
-                    <a
-                      href={portfolioUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-gray-300 dark:border-gray-600 hover:border-blue-600 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-gray-900 dark:text-white rounded-lg font-medium transition-all duration-300"
-                    >
-                      <Briefcase className="w-4 h-4" />
-                      Portfolio
-                    </a>
-                  )}
+                {bio && (
+                  <p className="text-base text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
+                    {bio.split("\n")[0]}
+                  </p>
+                )}
+
+                {/* CTA Buttons */}
+                <div className="flex flex-wrap gap-4 mb-8">
                   {cvUrl && (
                     <a
                       href={cvUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-blue-600 dark:border-blue-400 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-400 dark:hover:text-gray-900 text-blue-600 dark:text-blue-400 rounded-lg font-semibold transition-all duration-300"
-                    >
-                      <Download className="w-4 h-4" />
-                      Download CV
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl">
+                      <Download className="h-5 w-5" />
+                      {t("downloadCV")}
+                    </a>
+                  )}
+                  {portfolioUrl && (
+                    <a
+                      href={portfolioUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-6 py-3 border-2 border-gray-300 dark:border-gray-600 hover:border-gray-900 dark:hover:border-white text-gray-900 dark:text-white rounded-full font-semibold transition-all duration-300">
+                      <ExternalLink className="h-5 w-5" />
+                      Portfolio
                     </a>
                   )}
                 </div>
-              </div>
+
+                {/* Social Links */}
+                <div className="flex items-center gap-4">
+                  {settings?.social_github && (
+                    <a
+                      href={settings.social_github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-3 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-300"
+                      aria-label="GitHub">
+                      <Github className="h-5 w-5" />
+                    </a>
+                  )}
+                  {settings?.social_instagram && (
+                    <a
+                      href={settings.social_instagram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-3 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-300"
+                      aria-label="Instagram">
+                      <Instagram className="h-5 w-5" />
+                    </a>
+                  )}
+                  {settings?.social_whatsapp && (
+                    <a
+                      href={settings.social_whatsapp}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-3 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all duration-300"
+                      aria-label="WhatsApp">
+                      <MessageCircle className="h-5 w-5" />
+                    </a>
+                  )}
+                </div>
+              </motion.div>
+
+              {/* Right - Profile Image */}
+              <motion.div
+                variants={itemVariants}
+                className="order-1 lg:order-2 flex justify-center lg:justify-end">
+                <div className="relative w-64 h-80 md:w-72 md:h-96 lg:w-80 lg:h-[28rem]">
+                  {profileImage ? (
+                    <Image
+                      src={profileImage}
+                      alt={name}
+                      className="object-cover object-top"
+                      fill
+                      unoptimized
+                      priority
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl text-white text-7xl font-bold">
+                      {name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+              </motion.div>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Bento Grid Content Section */}
-      <div className="mx-auto max-w-5xl px-6 lg:px-8 pt-0">
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={containerVariants}
-          className={`grid grid-cols-1 ${SPACING.cardGap} auto-rows-auto`}
-        >
-          {/* Education Timeline - Full width */}
-          {educations.length > 0 && (
-            <motion.div variants={itemVariants} className={`col-span-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 ${SPACING.card}`}>
-              <h2 className={`${TYPOGRAPHY.sectionTitle} ${SPACING.sectionTitle} pb-1.5 mb-4 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-3/4 after:h-[1px] after:bg-gray-400 dark:after:bg-gray-500`}>{t('education')}</h2>
-              <div className={SPACING.itemGap}>
-                {educations.map((edu) => (
-                  <div key={edu.id} className="relative pl-6 border-l-[1.5px] border-gray-200 dark:border-gray-700">
-                    <div className="absolute -left-[6.5px] top-0 h-3 w-3 rounded-full bg-gray-300 dark:bg-gray-600 ring-4 ring-white/30 dark:ring-gray-900/30" />
-                    <div className="mb-1 flex flex-col gap-1">
-                      <h3 className={TYPOGRAPHY.cardTitle}>{edu.degree}</h3>
-                      <span className={TYPOGRAPHY.meta}>{edu.period}</span>
+      {/* Know More About Me Section */}
+      {hasKnowMoreContent && (
+        <section className="py-16 bg-gray-50 dark:bg-gray-900/50">
+          <div className="mx-auto max-w-6xl px-6 lg:px-8">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={containerVariants}>
+              {/* Section Header */}
+              <motion.div variants={itemVariants} className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                  {t("knowMore.title")}
+                </h2>
+                <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                  {t("knowMore.subtitle")}
+                </p>
+              </motion.div>
+
+              {/* Bento Grid Layout */}
+              <motion.div
+                variants={itemVariants}
+                className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Education - Full width with accordion */}
+                {educations.length > 0 && (
+                  <EducationCard educations={educations} t={t} />
+                )}
+
+                {/* Experience - Full width with accordion */}
+                {experiences.length > 0 && (
+                  <ExperienceCard
+                    experiences={experiences}
+                    t={t}
+                    locale={locale}
+                  />
+                )}
+
+                {/* Volunteering - Full width with accordion */}
+                {volunteering.length > 0 && (
+                  <VolunteeringCard
+                    volunteering={volunteering}
+                    t={t}
+                    locale={locale}
+                  />
+                )}
+
+                {/* Hobbies - 1/3 width, side by side with Tech Stack and Tools */}
+                {hobbies.length > 0 && (
+                  <InfoCard
+                    icon={
+                      <Heart className="h-5 w-5 text-rose-600 dark:text-rose-400" />
+                    }
+                    title={t("hobbies")}
+                    bgColor="bg-rose-100 dark:bg-rose-900/30">
+                    <div className="flex flex-wrap gap-2">
+                      {hobbies.map((hobby) => (
+                        <span
+                          key={hobby}
+                          className="inline-flex items-center rounded-full bg-rose-50 dark:bg-rose-900/20 px-3 py-1.5 text-sm font-medium text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+                          {hobby}
+                        </span>
+                      ))}
                     </div>
-                    <p className={`${TYPOGRAPHY.subtitle} text-blue-600 dark:text-blue-400 mb-2`}>{edu.institution}</p>
-                    <p className={`${TYPOGRAPHY.body} text-xs`}>{edu.description}</p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
+                  </InfoCard>
+                )}
 
-          {/* Experience Section - Full width */}
-          {experiences.length > 0 && (
-            <motion.div variants={itemVariants} className={`col-span-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 ${SPACING.card}`}>
-              <h2 className={`${TYPOGRAPHY.sectionTitle} ${SPACING.sectionTitle} pb-1.5 mb-4 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-3/4 after:h-[1px] after:bg-gray-400 dark:after:bg-gray-500`}>{t('experience')}</h2>
-              <div className={SPACING.itemGap}>
-                {experiences.map((exp) => (
-                  <div key={exp.id} className="bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-100 dark:border-gray-800">
-                    <Accordion
-                      helperText={t('clickToView')}
-                      trigger={
-                        <div className="flex items-center gap-3">
-                          <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg shrink-0">
-                            <Briefcase className={`${SPACING.iconSize} text-blue-600 dark:text-blue-400`} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className={TYPOGRAPHY.cardTitle}>{exp.title}</h3>
-                            <p className={`${TYPOGRAPHY.subtitle} text-blue-600 dark:text-blue-400`}>{exp.company}</p>
-                            <p className={TYPOGRAPHY.meta}>
-                              {formatPeriod(exp.startMonth, exp.startYear, exp.endMonth, exp.endYear, exp.isCurrent)}
-                            </p>
-                          </div>
-                        </div>
-                      }
-                    >
-                      <p className={`${TYPOGRAPHY.body} mt-2`}>
-                        {locale === 'id' ? exp.descriptionId : exp.descriptionEn}
-                      </p>
-                    </Accordion>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
+                {/* Tech Stack - 1/3 width */}
+                {techStack.length > 0 && (
+                  <InfoCard
+                    icon={
+                      <Code className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                    }
+                    title={t("techStack")}
+                    bgColor="bg-purple-100 dark:bg-purple-900/30">
+                    <div className="flex flex-wrap gap-2">
+                      {techStack.map((tech) => (
+                        <IconBadge
+                          key={tech}
+                          icon={getToolIcon(tech)}
+                          label={tech}
+                        />
+                      ))}
+                    </div>
+                  </InfoCard>
+                )}
 
-          {/* Volunteering - Full width */}
-          {volunteering.length > 0 && (
-            <motion.div variants={itemVariants} className={`col-span-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 ${SPACING.card}`}>
-              <h2 className={`${TYPOGRAPHY.sectionTitle} ${SPACING.sectionTitle} pb-1.5 mb-4 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-3/4 after:h-[1px] after:bg-gray-400 dark:after:bg-gray-500`}>{t('volunteering.title')}</h2>
-              <div className={SPACING.itemGap}>
-                {volunteering.map((vol) => (
-                  <div key={vol.id} className="bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-100 dark:border-gray-800">
-                    <Accordion
-                      helperText={t('clickToView')}
-                      trigger={
-                        <div className="flex items-center gap-3">
-                          <div className="p-1.5 bg-teal-100 dark:bg-teal-900/30 rounded-lg shrink-0">
-                            <Users className={`${SPACING.iconSize} text-teal-600 dark:text-teal-400`} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className={TYPOGRAPHY.cardTitle}>{vol.role}</h3>
-                            <p className={`${TYPOGRAPHY.subtitle} text-teal-600 dark:text-teal-400`}>{vol.organization}</p>
-                            <p className={TYPOGRAPHY.meta}>{vol.period}</p>
-                          </div>
-                        </div>
-                      }
-                    >
-                      <p className={`${TYPOGRAPHY.body} mt-2`}>
-                        {locale === 'id' ? vol.descriptionId : vol.descriptionEn}
-                      </p>
-                    </Accordion>
-                  </div>
-                ))}
-              </div>
+                {/* Tools - 1/3 width */}
+                {tools.length > 0 && (
+                  <InfoCard
+                    icon={
+                      <Wrench className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                    }
+                    title={t("tools")}
+                    bgColor="bg-indigo-100 dark:bg-indigo-900/30">
+                    <div className="flex flex-wrap gap-2">
+                      {tools.map((tool) => (
+                        <IconBadge
+                          key={tool}
+                          icon={getToolIcon(tool)}
+                          label={tool}
+                        />
+                      ))}
+                    </div>
+                  </InfoCard>
+                )}
+              </motion.div>
             </motion.div>
-          )}
+          </div>
+        </section>
+      )}
 
-          {/* Hobbies - Full width */}
-          {hobbies.length > 0 && (
-            <motion.div variants={itemVariants} className={`col-span-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 ${SPACING.card}`}>
-              <h2 className={`${TYPOGRAPHY.sectionTitle} ${SPACING.sectionTitle} pb-1.5 mb-4 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-3/4 after:h-[1px] after:bg-gray-400 dark:after:bg-gray-500`}>{t('hobbies')}</h2>
-              <div className="flex flex-wrap gap-2">
-                {hobbies.map((hobby) => (
-                  <span
-                    key={hobby}
-                    className="inline-flex items-center rounded-full bg-rose-50 dark:bg-rose-900/20 px-3 py-1.5 text-xs font-medium text-rose-700 dark:text-rose-300 border border-rose-100 dark:border-rose-800"
-                  >
-                    {hobby}
-                  </span>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {/* Tech Stack - Icon Only */}
-          {techStack.length > 0 && (
-            <motion.div variants={itemVariants} className={`col-span-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 ${SPACING.card}`}>
-              <h2 className={`${TYPOGRAPHY.sectionTitle} ${SPACING.sectionTitle} pb-1.5 mb-4 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-3/4 after:h-[1px] after:bg-gray-400 dark:after:bg-gray-500`}>{t('techStack')}</h2>
-              <div className="flex flex-wrap gap-2">
-                {techStack.map((tech) => (
-                  <IconBadge
-                    key={tech}
-                    icon={getToolIcon(tech)}
-                    label={tech}
-                  />
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {/* Tools - Icon Only */}
-          {tools.length > 0 && (
-            <motion.div variants={itemVariants} className={`col-span-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 ${SPACING.card}`}>
-              <h2 className={`${TYPOGRAPHY.sectionTitle} ${SPACING.sectionTitle} pb-1.5 mb-4 relative inline-block after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-3/4 after:h-[1px] after:bg-gray-400 dark:after:bg-gray-500`}>{t('tools')}</h2>
-              <div className="flex flex-wrap gap-2">
-                {tools.map((tool) => (
-                  <IconBadge
-                    key={tool}
-                    icon={getToolIcon(tool)}
-                    label={tool}
-                  />
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </motion.div>
-
-        {/* Contact Section - Separate */}
-        <motion.section
-          initial="hidden"
-          animate="visible"
-          variants={itemVariants}
-          className="border-t border-gray-200 dark:border-gray-800 pt-16 mt-16"
-        >
-          <div className="mx-auto max-w-3xl">
-            {/* Header */}
-            <div className="text-center mb-10">
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
-                {t('contact.title')}
+      {/* Contact Section */}
+      <section className="py-16">
+        <div className="mx-auto max-w-6xl px-6 lg:px-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={containerVariants}>
+            {/* Section Header */}
+            <motion.div variants={itemVariants} className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                {t("contact.title")}
               </h2>
-              <p className="text-base text-gray-600 dark:text-gray-400">
-                {t('contact.description')}
+              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                {t("contact.description")}
               </p>
-            </div>
+            </motion.div>
 
             {/* Contact Form */}
-            <div className={`bg-white dark:bg-gray-800 rounded-2xl ${SPACING.heroCard} border border-gray-200 dark:border-gray-700 shadow-xl`}>
+            <motion.div
+              variants={itemVariants}
+              className="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-2xl p-8 md:p-10 border border-gray-200 dark:border-gray-700 shadow-xl">
               <ContactForm />
-            </div>
-          </div>
-        </motion.section>
-      </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
     </div>
   );
 }

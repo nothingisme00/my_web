@@ -22,6 +22,7 @@
     "blog": "Blog",
     "projects": "Projects",
     "gallery": "Gallery",
+    "watchlist": "Watchlist",
     "contact": "Contact",
     "admin": "Admin"
   },
@@ -134,11 +135,21 @@
     "downloadCV": "Download CV",
     "downloadPortfolio": "Download Portfolio",
     "currentlyWorking": "Currently Working",
+    "present": "Present",
+    "hero": {
+      "cta": "More About Me"
+    },
+    "knowMore": {
+      "title": "Know More About Me",
+      "subtitle": "A glimpse of my journey, skills, and interests",
+      "entries": "{count} entries",
+      "items": "{count} items"
+    },
     "contact": {
       "title": "Let's Work Together",
       "description": "Have a project in mind or want to collaborate? I'd love to hear from you. Send me a message and I'll respond as soon as possible."
     },
-    "clickToView": "See job details",
+    "clickToView": "Click to expand",
     "volunteering": {
       "title": "Volunteering & Organization",
       "role": "Role",
@@ -235,6 +246,42 @@
       "planned": "Planned"
     },
     "noProjects": "No projects yet"
+  },
+  "watchlist": {
+    "title": "Watchlist",
+    "subtitle": "Anime, films, and series I've watched",
+    "stats": {
+      "total": "Total Watched",
+      "completed": "Completed",
+      "averageRating": "Average Rating"
+    },
+    "filters": {
+      "all": "All",
+      "allTypes": "All Types",
+      "allStatus": "All Status",
+      "search": "Search titles...",
+      "type": "Type",
+      "status": "Status"
+    },
+    "table": {
+      "title": "Title",
+      "type": "Type",
+      "genre": "Genre",
+      "episodes": "Episodes",
+      "status": "Status",
+      "rating": "Rating",
+      "year": "Year",
+      "actions": "Actions"
+    },
+    "status": {
+      "watching": "Watching",
+      "completed": "Completed",
+      "dropped": "Dropped",
+      "onHold": "On Hold",
+      "planToWatch": "Plan to Watch"
+    },
+    "noItems": "No items in watchlist yet",
+    "addFirst": "Start adding some anime or movies!"
   },
   "footer": {
     "description": "Full Stack Developer passionate about creating amazing web experiences.",

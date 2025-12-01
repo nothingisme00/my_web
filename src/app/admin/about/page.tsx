@@ -1,11 +1,26 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
-import { AccordionSection } from '@/components/admin/AccordionSection';
-import { Save, User, Briefcase, GraduationCap, Code, Plus, Trash2, Check, Upload, X, Heart, Loader2 } from 'lucide-react';
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
+import { SelectCompact } from "@/components/ui/SelectCompact";
+import { AccordionSection } from "@/components/admin/AccordionSection";
+import { TechStackInput } from "@/components/admin/TechStackInput";
+import {
+  Save,
+  User,
+  Briefcase,
+  GraduationCap,
+  Code,
+  Plus,
+  Trash2,
+  Check,
+  Upload,
+  X,
+  Heart,
+  Loader2,
+} from "lucide-react";
 
 interface Experience {
   id: string;
@@ -33,8 +48,15 @@ interface Education {
   id: string;
   degree: string;
   institution: string;
-  period: string;
+  period?: string; // Legacy field
+  startYear?: string;
+  endYear?: string;
   description: string;
+  gpa?: string;
+  thesis?: string;
+  achievements?: string;
+  activities?: string;
+  locationUrl?: string;
 }
 
 interface AboutData {
@@ -57,24 +79,23 @@ interface AboutData {
 }
 
 const defaultData: AboutData = {
-  name: '',
-  title: '',
-  tagline: '',
-  profileImage: '',
-  location: '',
-  email: '',
-  website: '',
-  bio: '',
-  cvUrl: '',
-  portfolioUrl: '',
-  techStack: '',
-  tools: '',
-  hobbies: '',
+  name: "",
+  title: "",
+  tagline: "",
+  profileImage: "",
+  location: "",
+  email: "",
+  website: "",
+  bio: "",
+  cvUrl: "",
+  portfolioUrl: "",
+  techStack: "",
+  tools: "",
+  hobbies: "",
   experiences: [],
   volunteering: [],
   educations: [],
 };
-
 
 export default function AdminAboutPage() {
   const [data, setData] = useState<AboutData>(defaultData);
@@ -84,21 +105,24 @@ export default function AdminAboutPage() {
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
-    fetch('/api/about')
-      .then(res => res.json())
-      .then(result => {
+    fetch("/api/about")
+      .then((res) => res.json())
+      .then((result) => {
         if (result && Object.keys(result).length > 0) {
-          const migratedExperiences = result.experiences?.map((exp: Experience & { description?: string }) => ({
-            ...exp,
-            descriptionEn: exp.descriptionEn || exp.description || '',
-            descriptionId: exp.descriptionId || exp.description || '',
-          })) || [];
+          const migratedExperiences =
+            result.experiences?.map(
+              (exp: Experience & { description?: string }) => ({
+                ...exp,
+                descriptionEn: exp.descriptionEn || exp.description || "",
+                descriptionId: exp.descriptionId || exp.description || "",
+              })
+            ) || [];
 
           setData({
             ...defaultData,
             ...result,
             experiences: migratedExperiences,
-            volunteering: result.volunteering || []
+            volunteering: result.volunteering || [],
           });
         }
         setIsLoading(false);
@@ -111,29 +135,29 @@ export default function AdminAboutPage() {
     setSaved(false);
 
     try {
-      const response = await fetch('/api/about', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/about", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        console.error('Save failed:', error);
-        alert(`Failed to save: ${error.error || 'Unknown error'}`);
+        console.error("Save failed:", error);
+        alert(`Failed to save: ${error.error || "Unknown error"}`);
         setIsSaving(false);
         return;
       }
 
       const result = await response.json();
-      console.log('Save successful:', result);
+      console.log("Save successful:", result);
 
       setIsSaving(false);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
-      console.error('Error saving data:', error);
-      alert('Error saving data. Please check console for details.');
+      console.error("Error saving data:", error);
+      alert("Error saving data. Please check console for details.");
       setIsSaving(false);
     }
   }
@@ -146,16 +170,16 @@ export default function AdminAboutPage() {
 
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append("file", file);
 
-      const res = await fetch('/api/about/upload', {
-        method: 'POST',
+      const res = await fetch("/api/about/upload", {
+        method: "POST",
         body: formData,
       });
 
       if (!res.ok) {
         const errorData = await res.json();
-        alert(`Upload failed: ${errorData.error || 'Unknown error'}`);
+        alert(`Upload failed: ${errorData.error || "Unknown error"}`);
         setIsUploading(false);
         return;
       }
@@ -166,19 +190,21 @@ export default function AdminAboutPage() {
         const updatedData = { ...data, profileImage: result.url };
         setData(updatedData);
 
-        const saveRes = await fetch('/api/about', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const saveRes = await fetch("/api/about", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(updatedData),
         });
 
         if (!saveRes.ok) {
-          alert('Photo uploaded but failed to save. Please click Save button manually.');
+          alert(
+            "Photo uploaded but failed to save. Please click Save button manually."
+          );
           setIsUploading(false);
           return;
         }
 
-        alert('✅ Profile photo uploaded successfully! Page will refresh...');
+        alert("✅ Profile photo uploaded successfully! Page will refresh...");
         setSaved(true);
 
         setTimeout(() => {
@@ -186,125 +212,147 @@ export default function AdminAboutPage() {
         }, 1000);
       }
     } catch (error) {
-      alert('Upload failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      alert(
+        "Upload failed: " +
+          (error instanceof Error ? error.message : "Unknown error")
+      );
     } finally {
       setIsUploading(false);
     }
   }
 
   function removeImage() {
-    setData(prev => ({ ...prev, profileImage: '' }));
+    setData((prev) => ({ ...prev, profileImage: "" }));
   }
 
   const months = [
-    { value: '', label: 'Bulan' },
-    { value: '01', label: 'Januari' },
-    { value: '02', label: 'Februari' },
-    { value: '03', label: 'Maret' },
-    { value: '04', label: 'April' },
-    { value: '05', label: 'Mei' },
-    { value: '06', label: 'Juni' },
-    { value: '07', label: 'Juli' },
-    { value: '08', label: 'Agustus' },
-    { value: '09', label: 'September' },
-    { value: '10', label: 'Oktober' },
-    { value: '11', label: 'November' },
-    { value: '12', label: 'Desember' },
+    { value: "", label: "Bulan" },
+    { value: "01", label: "Januari" },
+    { value: "02", label: "Februari" },
+    { value: "03", label: "Maret" },
+    { value: "04", label: "April" },
+    { value: "05", label: "Mei" },
+    { value: "06", label: "Juni" },
+    { value: "07", label: "Juli" },
+    { value: "08", label: "Agustus" },
+    { value: "09", label: "September" },
+    { value: "10", label: "Oktober" },
+    { value: "11", label: "November" },
+    { value: "12", label: "Desember" },
   ];
 
   const currentYear = new Date().getFullYear();
-  const years = [{ value: '', label: 'Tahun' }, ...Array.from({ length: 50 }, (_, i) => ({ value: String(currentYear - i), label: String(currentYear - i) }))];
+  const years = [
+    { value: "", label: "Tahun" },
+    ...Array.from({ length: 50 }, (_, i) => ({
+      value: String(currentYear - i),
+      label: String(currentYear - i),
+    })),
+  ];
 
   function addExperience() {
-    setData(prev => ({
+    setData((prev) => ({
       ...prev,
-      experiences: [...prev.experiences, {
-        id: Date.now().toString(),
-        title: '',
-        company: '',
-        startMonth: '',
-        startYear: '',
-        endMonth: '',
-        endYear: '',
-        descriptionEn: '',
-        descriptionId: '',
-        isCurrent: false,
-      }],
+      experiences: [
+        ...prev.experiences,
+        {
+          id: Date.now().toString(),
+          title: "",
+          company: "",
+          startMonth: "",
+          startYear: "",
+          endMonth: "",
+          endYear: "",
+          descriptionEn: "",
+          descriptionId: "",
+          isCurrent: false,
+        },
+      ],
     }));
   }
 
-  function updateExperience(id: string, field: keyof Experience, value: string | boolean) {
-    setData(prev => ({
+  function updateExperience(
+    id: string,
+    field: keyof Experience,
+    value: string | boolean
+  ) {
+    setData((prev) => ({
       ...prev,
-      experiences: prev.experiences.map(exp =>
+      experiences: prev.experiences.map((exp) =>
         exp.id === id ? { ...exp, [field]: value } : exp
       ),
     }));
   }
 
   function removeExperience(id: string) {
-    setData(prev => ({
+    setData((prev) => ({
       ...prev,
-      experiences: prev.experiences.filter(exp => exp.id !== id),
+      experiences: prev.experiences.filter((exp) => exp.id !== id),
     }));
   }
 
   function addVolunteer() {
-    setData(prev => ({
+    setData((prev) => ({
       ...prev,
-      volunteering: [...prev.volunteering, {
-        id: Date.now().toString(),
-        role: '',
-        organization: '',
-        period: '',
-        descriptionEn: '',
-        descriptionId: '',
-      }],
+      volunteering: [
+        ...prev.volunteering,
+        {
+          id: Date.now().toString(),
+          role: "",
+          organization: "",
+          period: "",
+          descriptionEn: "",
+          descriptionId: "",
+        },
+      ],
     }));
   }
 
   function updateVolunteer(id: string, field: keyof Volunteer, value: string) {
-    setData(prev => ({
+    setData((prev) => ({
       ...prev,
-      volunteering: prev.volunteering.map(vol =>
+      volunteering: prev.volunteering.map((vol) =>
         vol.id === id ? { ...vol, [field]: value } : vol
       ),
     }));
   }
 
   function removeVolunteer(id: string) {
-    setData(prev => ({
+    setData((prev) => ({
       ...prev,
-      volunteering: prev.volunteering.filter(vol => vol.id !== id),
+      volunteering: prev.volunteering.filter((vol) => vol.id !== id),
     }));
   }
 
   function addEducation() {
-    setData(prev => ({
+    setData((prev) => ({
       ...prev,
-      educations: [...prev.educations, {
-        id: Date.now().toString(),
-        degree: '',
-        institution: '',
-        period: '',
-        description: '',
-      }],
+      educations: [
+        ...prev.educations,
+        {
+          id: Date.now().toString(),
+          degree: "",
+          institution: "",
+          period: "",
+          description: "",
+        },
+      ],
     }));
   }
 
   function updateEducation(id: string, field: keyof Education, value: string) {
-    setData(prev => ({
+    setData((prev) => ({
       ...prev,
-      educations: prev.educations.map(edu =>
+      educations: prev.educations.map((edu) =>
         edu.id === id ? { ...edu, [field]: value } : edu
       ),
     }));
   }
 
   function removeEducation(id: string) {
-    setData(prev => ({
+    setData((prev) => ({
       ...prev,
-      educations: prev.educations.filter(edu => edu.id !== id),
+      educations: prev.educations.filter((edu) => edu.id !== id),
     }));
   }
 
@@ -323,7 +371,9 @@ export default function AdminAboutPage() {
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div className="border-b border-gray-200 dark:border-gray-800 pb-5">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">About Page</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          About Page
+        </h1>
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
           Manage your personal information, experience, and education
         </p>
@@ -331,7 +381,12 @@ export default function AdminAboutPage() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Profile Section */}
-        <AccordionSection icon={User} title="Profile Information" subtitle="Basic details and bio" color="blue" defaultOpen={true}>
+        <AccordionSection
+          icon={User}
+          title="Profile Information"
+          subtitle="Basic details and bio"
+          color="blue"
+          defaultOpen={true}>
           <div className="space-y-6">
             {/* Profile Photo */}
             <div>
@@ -342,10 +397,16 @@ export default function AdminAboutPage() {
                 <div className="relative flex-shrink-0">
                   <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                     {data.profileImage ? (
-                      <Image src={data.profileImage} alt="Profile" className="object-cover" fill unoptimized />
+                      <Image
+                        src={data.profileImage}
+                        alt="Profile"
+                        className="object-cover"
+                        fill
+                        unoptimized
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500 text-3xl font-semibold">
-                        {data.name ? data.name.charAt(0).toUpperCase() : '?'}
+                        {data.name ? data.name.charAt(0).toUpperCase() : "?"}
                       </div>
                     )}
                   </div>
@@ -353,8 +414,7 @@ export default function AdminAboutPage() {
                     <button
                       type="button"
                       onClick={removeImage}
-                      className="absolute -top-2 -right-2 p-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700"
-                    >
+                      className="absolute -top-2 -right-2 p-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full hover:bg-gray-50 dark:hover:bg-gray-700">
                       <X className="h-3 w-3 text-gray-600 dark:text-gray-400" />
                     </button>
                   )}
@@ -367,12 +427,16 @@ export default function AdminAboutPage() {
                         {isUploading ? (
                           <>
                             <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
-                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Uploading...</span>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                              Uploading...
+                            </span>
                           </>
                         ) : (
                           <>
                             <Upload className="h-4 w-4 text-gray-500" />
-                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Upload Photo</span>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                              Upload Photo
+                            </span>
                           </>
                         )}
                       </div>
@@ -396,13 +460,17 @@ export default function AdminAboutPage() {
               <Input
                 label="Name"
                 value={data.name}
-                onChange={e => setData(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setData((prev) => ({ ...prev, name: e.target.value }))
+                }
                 placeholder="Your name"
               />
               <Input
                 label="Title/Role"
                 value={data.title}
-                onChange={e => setData(prev => ({ ...prev, title: e.target.value }))}
+                onChange={(e) =>
+                  setData((prev) => ({ ...prev, title: e.target.value }))
+                }
                 placeholder="Learning Enthusiast"
               />
             </div>
@@ -410,7 +478,9 @@ export default function AdminAboutPage() {
             <Input
               label="Tagline"
               value={data.tagline}
-              onChange={e => setData(prev => ({ ...prev, tagline: e.target.value }))}
+              onChange={(e) =>
+                setData((prev) => ({ ...prev, tagline: e.target.value }))
+              }
               placeholder="Crafting digital experiences with passion..."
               helperText="This text will appear under the 'About Me' header"
             />
@@ -419,43 +489,57 @@ export default function AdminAboutPage() {
               <Input
                 label="Location"
                 value={data.location}
-                onChange={e => setData(prev => ({ ...prev, location: e.target.value }))}
+                onChange={(e) =>
+                  setData((prev) => ({ ...prev, location: e.target.value }))
+                }
                 placeholder="Jakarta, Indonesia"
               />
               <Input
                 label="Email"
                 type="email"
                 value={data.email}
-                onChange={e => setData(prev => ({ ...prev, email: e.target.value }))}
+                onChange={(e) =>
+                  setData((prev) => ({ ...prev, email: e.target.value }))
+                }
                 placeholder="hello@example.com"
               />
               <Input
                 label="Website"
                 value={data.website}
-                onChange={e => setData(prev => ({ ...prev, website: e.target.value }))}
+                onChange={(e) =>
+                  setData((prev) => ({ ...prev, website: e.target.value }))
+                }
                 placeholder="example.com"
               />
               <Input
                 label="CV URL"
                 type="url"
                 value={data.cvUrl}
-                onChange={e => setData(prev => ({ ...prev, cvUrl: e.target.value }))}
+                onChange={(e) =>
+                  setData((prev) => ({ ...prev, cvUrl: e.target.value }))
+                }
                 placeholder="https://drive.google.com/..."
               />
               <Input
                 label="Portfolio URL"
                 type="url"
                 value={data.portfolioUrl}
-                onChange={e => setData(prev => ({ ...prev, portfolioUrl: e.target.value }))}
+                onChange={(e) =>
+                  setData((prev) => ({ ...prev, portfolioUrl: e.target.value }))
+                }
                 placeholder="https://drive.google.com/..."
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bio</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Bio
+              </label>
               <textarea
                 value={data.bio}
-                onChange={e => setData(prev => ({ ...prev, bio: e.target.value }))}
+                onChange={(e) =>
+                  setData((prev) => ({ ...prev, bio: e.target.value }))
+                }
                 rows={4}
                 className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Write about yourself..."
@@ -465,56 +549,89 @@ export default function AdminAboutPage() {
         </AccordionSection>
 
         {/* Tech Stack */}
-        <AccordionSection icon={Code} title="Tech Stack" subtitle="Technologies you work with" color="purple" defaultOpen={false}>
-          <Input
+        <AccordionSection
+          icon={Code}
+          title="Tech Stack"
+          subtitle="Technologies you work with"
+          color="purple"
+          defaultOpen={false}>
+          <TechStackInput
             label="Technologies"
             value={data.techStack}
-            onChange={e => setData(prev => ({ ...prev, techStack: e.target.value }))}
-            placeholder="JavaScript, TypeScript, React, Next.js, Node.js"
-            helperText="Comma separated list"
+            onChange={(value) =>
+              setData((prev) => ({ ...prev, techStack: value }))
+            }
+            placeholder="Search technologies..."
+            helperText="Click to add or type and press Enter for custom items"
           />
         </AccordionSection>
 
         {/* Tools */}
-        <AccordionSection icon={Code} title="Tools & Software" subtitle="Development and design tools" color="indigo" defaultOpen={false}>
-          <Input
+        <AccordionSection
+          icon={Code}
+          title="Tools & Software"
+          subtitle="Development and design tools"
+          color="indigo"
+          defaultOpen={false}>
+          <TechStackInput
             label="Tools"
             value={data.tools}
-            onChange={e => setData(prev => ({ ...prev, tools: e.target.value }))}
-            placeholder="VS Code, Figma, Docker, Git"
-            helperText="Comma separated list"
+            onChange={(value) => setData((prev) => ({ ...prev, tools: value }))}
+            placeholder="Search tools..."
+            helperText="Click to add or type and press Enter for custom items"
           />
         </AccordionSection>
 
         {/* Hobbies */}
-        <AccordionSection icon={Heart} title="Hobbies & Interests" subtitle="What you enjoy doing" color="rose" defaultOpen={false}>
+        <AccordionSection
+          icon={Heart}
+          title="Hobbies & Interests"
+          subtitle="What you enjoy doing"
+          color="rose"
+          defaultOpen={false}>
           <Input
             label="Hobbies"
             value={data.hobbies}
-            onChange={e => setData(prev => ({ ...prev, hobbies: e.target.value }))}
+            onChange={(e) =>
+              setData((prev) => ({ ...prev, hobbies: e.target.value }))
+            }
             placeholder="Gaming, Hiking, Photography"
             helperText="Comma separated list"
           />
         </AccordionSection>
 
         {/* Experience Section */}
-        <AccordionSection icon={Briefcase} title="Work Experience" subtitle="Your professional journey" color="green" defaultOpen={false} itemCount={data.experiences.length}>
+        <AccordionSection
+          icon={Briefcase}
+          title="Work Experience"
+          subtitle="Your professional journey"
+          color="green"
+          defaultOpen={false}
+          itemCount={data.experiences.length}>
           <div className="space-y-4">
             <div className="flex justify-end">
-              <Button type="button" variant="secondary" size="sm" onClick={addExperience} className="gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={addExperience}
+                className="gap-2">
                 <Plus className="h-4 w-4" /> Add Experience
               </Button>
             </div>
 
             {data.experiences.map((exp, index) => (
-              <div key={exp.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-4">
+              <div
+                key={exp.id}
+                className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Experience #{index + 1}</span>
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    Experience #{index + 1}
+                  </span>
                   <button
                     type="button"
                     onClick={() => removeExperience(exp.id)}
-                    className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 rounded"
-                  >
+                    className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 rounded">
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
@@ -523,88 +640,104 @@ export default function AdminAboutPage() {
                   <Input
                     label="Job Title"
                     value={exp.title}
-                    onChange={e => updateExperience(exp.id, 'title', e.target.value)}
+                    onChange={(e) =>
+                      updateExperience(exp.id, "title", e.target.value)
+                    }
                     placeholder="Senior Developer"
                   />
                   <Input
                     label="Company"
                     value={exp.company}
-                    onChange={e => updateExperience(exp.id, 'company', e.target.value)}
+                    onChange={(e) =>
+                      updateExperience(exp.id, "company", e.target.value)
+                    }
                     placeholder="Tech Company"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Start Month</label>
-                    <select
-                      value={exp.startMonth}
-                      onChange={e => updateExperience(exp.id, 'startMonth', e.target.value)}
-                      className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      {months.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Year</label>
-                    <select
-                      value={exp.startYear}
-                      onChange={e => updateExperience(exp.id, 'startYear', e.target.value)}
-                      className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      {years.map(y => <option key={y.value} value={y.value}>{y.label}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">End Month</label>
-                    <select
-                      value={exp.endMonth}
-                      onChange={e => updateExperience(exp.id, 'endMonth', e.target.value)}
-                      disabled={exp.isCurrent}
-                      className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {months.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Year</label>
-                    <select
-                      value={exp.endYear}
-                      onChange={e => updateExperience(exp.id, 'endYear', e.target.value)}
-                      disabled={exp.isCurrent}
-                      className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {years.map(y => <option key={y.value} value={y.value}>{y.label}</option>)}
-                    </select>
-                  </div>
+                  <SelectCompact
+                    label="Start Month"
+                    value={exp.startMonth}
+                    onChange={(value) =>
+                      updateExperience(exp.id, "startMonth", value)
+                    }
+                    options={months}
+                  />
+                  <SelectCompact
+                    label="Year"
+                    value={exp.startYear}
+                    onChange={(value) =>
+                      updateExperience(exp.id, "startYear", value)
+                    }
+                    options={years}
+                  />
+                  <SelectCompact
+                    label="End Month"
+                    value={exp.endMonth}
+                    onChange={(value) =>
+                      updateExperience(exp.id, "endMonth", value)
+                    }
+                    options={months}
+                    disabled={exp.isCurrent}
+                  />
+                  <SelectCompact
+                    label="Year"
+                    value={exp.endYear}
+                    onChange={(value) =>
+                      updateExperience(exp.id, "endYear", value)
+                    }
+                    options={years}
+                    disabled={exp.isCurrent}
+                  />
                 </div>
 
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
                     checked={exp.isCurrent}
-                    onChange={e => updateExperience(exp.id, 'isCurrent', e.target.checked)}
+                    onChange={(e) =>
+                      updateExperience(exp.id, "isCurrent", e.target.checked)
+                    }
                     className="w-4 h-4 rounded border-gray-300"
                   />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Currently working here</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                    Currently working here
+                  </span>
                 </label>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description (EN)</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Description (EN)
+                    </label>
                     <textarea
                       value={exp.descriptionEn}
-                      onChange={e => updateExperience(exp.id, 'descriptionEn', e.target.value)}
+                      onChange={(e) =>
+                        updateExperience(
+                          exp.id,
+                          "descriptionEn",
+                          e.target.value
+                        )
+                      }
                       rows={3}
                       className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Describe your responsibilities..."
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Deskripsi (ID)</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Deskripsi (ID)
+                    </label>
                     <textarea
                       value={exp.descriptionId}
-                      onChange={e => updateExperience(exp.id, 'descriptionId', e.target.value)}
+                      onChange={(e) =>
+                        updateExperience(
+                          exp.id,
+                          "descriptionId",
+                          e.target.value
+                        )
+                      }
                       rows={3}
                       className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Jelaskan tanggung jawab Anda..."
@@ -616,55 +749,100 @@ export default function AdminAboutPage() {
 
             {data.experiences.length === 0 && (
               <div className="text-center py-8 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
-                <p className="text-sm text-gray-500 dark:text-gray-400">No experience added yet</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  No experience added yet
+                </p>
               </div>
             )}
           </div>
         </AccordionSection>
 
         {/* Volunteering Section */}
-        <AccordionSection icon={Heart} title="Volunteering & Organization" subtitle="Community involvement and activities" color="teal" defaultOpen={false} itemCount={data.volunteering.length}>
+        <AccordionSection
+          icon={Heart}
+          title="Volunteering & Organization"
+          subtitle="Community involvement and activities"
+          color="teal"
+          defaultOpen={false}
+          itemCount={data.volunteering.length}>
           <div className="space-y-4">
             <div className="flex justify-end">
-              <Button type="button" variant="secondary" size="sm" onClick={addVolunteer} className="gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={addVolunteer}
+                className="gap-2">
                 <Plus className="h-4 w-4" /> Add Activity
               </Button>
             </div>
 
             {data.volunteering.map((vol, index) => (
-              <div key={vol.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-4">
+              <div
+                key={vol.id}
+                className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Activity #{index + 1}</span>
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    Activity #{index + 1}
+                  </span>
                   <button
                     type="button"
                     onClick={() => removeVolunteer(vol.id)}
-                    className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 rounded"
-                  >
+                    className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 rounded">
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Input label="Role" value={vol.role} onChange={e => updateVolunteer(vol.id, 'role', e.target.value)} placeholder="Member" />
-                  <Input label="Organization" value={vol.organization} onChange={e => updateVolunteer(vol.id, 'organization', e.target.value)} placeholder="Org Name" />
-                  <Input label="Period" value={vol.period} onChange={e => updateVolunteer(vol.id, 'period', e.target.value)} placeholder="2024" />
+                  <Input
+                    label="Role"
+                    value={vol.role}
+                    onChange={(e) =>
+                      updateVolunteer(vol.id, "role", e.target.value)
+                    }
+                    placeholder="Member"
+                  />
+                  <Input
+                    label="Organization"
+                    value={vol.organization}
+                    onChange={(e) =>
+                      updateVolunteer(vol.id, "organization", e.target.value)
+                    }
+                    placeholder="Org Name"
+                  />
+                  <Input
+                    label="Period"
+                    value={vol.period}
+                    onChange={(e) =>
+                      updateVolunteer(vol.id, "period", e.target.value)
+                    }
+                    placeholder="2024"
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description (EN)</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Description (EN)
+                    </label>
                     <textarea
                       value={vol.descriptionEn}
-                      onChange={e => updateVolunteer(vol.id, 'descriptionEn', e.target.value)}
+                      onChange={(e) =>
+                        updateVolunteer(vol.id, "descriptionEn", e.target.value)
+                      }
                       rows={2}
                       className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Deskripsi (ID)</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Deskripsi (ID)
+                    </label>
                     <textarea
                       value={vol.descriptionId}
-                      onChange={e => updateVolunteer(vol.id, 'descriptionId', e.target.value)}
+                      onChange={(e) =>
+                        updateVolunteer(vol.id, "descriptionId", e.target.value)
+                      }
                       rows={2}
                       className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
@@ -675,46 +853,180 @@ export default function AdminAboutPage() {
 
             {data.volunteering.length === 0 && (
               <div className="text-center py-8 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
-                <p className="text-sm text-gray-500 dark:text-gray-400">No activities added yet</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  No activities added yet
+                </p>
               </div>
             )}
           </div>
         </AccordionSection>
 
         {/* Education Section */}
-        <AccordionSection icon={GraduationCap} title="Education" subtitle="Academic background and qualifications" color="orange" defaultOpen={false} itemCount={data.educations.length}>
+        <AccordionSection
+          icon={GraduationCap}
+          title="Education"
+          subtitle="Academic background and qualifications"
+          color="orange"
+          defaultOpen={false}
+          itemCount={data.educations.length}>
           <div className="space-y-4">
             <div className="flex justify-end">
-              <Button type="button" variant="secondary" size="sm" onClick={addEducation} className="gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={addEducation}
+                className="gap-2">
                 <Plus className="h-4 w-4" /> Add Education
               </Button>
             </div>
 
             {data.educations.map((edu, index) => (
-              <div key={edu.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-4">
+              <div
+                key={edu.id}
+                className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Education #{index + 1}</span>
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    Education #{index + 1}
+                  </span>
                   <button
                     type="button"
                     onClick={() => removeEducation(edu.id)}
-                    className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 rounded"
-                  >
+                    className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 rounded">
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input label="Degree" value={edu.degree} onChange={e => updateEducation(edu.id, 'degree', e.target.value)} placeholder="Bachelor of CS" />
-                  <Input label="Institution" value={edu.institution} onChange={e => updateEducation(edu.id, 'institution', e.target.value)} placeholder="University" />
-                  <Input label="Period" value={edu.period} onChange={e => updateEducation(edu.id, 'period', e.target.value)} placeholder="2016 - 2020" />
+                  <Input
+                    label="Institution"
+                    value={edu.institution}
+                    onChange={(e) =>
+                      updateEducation(edu.id, "institution", e.target.value)
+                    }
+                    placeholder="University Name"
+                  />
+                  <Input
+                    label="Degree"
+                    value={edu.degree}
+                    onChange={(e) =>
+                      updateEducation(edu.id, "degree", e.target.value)
+                    }
+                    placeholder="Bachelor of Computer Science"
+                  />
+                  <Input
+                    label="GPA/IPK"
+                    value={edu.gpa || ""}
+                    onChange={(e) =>
+                      updateEducation(edu.id, "gpa", e.target.value)
+                    }
+                    placeholder="3.85/4.00"
+                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Start Year
+                      </label>
+                      <select
+                        value={edu.startYear || ""}
+                        onChange={(e) =>
+                          updateEducation(edu.id, "startYear", e.target.value)
+                        }
+                        className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Select</option>
+                        {Array.from(
+                          { length: 30 },
+                          (_, i) => new Date().getFullYear() - i
+                        ).map((year) => (
+                          <option key={year} value={year.toString()}>
+                            {year}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        End Year
+                      </label>
+                      <select
+                        value={edu.endYear || ""}
+                        onChange={(e) =>
+                          updateEducation(edu.id, "endYear", e.target.value)
+                        }
+                        className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Present</option>
+                        {Array.from(
+                          { length: 30 },
+                          (_, i) => new Date().getFullYear() + 5 - i
+                        ).map((year) => (
+                          <option key={year} value={year.toString()}>
+                            {year}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <Input
+                  label="Thesis/Skripsi Title"
+                  value={edu.thesis || ""}
+                  onChange={(e) =>
+                    updateEducation(edu.id, "thesis", e.target.value)
+                  }
+                  placeholder="Title of your thesis or final project"
+                />
+
+                <Input
+                  label="Location URL (Google Maps)"
+                  value={edu.locationUrl || ""}
+                  onChange={(e) =>
+                    updateEducation(edu.id, "locationUrl", e.target.value)
+                  }
+                  placeholder="https://maps.google.com/..."
+                />
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Achievements (Cum Laude, Dean&apos;s List, etc.)
+                  </label>
+                  <textarea
+                    value={edu.achievements || ""}
+                    onChange={(e) =>
+                      updateEducation(edu.id, "achievements", e.target.value)
+                    }
+                    rows={2}
+                    placeholder="List your academic achievements..."
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Activities (Competitions, Organizations)
+                  </label>
+                  <textarea
+                    value={edu.activities || ""}
+                    onChange={(e) =>
+                      updateEducation(edu.id, "activities", e.target.value)
+                    }
+                    rows={2}
+                    placeholder="Competition wins, club memberships, etc."
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Description
+                  </label>
                   <textarea
                     value={edu.description}
-                    onChange={e => updateEducation(edu.id, 'description', e.target.value)}
+                    onChange={(e) =>
+                      updateEducation(edu.id, "description", e.target.value)
+                    }
                     rows={2}
+                    placeholder="Additional notes about your education..."
                     className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -723,7 +1035,9 @@ export default function AdminAboutPage() {
 
             {data.educations.length === 0 && (
               <div className="text-center py-8 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
-                <p className="text-sm text-gray-500 dark:text-gray-400">No education added yet</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  No education added yet
+                </p>
               </div>
             )}
           </div>
@@ -734,15 +1048,16 @@ export default function AdminAboutPage() {
           {saved && (
             <div className="flex items-center gap-2 px-3 py-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
               <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
-              <span className="text-sm font-medium text-green-700 dark:text-green-300">Changes saved successfully</span>
+              <span className="text-sm font-medium text-green-700 dark:text-green-300">
+                Changes saved successfully
+              </span>
             </div>
           )}
           <div className="ml-auto">
             <Button
               type="submit"
               disabled={isSaving}
-              className="gap-2 bg-blue-600 hover:bg-blue-700 text-white"
-            >
+              className="gap-2 bg-blue-600 hover:bg-blue-700 text-white">
               {isSaving ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />

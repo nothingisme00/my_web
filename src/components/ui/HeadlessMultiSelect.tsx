@@ -1,10 +1,8 @@
-"use client"
+"use client";
 
-import { Fragment } from 'react';
-import { Listbox, Transition } from '@headlessui/react';
-import { ChevronDown } from 'lucide-react';
-import { clsx } from 'clsx';
-import { useFloating, offset, flip, shift, autoUpdate, size, FloatingPortal } from '@floating-ui/react';
+import { useState, useRef, useEffect } from "react";
+import { ChevronDown } from "lucide-react";
+import { clsx } from "clsx";
 
 export interface MultiSelectOption {
   value: string;
@@ -27,17 +25,20 @@ export function MultiSelect({
   onChange,
   options,
   label,
-  placeholder = 'Select options',
+  placeholder = "Select options",
   disabled = false,
   className,
 }: MultiSelectProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const selectedOptions = options.filter((option) =>
     value.includes(option.value)
   );
 
   const displayValue =
     selectedOptions.length > 0
-      ? selectedOptions.map((opt) => opt.label).join(', ')
+      ? selectedOptions.map((opt) => opt.label).join(", ")
       : placeholder;
 
   const handleToggle = (optionValue: string) => {
@@ -48,120 +49,89 @@ export function MultiSelect({
     }
   };
 
-  const { refs, floatingStyles } = useFloating({
-    middleware: [
-      offset(8),
-      flip(),
-      shift({ padding: 8 }),
-      size({
-        apply({ rects, elements }) {
-          Object.assign(elements.floating.style, {
-            width: `${rects.reference.width}px`,
-          });
-        },
-      }),
-    ],
-    whileElementsMounted: autoUpdate,
-    placement: 'bottom-start',
-  });
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
-    <div className={clsx('w-full', className)}>
+    <div className={clsx("w-full", className)} ref={containerRef}>
       {label && (
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           {label}
         </label>
       )}
 
-      <Listbox value={value} onChange={onChange} disabled={disabled} multiple>
-        {({ open }) => (
-          <>
-            <Listbox.Button
-              ref={refs.setReference}
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => !disabled && setIsOpen(!isOpen)}
+          disabled={disabled}
+          className={clsx(
+            "w-full px-4 py-3 pr-10 rounded-2xl border cursor-pointer text-left",
+            "bg-white dark:bg-gray-900",
+            "text-gray-900 dark:text-white text-sm font-medium",
+            "border-gray-200 dark:border-gray-700",
+            "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+            "hover:border-blue-400 dark:hover:border-blue-600",
+            "disabled:opacity-50 disabled:cursor-not-allowed"
+          )}>
+          <span className="block truncate">{displayValue}</span>
+          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+            <ChevronDown
               className={clsx(
-                'relative w-full px-4 py-3 pr-10 rounded-2xl border transition-all duration-200 cursor-pointer text-left',
-                'bg-white dark:bg-gray-900',
-                'text-gray-900 dark:text-white text-sm font-medium',
-                'border-gray-200 dark:border-gray-700',
-                'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
-                'hover:border-blue-400 dark:hover:border-blue-600',
-                'disabled:opacity-50 disabled:cursor-not-allowed'
+                "h-4 w-4 text-gray-400 dark:text-gray-500 transition-transform duration-200",
+                isOpen && "rotate-180"
               )}
-            >
-              <span className="block truncate">{displayValue}</span>
-              <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                <ChevronDown className={clsx(
-                  'h-4 w-4 text-gray-400 dark:text-gray-500 transition-transform duration-200',
-                  open && 'rotate-180'
-                )} />
-              </span>
-            </Listbox.Button>
+            />
+          </span>
+        </button>
 
-            <FloatingPortal>
-              <Transition
-                as={Fragment}
-                show={open}
-                enter="transition ease-out duration-100"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="transition ease-in duration-75"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Listbox.Options
-                  ref={refs.setFloating}
-                  style={floatingStyles}
-                  className="z-[99999] bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl overflow-hidden focus:outline-none ring-1 ring-black ring-opacity-5"
-                >
-                  <div className="max-h-60 overflow-y-auto py-1">
-                    {options.map((option) => (
-                      <Listbox.Option
-                        key={option.value}
-                        value={option.value}
-                        className={({ active }) =>
-                          clsx(
-                            'relative cursor-pointer select-none py-2.5 pl-10 pr-4 transition-colors',
-                            active
-                              ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
-                              : 'text-gray-900 dark:text-white'
-                          )
-                        }
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleToggle(option.value);
-                        }}
-                      >
-                        {({ selected }) => (
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                                <input
-                                  type="checkbox"
-                                  checked={selected}
-                                  onChange={() => {}}
-                                  className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
-                                />
-                              </span>
-                              <span className="block truncate text-sm ml-7">
-                                {option.label}
-                              </span>
-                            </div>
-                            {option.count !== undefined && (
-                              <span className="text-xs text-gray-500 dark:text-gray-400">
-                                ({option.count})
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </Listbox.Option>
-                    ))}
+        {isOpen && (
+          <div className="absolute z-50 mt-1 w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-xl overflow-hidden">
+            <div className="max-h-60 overflow-y-auto py-1">
+              {options.map((option) => {
+                const isSelected = value.includes(option.value);
+                return (
+                  <div
+                    key={option.value}
+                    onClick={() => handleToggle(option.value)}
+                    className={clsx(
+                      "flex items-center justify-between px-4 py-2.5 cursor-pointer",
+                      "hover:bg-gray-100 dark:hover:bg-gray-800",
+                      "text-gray-900 dark:text-white"
+                    )}>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => {}}
+                        className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-sm">{option.label}</span>
+                    </div>
+                    {option.count !== undefined && (
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        ({option.count})
+                      </span>
+                    )}
                   </div>
-                </Listbox.Options>
-              </Transition>
-            </FloatingPortal>
-          </>
+                );
+              })}
+            </div>
+          </div>
         )}
-      </Listbox>
+      </div>
     </div>
   );
 }

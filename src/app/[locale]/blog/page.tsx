@@ -1,21 +1,28 @@
-import { getPublishedPosts, getCategories, getTags } from "@/lib/actions";
+import { getPublishedPosts, getCategories } from "@/lib/actions";
 import { BookOpen } from "lucide-react";
 import { Prisma } from "@prisma/client";
 import { BlogClientWrapper } from "@/components/blog/BlogClientWrapper";
+import { isPageEnabled } from "@/lib/page-visibility";
+import { notFound } from "next/navigation";
 
 type PostWithRelations = Prisma.PostGetPayload<{
   include: {
     category: true;
     tags: true;
-  }
+  };
 }>;
 
 export default async function BlogPage() {
+  // Check if page is enabled
+  const pageEnabled = await isPageEnabled("page_blog");
+  if (!pageEnabled) {
+    notFound();
+  }
+
   // Fetch all data on server
-  const [posts, categories, tags] = await Promise.all([
+  const [posts, categories] = await Promise.all([
     getPublishedPosts(),
     getCategories(),
-    getTags()
   ]);
 
   return (
@@ -24,7 +31,6 @@ export default async function BlogPage() {
         <BlogClientWrapper
           initialPosts={posts as PostWithRelations[]}
           categories={categories}
-          tags={tags}
           totalPosts={posts.length}
         />
       ) : (
@@ -37,7 +43,8 @@ export default async function BlogPage() {
                   Blog
                 </h1>
                 <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
-                  Artikel dan tulisan tentang web development, programming, dan teknologi
+                  Artikel dan tulisan tentang web development, programming, dan
+                  teknologi
                 </p>
 
                 {/* Stats */}
@@ -53,7 +60,9 @@ export default async function BlogPage() {
 
           <div className="mx-auto max-w-7xl px-6 lg:px-8 py-12 lg:py-16">
             <div className="text-center py-20">
-              <p className="text-gray-500 dark:text-gray-400">Belum ada artikel yang dipublikasikan.</p>
+              <p className="text-gray-500 dark:text-gray-400">
+                Belum ada artikel yang dipublikasikan.
+              </p>
             </div>
           </div>
         </>

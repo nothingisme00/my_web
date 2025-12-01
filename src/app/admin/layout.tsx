@@ -1,43 +1,65 @@
-"use client"
+"use client";
 
-import Link from 'next/link';
-import { LayoutDashboard, FileText, Briefcase, LogOut, Image, Settings, Menu, X, Camera, UserCircle } from 'lucide-react';
-import { logout } from '@/lib/actions';
-import { ThemeToggle } from '@/components/theme-toggle';
-import { ThemeProvider } from '@/components/theme-provider';
-import { Breadcrumbs } from '@/components/admin/Breadcrumbs';
-import { ToastContainer } from '@/components/ui/Toast';
-import { useToast } from '@/hooks/useToast';
-import { usePathname } from 'next/navigation';
-import { clsx } from 'clsx';
-import { useState, useEffect } from 'react';
+import Link from "next/link";
+import {
+  LayoutDashboard,
+  FileText,
+  Briefcase,
+  LogOut,
+  Image,
+  Settings,
+  Menu,
+  X,
+  UserCircle,
+  Film,
+} from "lucide-react";
+import { logout } from "@/lib/actions";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Breadcrumbs } from "@/components/admin/Breadcrumbs";
+import { ToastContainer } from "@/components/ui/Toast";
+import { useToast } from "@/hooks/useToast";
+import { usePathname } from "next/navigation";
+import { clsx } from "clsx";
+import { useState, useEffect } from "react";
 
-function NavLink({ href, icon: Icon, children, pathname }: { href: string; icon: React.ComponentType<{ className?: string }>; children: React.ReactNode; pathname: string }) {
+function NavLink({
+  href,
+  icon: Icon,
+  children,
+  pathname,
+}: {
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  children: React.ReactNode;
+  pathname: string;
+}) {
   // Special case for dashboard: only active when exactly /admin
-  const isActive = href === '/admin'
-    ? pathname === '/admin'
-    : pathname === href || pathname.startsWith(href + '/');
+  const isActive =
+    href === "/admin"
+      ? pathname === "/admin"
+      : pathname === href || pathname.startsWith(href + "/");
 
   return (
     <Link
       href={href}
       className={clsx(
-        'group relative flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 touch-manipulation overflow-hidden',
+        "group relative flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 touch-manipulation overflow-hidden",
         isActive
-          ? 'bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/30'
-          : 'text-gray-300 hover:bg-gray-800/80 hover:text-white active:bg-gray-800'
-      )}
-    >
+          ? "bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/30"
+          : "text-gray-300 hover:bg-gray-800/80 hover:text-white active:bg-gray-800"
+      )}>
       {/* Animated background on hover */}
       {!isActive && (
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/0 via-purple-600/0 to-blue-600/0 group-hover:from-blue-600/10 group-hover:via-purple-600/10 group-hover:to-blue-600/10 transition-all duration-500 rounded-xl" />
       )}
 
       {/* Icon with animation */}
-      <div className={clsx(
-        'relative z-10 transition-all duration-300',
-        isActive ? 'scale-110' : 'group-hover:scale-110 group-hover:rotate-6'
-      )}>
+      <div
+        className={clsx(
+          "relative z-10 transition-all duration-300",
+          isActive ? "scale-110" : "group-hover:scale-110 group-hover:rotate-6"
+        )}>
         <Icon className="h-5 w-5 flex-shrink-0" />
       </div>
 
@@ -72,19 +94,23 @@ export default function AdminLayout({
   // Prevent body scroll when sidebar is open on mobile
   useEffect(() => {
     if (isSidebarOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [isSidebarOpen]);
 
   return (
     <html suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="theme">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          storageKey="theme">
           <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">
             {/* Overlay with smooth animation */}
             <div
@@ -110,8 +136,7 @@ export default function AdminLayout({
                       : "text-gray-400 hover:text-white hover:bg-gray-800/80"
                   )}
                   aria-label="Toggle menu"
-                  aria-expanded={isSidebarOpen}
-                >
+                  aria-expanded={isSidebarOpen}>
                   <div className="relative w-6 h-6">
                     <Menu
                       className={clsx(
@@ -149,11 +174,14 @@ export default function AdminLayout({
             </div>
 
             {/* Sidebar with smooth slide animation */}
-            <aside className={clsx(
-              "fixed top-0 left-0 h-full z-30 w-[280px] sm:w-72 lg:w-64 bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950 text-white flex-shrink-0 border-r border-gray-700/50 transition-all duration-500 ease-out flex flex-col backdrop-blur-xl",
-              // Mobile/Tablet: controlled by state
-              isSidebarOpen ? "translate-x-0 shadow-2xl shadow-black/50" : "-translate-x-full lg:translate-x-0 shadow-none lg:shadow-none"
-            )}>
+            <aside
+              className={clsx(
+                "fixed top-0 left-0 h-full z-30 w-[280px] sm:w-72 lg:w-64 bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950 text-white flex-shrink-0 border-r border-gray-700/50 transition-all duration-500 ease-out flex flex-col backdrop-blur-xl",
+                // Mobile/Tablet: controlled by state
+                isSidebarOpen
+                  ? "translate-x-0 shadow-2xl shadow-black/50"
+                  : "-translate-x-full lg:translate-x-0 shadow-none lg:shadow-none"
+              )}>
               {/* Gradient overlay for depth */}
               <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-transparent to-purple-600/5 pointer-events-none" />
 
@@ -167,16 +195,21 @@ export default function AdminLayout({
                     <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                       CMS Admin
                     </h1>
-                    <p className="text-xs text-gray-400 mt-0.5">Content Management</p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      Content Management
+                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Mobile Header with stagger animation */}
-              <div className={clsx(
-                "lg:hidden relative flex items-center justify-between p-5 border-b border-gray-700/50 flex-shrink-0 transition-all duration-500",
-                isSidebarOpen ? "opacity-100 translate-y-0 delay-100" : "opacity-0 -translate-y-4"
-              )}>
+              <div
+                className={clsx(
+                  "lg:hidden relative flex items-center justify-between p-5 border-b border-gray-700/50 flex-shrink-0 transition-all duration-500",
+                  isSidebarOpen
+                    ? "opacity-100 translate-y-0 delay-100"
+                    : "opacity-0 -translate-y-4"
+                )}>
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-blue-500/30 animate-pulse">
                     <LayoutDashboard className="h-5 w-5 text-white" />
@@ -191,50 +224,75 @@ export default function AdminLayout({
                 <button
                   onClick={() => setIsSidebarOpen(false)}
                   className="p-2 text-gray-400 hover:text-white hover:bg-red-500/20 hover:border-red-500/50 border border-gray-700/50 rounded-xl transition-all duration-300 active:scale-90 touch-manipulation group"
-                  aria-label="Close menu"
-                >
+                  aria-label="Close menu">
                   <X className="h-5 w-5 group-hover:rotate-90 transition-transform duration-300" />
                 </button>
               </div>
 
               {/* Scrollable Navigation with stagger */}
-              <nav className={clsx(
-                "admin-sidebar-nav relative flex-1 px-4 py-6 space-y-2 overflow-y-auto overscroll-contain transition-all duration-700",
-                isSidebarOpen ? "opacity-100 delay-200" : "opacity-0 lg:opacity-100"
-              )}>
-                <NavLink href="/admin" icon={LayoutDashboard} pathname={pathname}>
+              <nav
+                className={clsx(
+                  "admin-sidebar-nav relative flex-1 px-4 py-6 space-y-2 overflow-y-auto overscroll-contain transition-all duration-700",
+                  isSidebarOpen
+                    ? "opacity-100 delay-200"
+                    : "opacity-0 lg:opacity-100"
+                )}>
+                <NavLink
+                  href="/admin"
+                  icon={LayoutDashboard}
+                  pathname={pathname}>
                   Dashboard
                 </NavLink>
-                <NavLink href="/admin/posts" icon={FileText} pathname={pathname}>
+                <NavLink
+                  href="/admin/posts"
+                  icon={FileText}
+                  pathname={pathname}>
                   Posts
                 </NavLink>
-                <NavLink href="/admin/projects" icon={Briefcase} pathname={pathname}>
+                <NavLink
+                  href="/admin/projects"
+                  icon={Briefcase}
+                  pathname={pathname}>
                   Projects
                 </NavLink>
                 <NavLink href="/admin/media" icon={Image} pathname={pathname}>
                   Media Library
                 </NavLink>
-                <NavLink href="/admin/gallery" icon={Camera} pathname={pathname}>
-                  Gallery
-                </NavLink>
-                <NavLink href="/admin/about" icon={UserCircle} pathname={pathname}>
+                <NavLink
+                  href="/admin/about"
+                  icon={UserCircle}
+                  pathname={pathname}>
                   About Page
                 </NavLink>
-                <NavLink href="/admin/settings" icon={Settings} pathname={pathname}>
+                <NavLink
+                  href="/admin/watchlist"
+                  icon={Film}
+                  pathname={pathname}>
+                  Watchlist
+                </NavLink>
+                <NavLink
+                  href="/admin/settings"
+                  icon={Settings}
+                  pathname={pathname}>
                   Settings
                 </NavLink>
               </nav>
 
               {/* Bottom Actions with gradient border */}
-              <div className={clsx(
-                "relative flex-shrink-0 p-4 border-t border-gray-700/50 space-y-3 bg-gradient-to-t from-gray-950 to-transparent transition-all duration-700",
-                isSidebarOpen ? "opacity-100 translate-y-0 delay-300" : "opacity-0 lg:opacity-100 translate-y-4 lg:translate-y-0"
-              )}>
+              <div
+                className={clsx(
+                  "relative flex-shrink-0 p-4 border-t border-gray-700/50 space-y-3 bg-gradient-to-t from-gray-950 to-transparent transition-all duration-700",
+                  isSidebarOpen
+                    ? "opacity-100 translate-y-0 delay-300"
+                    : "opacity-0 lg:opacity-100 translate-y-4 lg:translate-y-0"
+                )}>
                 {/* Theme Toggle - Hidden on mobile (shown in header) */}
                 <div className="hidden lg:flex items-center justify-between px-4 py-2.5 bg-gray-800/50 rounded-xl border border-gray-700/50 hover:border-gray-600/50 transition-all duration-300">
                   <div className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
-                    <span className="text-sm text-gray-300 font-medium">Theme</span>
+                    <span className="text-sm text-gray-300 font-medium">
+                      Theme
+                    </span>
                   </div>
                   <ThemeToggle />
                 </div>
@@ -243,8 +301,7 @@ export default function AdminLayout({
                 <form action={logout} className="w-full">
                   <button
                     type="submit"
-                    className="group w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 text-red-400 hover:text-white bg-red-900/0 hover:bg-red-600 border border-red-900/30 hover:border-red-600 active:scale-95 touch-manipulation shadow-lg shadow-red-900/0 hover:shadow-red-600/30"
-                  >
+                    className="group w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 text-red-400 hover:text-white bg-red-900/0 hover:bg-red-600 border border-red-900/30 hover:border-red-600 active:scale-95 touch-manipulation shadow-lg shadow-red-900/0 hover:shadow-red-600/30">
                     <LogOut className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
                     <span className="font-medium">Logout</span>
                   </button>

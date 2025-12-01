@@ -24,6 +24,7 @@ model Post {
   excerpt         String?   @db.Text
   image           String?
   published       Boolean   @default(false)
+  status          String    @default("draft") // draft, published, archived
   views           Int       @default(0)
   reactionsLove   Int       @default(0)
   reactionsLike   Int       @default(0)
@@ -32,6 +33,7 @@ model Post {
   readingTime     Int       @default(5) // in minutes
   author          String    @default("Alfattah")
   publishedAt     DateTime?
+  archivedAt      DateTime?
   metaDescription String?   @db.Text
   metaKeywords    String?
   categoryId      String?
@@ -42,11 +44,13 @@ model Post {
 
   @@index([slug])
   @@index([published])
+  @@index([status])
   @@index([createdAt])
   @@index([publishedAt])
   @@index([categoryId])
   @@index([published, publishedAt])
   @@index([published, views])
+  @@index([status, publishedAt])
 }
 
 model Project {
@@ -111,16 +115,23 @@ model Settings {
   updatedAt DateTime @updatedAt
 }
 
-model GalleryPhoto {
-  id          String    @id @default(cuid())
-  title       String
-  description String?
-  filename    String    @unique
-  category    String?
-  takenAt     DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+model Watchlist {
+  id           String    @id @default(cuid())
+  title        String
+  type         String    @default("Anime") // Anime, Film, Series, Donghua
+  genre        String?
+  totalEpisode Int?
+  status       String    @default("Completed") // Watching, Completed, Dropped, On Hold, Plan to Watch
+  rating       Float?    // 1-10
+  notes        String?   @db.Text
+  imageUrl     String?
+  year         Int?
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  @@index([category])
+  @@index([status])
+  @@index([type])
+  @@index([rating])
   @@index([createdAt])
 }

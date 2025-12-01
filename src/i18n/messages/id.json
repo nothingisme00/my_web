@@ -22,6 +22,7 @@
     "blog": "Blog",
     "projects": "Proyek",
     "gallery": "Galeri",
+    "watchlist": "Watchlist",
     "contact": "Kontak",
     "admin": "Admin"
   },
@@ -134,11 +135,21 @@
     "downloadCV": "Unduh CV",
     "downloadPortfolio": "Unduh Portfolio",
     "currentlyWorking": "Sedang Bekerja",
+    "present": "Sekarang",
+    "hero": {
+      "cta": "Lebih Lanjut Tentang Saya"
+    },
+    "knowMore": {
+      "title": "Kenali Saya Lebih Dekat",
+      "subtitle": "Sekilas tentang perjalanan, keahlian, dan minat saya",
+      "entries": "{count} entri",
+      "items": "{count} item"
+    },
     "contact": {
       "title": "Mari Bekerja Sama",
       "description": "Punya proyek yang ingin dikerjakan atau ingin berkolaborasi? Saya ingin mendengar dari Anda. Kirim pesan dan saya akan merespons sesegera mungkin."
     },
-    "clickToView": "Lihat detail pekerjaan",
+    "clickToView": "Klik untuk expand",
     "volunteering": {
       "title": "Pengalaman Organisasi & Sukarelawan",
       "role": "Peran",
@@ -235,6 +246,42 @@
       "planned": "Direncanakan"
     },
     "noProjects": "Belum ada proyek"
+  },
+  "watchlist": {
+    "title": "Daftar Tontonan",
+    "subtitle": "Anime, film, dan series yang sudah saya tonton",
+    "stats": {
+      "total": "Total Ditonton",
+      "completed": "Selesai",
+      "averageRating": "Rating Rata-rata"
+    },
+    "filters": {
+      "all": "Semua",
+      "allTypes": "Semua Tipe",
+      "allStatus": "Semua Status",
+      "search": "Cari judul...",
+      "type": "Tipe",
+      "status": "Status"
+    },
+    "table": {
+      "title": "Judul",
+      "type": "Tipe",
+      "genre": "Genre",
+      "episodes": "Episode",
+      "status": "Status",
+      "rating": "Rating",
+      "year": "Tahun",
+      "actions": "Aksi"
+    },
+    "status": {
+      "watching": "Sedang Menonton",
+      "completed": "Selesai",
+      "dropped": "Dihentikan",
+      "onHold": "Ditunda",
+      "planToWatch": "Rencana Tonton"
+    },
+    "noItems": "Belum ada item di watchlist",
+    "addFirst": "Mulai tambahkan anime atau film!"
   },
   "footer": {
     "description": "Full Stack Developer yang passionate dalam menciptakan pengalaman web yang luar biasa.",

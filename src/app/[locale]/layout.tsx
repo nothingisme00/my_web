@@ -1,25 +1,28 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-import { notFound } from 'next/navigation';
-import { LayoutWrapper } from '@/components/layout/LayoutWrapper';
-import { Footer } from '@/components/layout/Footer';
-import { getSettings } from '@/lib/actions';
-import { ScrollToTop } from '@/components/blog/ScrollToTop';
-import { ReCaptchaProvider } from '@/components/providers/ReCaptchaProvider';
-import { NavigationProvider } from '@/components/providers/NavigationProvider';
-import { locales } from '@/i18n/config';
-import '../globals.css';
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+import { notFound } from "next/navigation";
+import { LayoutWrapper } from "@/components/layout/LayoutWrapper";
+import { Footer } from "@/components/layout/Footer";
+import { getSettings } from "@/lib/actions";
+import { ScrollToTop } from "@/components/blog/ScrollToTop";
+import { ReCaptchaProvider } from "@/components/providers/ReCaptchaProvider";
+import { NavigationProvider } from "@/components/providers/NavigationProvider";
+import { locales } from "@/i18n/config";
+import "../globals.css";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
+
+// Force dynamic rendering to ensure settings are always fresh
+export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
 export async function generateMetadata({
-  params
+  params,
 }: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
@@ -27,19 +30,22 @@ export async function generateMetadata({
   const settings = await getSettings();
 
   return {
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+    metadataBase: new URL(
+      process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+    ),
     title: {
-      default: settings.site_name || 'My Portfolio',
-      template: `%s | ${settings.site_name || 'My Portfolio'}`,
+      default: settings.site_name || "My Portfolio",
+      template: `%s | ${settings.site_name || "My Portfolio"}`,
     },
-    description: settings.seo_description || 'Personal portfolio and blog website',
+    description:
+      settings.seo_description || "Personal portfolio and blog website",
     keywords: settings.seo_keywords || undefined,
   };
 }
 
 export default async function LocaleLayout({
   children,
-  params
+  params,
 }: {
   children: React.ReactNode;
   params: Promise<{ locale: string }>;

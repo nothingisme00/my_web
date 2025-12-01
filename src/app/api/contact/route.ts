@@ -3,6 +3,16 @@ import { z } from "zod";
 import { uploadLimiter, getClientIdentifier } from "@/lib/rate-limit";
 import { Resend } from "resend";
 
+// Escape HTML to prevent XSS in emails
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 // Validation schema
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
@@ -20,18 +30,29 @@ async function verifyRecaptcha(token: string): Promise<boolean> {
   const secretKey = process.env.RECAPTCHA_SECRET_KEY;
 
   if (!secretKey) {
-    console.warn('reCAPTCHA secret key not configured');
-    return true; // Allow submission if not configured (for development)
+    // In production, fail closed (reject) if reCAPTCHA is not configured
+    const isProduction = process.env.NODE_ENV === "production";
+    if (isProduction) {
+      console.error(
+        "SECURITY: reCAPTCHA secret key not configured in production!"
+      );
+      return false; // Reject in production
+    }
+    console.warn("reCAPTCHA secret key not configured (development mode)");
+    return true; // Allow in development only
   }
 
   try {
-    const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: `secret=${secretKey}&response=${token}`,
-    });
+    const response = await fetch(
+      "https://www.google.com/recaptcha/api/siteverify",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `secret=${secretKey}&response=${token}`,
+      }
+    );
 
     const data = await response.json();
 
@@ -40,7 +61,7 @@ async function verifyRecaptcha(token: string): Promise<boolean> {
     // We'll use 0.5 as threshold (you can adjust this)
     return data.success && data.score >= 0.5;
   } catch (error) {
-    console.error('reCAPTCHA verification error:', error);
+    console.error("reCAPTCHA verification error:", error);
     return false;
   }
 }
@@ -68,7 +89,9 @@ export async function POST(request: NextRequest) {
 
     // Verify reCAPTCHA token
     if (validatedData.recaptchaToken) {
-      const isValidRecaptcha = await verifyRecaptcha(validatedData.recaptchaToken);
+      const isValidRecaptcha = await verifyRecaptcha(
+        validatedData.recaptchaToken
+      );
       if (!isValidRecaptcha) {
         return NextResponse.json(
           { error: "reCAPTCHA verification failed. Please try again." },
@@ -89,10 +112,10 @@ export async function POST(request: NextRequest) {
 
     // Validate required environment variables
     if (!process.env.RESEND_API_KEY) {
-      throw new Error('RESEND_API_KEY is not configured');
+      throw new Error("RESEND_API_KEY is not configured");
     }
     if (!process.env.CONTACT_EMAIL) {
-      throw new Error('CONTACT_EMAIL is not configured');
+      throw new Error("CONTACT_EMAIL is not configured");
     }
 
     // Send email using Resend
@@ -130,28 +153,37 @@ export async function POST(request: NextRequest) {
             <div class="content">
               <div class="field">
                 <div class="label">From:</div>
-                <div class="value">${validatedData.name}</div>
+                <div class="value">${escapeHtml(validatedData.name)}</div>
               </div>
               <div class="field">
                 <div class="label">Email:</div>
-                <div class="value">${validatedData.email}</div>
+                <div class="value">${escapeHtml(validatedData.email)}</div>
               </div>
               <div class="field">
                 <div class="label">Subject:</div>
-                <div class="value">${validatedData.subject}</div>
+                <div class="value">${escapeHtml(validatedData.subject)}</div>
               </div>
               <div class="field">
                 <div class="label">Message:</div>
-                <div class="value" style="white-space: pre-wrap;">${validatedData.message}</div>
+                <div class="value" style="white-space: pre-wrap;">${escapeHtml(
+                  validatedData.message
+                )}</div>
               </div>
               <div style="text-align: center;">
-                <a href="mailto:${validatedData.email}?subject=Re: ${encodeURIComponent(validatedData.subject)}" class="reply-button">
-                  Reply to ${validatedData.name}
+                <a href="mailto:${escapeHtml(
+                  validatedData.email
+                )}?subject=Re: ${encodeURIComponent(
+        validatedData.subject
+      )}" class="reply-button">
+                  Reply to ${escapeHtml(validatedData.name)}
                 </a>
               </div>
             </div>
             <div class="footer">
-              <p>Received: ${new Date().toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'short' })}</p>
+              <p>Received: ${new Date().toLocaleString("en-US", {
+                dateStyle: "full",
+                timeStyle: "short",
+              })}</p>
               <p>IP Address: ${clientId}</p>
             </div>
           </div>
@@ -189,16 +221,23 @@ export async function POST(request: NextRequest) {
             <div class="header">
               <div class="check-icon">✅</div>
               <h1 style="margin: 0;">Message Received!</h1>
-              <p style="margin: 10px 0 0 0; opacity: 0.9;">Thanks for reaching out, ${validatedData.name}</p>
+              <p style="margin: 10px 0 0 0; opacity: 0.9;">Thanks for reaching out, ${escapeHtml(
+                validatedData.name
+              )}</p>
             </div>
             <div class="content">
-              <p>Hi ${validatedData.name},</p>
+              <p>Hi ${escapeHtml(validatedData.name)},</p>
               <p>I've received your message and wanted to confirm it arrived safely. I'll review it carefully and get back to you as soon as possible.</p>
 
               <div class="message-summary">
                 <p style="margin: 0 0 10px 0; font-weight: 600; color: #4b5563;">Your message summary:</p>
-                <p style="margin: 5px 0;"><strong>Subject:</strong> ${validatedData.subject}</p>
-                <p style="margin: 5px 0;"><strong>Sent:</strong> ${new Date().toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'short' })}</p>
+                <p style="margin: 5px 0;"><strong>Subject:</strong> ${escapeHtml(
+                  validatedData.subject
+                )}</p>
+                <p style="margin: 5px 0;"><strong>Sent:</strong> ${new Date().toLocaleString(
+                  "en-US",
+                  { dateStyle: "full", timeStyle: "short" }
+                )}</p>
               </div>
 
               <div class="timeline">

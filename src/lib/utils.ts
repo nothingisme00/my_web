@@ -2,13 +2,23 @@
  * Utility functions for the blog
  */
 
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+/**
+ * Combine class names with tailwind-merge
+ */
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
 /**
  * Calculate reading time based on word count
  * Average reading speed: 200 words per minute
  */
 export function calculateReadingTime(content: string): number {
   // Remove HTML tags
-  const text = content.replace(/<[^>]*>/g, '');
+  const text = content.replace(/<[^>]*>/g, "");
 
   // Count words
   const words = text.trim().split(/\s+/).length;
@@ -23,21 +33,27 @@ export function calculateReadingTime(content: string): number {
 /**
  * Format date to Indonesian locale
  */
-export function formatDate(date: Date | string, locale: string = 'id-ID'): string {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
+export function formatDate(
+  date: Date | string,
+  locale: string = "id-ID"
+): string {
+  const dateObj = typeof date === "string" ? new Date(date) : date;
 
   return new Intl.DateTimeFormat(locale, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   }).format(dateObj);
 }
 
 /**
  * Format date to relative time (e.g., "2 days ago")
  */
-export function formatRelativeTime(date: Date | string, locale: string = 'id-ID'): string {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
+export function formatRelativeTime(
+  date: Date | string,
+  locale: string = "id-ID"
+): string {
+  const dateObj = typeof date === "string" ? new Date(date) : date;
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - dateObj.getTime()) / 1000);
 
@@ -57,7 +73,7 @@ export function formatRelativeTime(date: Date | string, locale: string = 'id-ID'
     }
   }
 
-  return 'Baru saja';
+  return "Baru saja";
 }
 
 /**
@@ -67,20 +83,23 @@ export function truncateText(text: string, length: number = 100): string {
   if (text.length <= length) return text;
 
   // Truncate and add ellipsis
-  return text.substring(0, length).trim() + '...';
+  return text.substring(0, length).trim() + "...";
 }
 
 /**
  * Strip HTML tags from content
  */
 export function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, '');
+  return html.replace(/<[^>]*>/g, "");
 }
 
 /**
  * Generate excerpt from content if not provided
  */
-export function generateExcerpt(content: string, maxLength: number = 160): string {
+export function generateExcerpt(
+  content: string,
+  maxLength: number = 160
+): string {
   const text = stripHtml(content);
   return truncateText(text, maxLength);
 }
@@ -90,10 +109,10 @@ export function generateExcerpt(content: string, maxLength: number = 160): strin
  */
 export function formatViewCount(count: number): string {
   if (count >= 1000000) {
-    return (count / 1000000).toFixed(1) + 'M';
+    return (count / 1000000).toFixed(1) + "M";
   }
   if (count >= 1000) {
-    return (count / 1000).toFixed(1) + 'K';
+    return (count / 1000).toFixed(1) + "K";
   }
   return count.toString();
 }
@@ -104,8 +123,8 @@ export function formatViewCount(count: number): string {
 export function slugify(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '') // Remove special characters
-    .replace(/\s+/g, '-') // Replace spaces with hyphens
-    .replace(/--+/g, '-') // Replace multiple hyphens with single hyphen
+    .replace(/[^\w\s-]/g, "") // Remove special characters
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/--+/g, "-") // Replace multiple hyphens with single hyphen
     .trim();
 }

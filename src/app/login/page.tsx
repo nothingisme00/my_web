@@ -1,23 +1,23 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { login } from '@/lib/actions';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { useFormStatus } from 'react-dom';
-import { useActionState } from 'react';
+import Link from "next/link";
+import { login } from "@/lib/actions";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { useFormStatus } from "react-dom";
+import { useActionState } from "react";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" className="w-full" disabled={pending}>
-      {pending ? 'Logging in...' : 'Login'}
+      {pending ? "Logging in..." : "Login"}
     </Button>
   );
 }
 
 const initialState = {
-  error: '',
+  error: "",
 };
 
 export default function LoginPage() {
@@ -53,6 +53,7 @@ export default function LoginPage() {
               autoComplete="current-password"
               required
               placeholder="Enter your password"
+              showPasswordToggle
             />
 
             {state?.error && (
@@ -69,8 +70,7 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <Link
               href="/"
-              className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
-            >
+              className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
               ← Back to website
             </Link>
           </div>
