@@ -232,11 +232,11 @@ export default function PostForm({
     } catch (error) {
       // Check if this is a redirect (not an actual error)
       // Next.js redirect() throws an error with digest containing "NEXT_REDIRECT"
-      const isRedirectError = 
-        error instanceof Error && 
-        (error.message === "NEXT_REDIRECT" || 
-         (error as { digest?: string }).digest?.includes("NEXT_REDIRECT"));
-      
+      const isRedirectError =
+        error instanceof Error &&
+        (error.message === "NEXT_REDIRECT" ||
+          (error as { digest?: string }).digest?.includes("NEXT_REDIRECT"));
+
       if (isRedirectError) {
         // This is a successful redirect from server action, not an error
         addToast(
@@ -245,7 +245,7 @@ export default function PostForm({
         );
         return;
       }
-      
+
       console.error("Submit error:", error);
       setTranslationError(
         error instanceof Error ? error.message : "Terjadi kesalahan"
