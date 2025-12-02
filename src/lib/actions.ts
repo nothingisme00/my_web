@@ -6,7 +6,7 @@ import { existsSync } from "fs";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import {
   validateFormData,
   LoginSchema,
@@ -17,7 +17,11 @@ import {
 } from "@/lib/validations";
 import { calculateReadingTime } from "@/lib/utils";
 import { verifyPassword, generateToken } from "@/lib/auth";
-import { loginLimiter, RATE_LIMITS } from "@/lib/rate-limit";
+import {
+  loginLimiter,
+  RATE_LIMITS,
+  getClientIdentifier,
+} from "@/lib/rate-limit";
 import { logAuthAttempt, logError } from "@/lib/logger";
 
 // Types
@@ -39,9 +43,14 @@ export async function login(
 
   const { email, password } = validation.data;
 
-  // Rate limiting: 5 attempts per 15 minutes per email
+  // Get client IP address and user agent for logging
+  const headersList = await headers();
+  const ipAddress = getClientIdentifier(headersList);
+  const userAgent = headersList.get("user-agent") || undefined;
+
+  // Rate limiting: 5 attempts per 15 minutes per IP
   const rateLimitResult = loginLimiter.check(
-    email,
+    ipAddress,
     RATE_LIMITS.LOGIN.limit,
     RATE_LIMITS.LOGIN.windowMs
   );
@@ -50,7 +59,7 @@ export async function login(
     const minutesLeft = Math.ceil(
       (rateLimitResult.resetTime - Date.now()) / 60000
     );
-    logAuthAttempt(email, false, "rate-limited");
+    await logAuthAttempt(email, false, "rate-limited", ipAddress, userAgent);
     return {
       error: `Too many login attempts. Please try again in ${minutesLeft} minute${
         minutesLeft > 1 ? "s" : ""
@@ -65,7 +74,13 @@ export async function login(
     });
 
     if (!user) {
-      logAuthAttempt(email, false, "user-not-found");
+      await logAuthAttempt(
+        email,
+        false,
+        "user-not-found",
+        ipAddress,
+        userAgent
+      );
       return { error: "Invalid email or password" };
     }
 
@@ -73,13 +88,19 @@ export async function login(
     const isPasswordValid = await verifyPassword(password, user.password);
 
     if (!isPasswordValid) {
-      logAuthAttempt(email, false, "invalid-password");
+      await logAuthAttempt(
+        email,
+        false,
+        "invalid-password",
+        ipAddress,
+        userAgent
+      );
       return { error: "Invalid email or password" };
     }
 
-    // Successful login - reset rate limit for this email
-    loginLimiter.reset(email);
-    logAuthAttempt(email, true, "login-success");
+    // Successful login - reset rate limit for this IP
+    loginLimiter.reset(ipAddress);
+    await logAuthAttempt(email, true, "login-success", ipAddress, userAgent);
 
     // Generate JWT token
     const token = await generateToken(user.id, user.email);
@@ -214,15 +235,27 @@ export async function createPost(formData: FormData) {
 
     const { title, slug, content, excerpt, image } = validation.data;
 
+    // Get translated fields from form
+    const titleEn = formData.get("titleEn") as string;
+    const contentEn = formData.get("contentEn") as string;
+    const excerptEn = formData.get("excerptEn") as string;
+    const metaDescription = formData.get("metaDescription") as string;
+    const metaDescriptionEn = formData.get("metaDescriptionEn") as string;
+
     // Calculate reading time
     const readingTime = calculateReadingTime(content);
 
     await prisma.post.create({
       data: {
         title,
+        titleEn: titleEn || null,
         slug,
         content,
+        contentEn: contentEn || null,
         excerpt: excerpt || null,
+        excerptEn: excerptEn || null,
+        metaDescription: metaDescription || null,
+        metaDescriptionEn: metaDescriptionEn || null,
         image: image || null,
         published,
         status,
@@ -376,6 +409,13 @@ export async function updatePost(id: string, formData: FormData) {
 
     const { title, slug, content, excerpt, image } = validation.data;
 
+    // Get translated fields from form
+    const titleEn = formData.get("titleEn") as string;
+    const contentEn = formData.get("contentEn") as string;
+    const excerptEn = formData.get("excerptEn") as string;
+    const metaDescription = formData.get("metaDescription") as string;
+    const metaDescriptionEn = formData.get("metaDescriptionEn") as string;
+
     // Calculate reading time
     const readingTime = calculateReadingTime(content);
 
@@ -387,9 +427,14 @@ export async function updatePost(id: string, formData: FormData) {
       where: { id },
       data: {
         title,
+        titleEn: titleEn || null,
         slug,
         content,
+        contentEn: contentEn || null,
         excerpt: excerpt || null,
+        excerptEn: excerptEn || null,
+        metaDescription: metaDescription || null,
+        metaDescriptionEn: metaDescriptionEn || null,
         image: image || null,
         published,
         status,
@@ -439,11 +484,15 @@ export async function createProject(formData: FormData) {
       status,
     } = validation.data;
 
+    // Get translated description from form
+    const descriptionEn = formData.get("descriptionEn") as string;
+
     await prisma.project.create({
       data: {
         title,
         slug,
         description,
+        descriptionEn: descriptionEn || null,
         content: content || null,
         techStack: techStack || null,
         image: image || null,
@@ -472,9 +521,12 @@ export async function updateProject(id: string, formData: FormData) {
   const title = formData.get("title") as string;
   const slug = formData.get("slug") as string;
   const description = formData.get("description") as string;
+  const descriptionEn = formData.get("descriptionEn") as string;
   const content = formData.get("content") as string;
   const techStack = formData.get("techStack") as string;
   const image = formData.get("image") as string;
+  const demoUrl = formData.get("demoUrl") as string;
+  const githubUrl = formData.get("githubUrl") as string;
 
   await prisma.project.update({
     where: { id },
@@ -482,9 +534,12 @@ export async function updateProject(id: string, formData: FormData) {
       title,
       slug,
       description,
+      descriptionEn: descriptionEn || null,
       content,
       techStack,
       image,
+      demoUrl: demoUrl || null,
+      githubUrl: githubUrl || null,
     },
   });
 

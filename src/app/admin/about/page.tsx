@@ -370,11 +370,16 @@ export default function AdminAboutPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
-      <div className="border-b border-gray-200 dark:border-gray-800 pb-5">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          About Page
-        </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+      <div className="mb-8">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="p-2.5 rounded-xl bg-blue-600 dark:bg-blue-500 shadow-lg shadow-blue-600/20">
+            <User className="h-5 w-5 text-white" />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+            About Page
+          </h1>
+        </div>
+        <p className="text-slate-600 dark:text-slate-400 ml-[52px]">
           Manage your personal information, experience, and education
         </p>
       </div>
@@ -553,7 +558,7 @@ export default function AdminAboutPage() {
           icon={Code}
           title="Tech Stack"
           subtitle="Technologies you work with"
-          color="purple"
+          color="violet"
           defaultOpen={false}>
           <TechStackInput
             label="Technologies"
@@ -571,7 +576,7 @@ export default function AdminAboutPage() {
           icon={Code}
           title="Tools & Software"
           subtitle="Development and design tools"
-          color="indigo"
+          color="violet"
           defaultOpen={false}>
           <TechStackInput
             label="Tools"
@@ -605,7 +610,7 @@ export default function AdminAboutPage() {
           icon={Briefcase}
           title="Work Experience"
           subtitle="Your professional journey"
-          color="green"
+          color="amber"
           defaultOpen={false}
           itemCount={data.experiences.length}>
           <div className="space-y-4">
@@ -762,7 +767,7 @@ export default function AdminAboutPage() {
           icon={Heart}
           title="Volunteering & Organization"
           subtitle="Community involvement and activities"
-          color="teal"
+          color="rose"
           defaultOpen={false}
           itemCount={data.volunteering.length}>
           <div className="space-y-4">
@@ -866,7 +871,7 @@ export default function AdminAboutPage() {
           icon={GraduationCap}
           title="Education"
           subtitle="Academic background and qualifications"
-          color="orange"
+          color="emerald"
           defaultOpen={false}
           itemCount={data.educations.length}>
           <div className="space-y-4">
@@ -1044,33 +1049,33 @@ export default function AdminAboutPage() {
         </AccordionSection>
 
         {/* Save Button */}
-        <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-800">
-          {saved && (
-            <div className="flex items-center gap-2 px-3 py-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-              <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
-              <span className="text-sm font-medium text-green-700 dark:text-green-300">
-                Changes saved successfully
-              </span>
-            </div>
-          )}
-          <div className="ml-auto">
-            <Button
-              type="submit"
-              disabled={isSaving}
-              className="gap-2 bg-blue-600 hover:bg-blue-700 text-white">
-              {isSaving ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4" />
-                  Save Changes
-                </>
-              )}
-            </Button>
+        <div className="flex items-center justify-between pt-6 border-t-2 border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-2">
+            {saved && (
+              <div className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 dark:bg-emerald-500 rounded-xl shadow-lg shadow-emerald-600/20">
+                <Check className="h-4 w-4 text-white" />
+                <span className="text-sm font-semibold text-white">
+                  Changes saved successfully
+                </span>
+              </div>
+            )}
           </div>
+          <Button
+            type="submit"
+            disabled={isSaving}
+            className="gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold shadow-lg shadow-blue-600/20 dark:shadow-blue-500/20">
+            {isSaving ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Saving Changes...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4" />
+                Save All Changes
+              </>
+            )}
+          </Button>
         </div>
       </form>
     </div>

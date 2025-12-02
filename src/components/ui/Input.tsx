@@ -44,7 +44,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full">
         {label && (
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-semibold text-slate-800 dark:text-slate-200 mb-2">
             {label}
             {props.required && <span className="text-red-500 ml-1">*</span>}
           </label>
@@ -55,16 +55,15 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             type={inputType}
             className={twMerge(
               clsx(
-                "w-full px-4 py-2 rounded-lg border transition-all duration-200 ease-out",
-                "bg-white dark:bg-gray-900",
-                "text-gray-900 dark:text-white",
-                "border-gray-300 dark:border-gray-700",
-                "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:shadow-sm",
-                "hover:border-gray-400 dark:hover:border-gray-600",
-                "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-gray-300",
-                "placeholder:text-gray-400 dark:placeholder:text-gray-500",
-                error &&
-                  "border-red-500 focus:ring-red-500 focus:border-red-500",
+                "w-full px-4 py-2.5 rounded-xl border-2 transition-all duration-200 ease-out",
+                "bg-slate-50 dark:bg-slate-800/50",
+                "text-slate-900 dark:text-white",
+                "border-slate-200 dark:border-slate-700",
+                "focus:outline-none focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-800 dark:focus:border-indigo-500",
+                "hover:border-slate-300 dark:hover:border-slate-600",
+                "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-slate-200",
+                "placeholder:text-slate-400 dark:placeholder:text-slate-500",
+                error && "border-red-500 focus:border-red-500",
                 isPasswordField && showPasswordToggle && "pr-12",
                 className
               )
@@ -75,7 +74,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700"
               tabIndex={-1}
               aria-label={showPassword ? "Hide password" : "Show password"}>
               {showPassword ? (
@@ -86,9 +85,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             </button>
           )}
         </div>
-        {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+        {error && (
+          <p className="mt-1.5 text-sm font-medium text-red-600 dark:text-red-400">
+            {error}
+          </p>
+        )}
         {helperText && !error && (
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1.5 text-[13px] text-slate-500 dark:text-slate-400">
             {helperText}
           </p>
         )}
@@ -104,7 +107,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <div className="w-full">
         {label && (
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-semibold text-slate-800 dark:text-slate-200 mb-2">
             {label}
             {props.required && <span className="text-red-500 ml-1">*</span>}
           </label>
@@ -113,23 +116,27 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           ref={ref}
           className={twMerge(
             clsx(
-              "w-full px-4 py-2 rounded-lg border transition-all duration-200 ease-out resize-y",
-              "bg-white dark:bg-gray-900",
-              "text-gray-900 dark:text-white",
-              "border-gray-300 dark:border-gray-700",
-              "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:shadow-sm",
-              "hover:border-gray-400 dark:hover:border-gray-600",
-              "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-gray-300",
-              "placeholder:text-gray-400 dark:placeholder:text-gray-500",
-              error && "border-red-500 focus:ring-red-500 focus:border-red-500",
+              "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 ease-out resize-y",
+              "bg-slate-50 dark:bg-slate-800/50",
+              "text-slate-900 dark:text-white",
+              "border-slate-200 dark:border-slate-700",
+              "focus:outline-none focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-800 dark:focus:border-indigo-500",
+              "hover:border-slate-300 dark:hover:border-slate-600",
+              "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-slate-200",
+              "placeholder:text-slate-400 dark:placeholder:text-slate-500",
+              error && "border-red-500 focus:border-red-500",
               className
             )
           )}
           {...props}
         />
-        {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+        {error && (
+          <p className="mt-1.5 text-sm font-medium text-red-600 dark:text-red-400">
+            {error}
+          </p>
+        )}
         {helperText && !error && (
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1.5 text-[13px] text-slate-500 dark:text-slate-400">
             {helperText}
           </p>
         )}

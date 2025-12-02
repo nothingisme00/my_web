@@ -10,6 +10,8 @@ interface AccordionProps {
   defaultOpen?: boolean;
   helperText?: string;
   meta?: ReactNode;
+  headerClassName?: string;
+  onToggle?: (isOpen: boolean) => void;
 }
 
 export function Accordion({
@@ -18,15 +20,25 @@ export function Accordion({
   defaultOpen = false,
   helperText,
   meta,
+  headerClassName,
+  onToggle,
 }: AccordionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [isAnimating, setIsAnimating] = useState(false);
 
+  const handleToggle = () => {
+    const newState = !isOpen;
+    setIsOpen(newState);
+    onToggle?.(newState);
+  };
+
   return (
     <div>
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-200 rounded-lg px-2 group">
+        onClick={handleToggle}
+        className={`w-full flex items-center justify-between py-4 text-left transition-colors duration-200 rounded-t-2xl px-4 group ${
+          headerClassName || "hover:bg-gray-50 dark:hover:bg-gray-800/50"
+        }`}>
         <div className="flex-1">{trigger}</div>
         <div className="flex items-center gap-3">
           {meta && (

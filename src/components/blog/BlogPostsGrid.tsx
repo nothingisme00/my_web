@@ -1,17 +1,23 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { Clock, Eye } from 'lucide-react';
-import { StaggerContainer, StaggerItem } from '@/components/ui/StaggerContainer';
-import { ScrollReveal } from '@/components/ui/ScrollReveal';
-import { formatDate, formatViewCount } from '@/lib/utils';
+import Link from "next/link";
+import Image from "next/image";
+import { Clock, Eye } from "lucide-react";
+import {
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/ui/StaggerContainer";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import { formatDate, formatViewCount } from "@/lib/utils";
+import { useLocale } from "next-intl";
 
 interface Post {
   id: string;
   title: string;
+  titleEn?: string | null;
   slug: string;
   excerpt: string | null;
+  excerptEn?: string | null;
   image: string | null;
   readingTime: number;
   views: number;
@@ -27,7 +33,22 @@ interface BlogPostsGridProps {
   posts: Post[];
 }
 
+// Helper to get localized content
+function getLocalizedField(
+  id: string | null | undefined,
+  en: string | null | undefined,
+  locale: string
+): string | null {
+  // Indonesian is primary, English is translation
+  if (locale === "en") {
+    return en || id || null;
+  }
+  return id || null;
+}
+
 export function BlogPostsGrid({ featuredPost, posts }: BlogPostsGridProps) {
+  const locale = useLocale();
+
   return (
     <>
       {/* Featured Post */}
@@ -40,7 +61,13 @@ export function BlogPostsGrid({ featuredPost, posts }: BlogPostsGridProps) {
                 <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800">
                   <Image
                     src={featuredPost.image}
-                    alt={featuredPost.title}
+                    alt={
+                      getLocalizedField(
+                        featuredPost.title,
+                        featuredPost.titleEn,
+                        locale
+                      ) || featuredPost.title
+                    }
                     className="object-cover img-zoom"
                     fill
                     unoptimized
@@ -62,18 +89,33 @@ export function BlogPostsGrid({ featuredPost, posts }: BlogPostsGridProps) {
                 )}
 
                 <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-4 leading-tight">
-                  {featuredPost.title}
+                  {getLocalizedField(
+                    featuredPost.title,
+                    featuredPost.titleEn,
+                    locale
+                  ) || featuredPost.title}
                 </h2>
 
-                {featuredPost.excerpt && (
+                {(featuredPost.excerpt || featuredPost.excerptEn) && (
                   <p className="text-gray-600 dark:text-gray-300 line-clamp-3 mb-6 text-lg">
-                    {featuredPost.excerpt}
+                    {getLocalizedField(
+                      featuredPost.excerpt,
+                      featuredPost.excerptEn,
+                      locale
+                    )}
                   </p>
                 )}
 
                 <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                  <time dateTime={featuredPost.publishedAt?.toISOString() || featuredPost.createdAt.toISOString()}>
-                    {formatDate(featuredPost.publishedAt || featuredPost.createdAt, 'id-ID')}
+                  <time
+                    dateTime={
+                      featuredPost.publishedAt?.toISOString() ||
+                      featuredPost.createdAt.toISOString()
+                    }>
+                    {formatDate(
+                      featuredPost.publishedAt || featuredPost.createdAt,
+                      locale === "id" ? "id-ID" : "en-US"
+                    )}
                   </time>
                   <span>·</span>
                   <div className="flex items-center gap-1">
@@ -98,7 +140,9 @@ export function BlogPostsGrid({ featuredPost, posts }: BlogPostsGridProps) {
 
       {/* Other Posts Grid */}
       {posts.length > 0 && (
-        <StaggerContainer className="grid md:grid-cols-2 lg:grid-cols-3 gap-8" staggerDelay={0.08}>
+        <StaggerContainer
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+          staggerDelay={0.08}>
           {posts.map((post) => (
             <StaggerItem key={post.id}>
               <Link href={`/blog/${post.slug}`} className="group block h-full">
@@ -108,7 +152,10 @@ export function BlogPostsGrid({ featuredPost, posts }: BlogPostsGridProps) {
                     <div className="relative aspect-[16/10] overflow-hidden bg-gray-100 dark:bg-gray-800">
                       <Image
                         src={post.image}
-                        alt={post.title}
+                        alt={
+                          getLocalizedField(post.title, post.titleEn, locale) ||
+                          post.title
+                        }
                         className="object-cover img-zoom"
                         fill
                         unoptimized
@@ -125,18 +172,30 @@ export function BlogPostsGrid({ featuredPost, posts }: BlogPostsGridProps) {
                     )}
 
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2 leading-tight">
-                      {post.title}
+                      {getLocalizedField(post.title, post.titleEn, locale) ||
+                        post.title}
                     </h3>
 
-                    {post.excerpt && (
+                    {(post.excerpt || post.excerptEn) && (
                       <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-4 flex-grow">
-                        {post.excerpt}
+                        {getLocalizedField(
+                          post.excerpt,
+                          post.excerptEn,
+                          locale
+                        )}
                       </p>
                     )}
 
                     <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mt-auto">
-                      <time dateTime={post.publishedAt?.toISOString() || post.createdAt.toISOString()}>
-                        {formatDate(post.publishedAt || post.createdAt, 'id-ID')}
+                      <time
+                        dateTime={
+                          post.publishedAt?.toISOString() ||
+                          post.createdAt.toISOString()
+                        }>
+                        {formatDate(
+                          post.publishedAt || post.createdAt,
+                          locale === "id" ? "id-ID" : "en-US"
+                        )}
                       </time>
                       <span>·</span>
                       <div className="flex items-center gap-1">

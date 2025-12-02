@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { Icon } from "@iconify/react";
 import { X, Search } from "lucide-react";
 import { availableIcons, iconMap } from "@/lib/tool-icons";
@@ -28,13 +28,17 @@ export function TechStackInput({
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Parse comma-separated value to array
-  const selectedItems = value
-    ? value
-        .split(",")
-        .map((item) => item.trim())
-        .filter(Boolean)
-    : [];
+  // Parse comma-separated value to array - memoized to prevent re-renders
+  const selectedItems = useMemo(
+    () =>
+      value
+        ? value
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean)
+        : [],
+    [value]
+  );
 
   // Filter available icons based on search query
   const filteredOptions = searchQuery

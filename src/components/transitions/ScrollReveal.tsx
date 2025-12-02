@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { motion, useInView } from 'framer-motion';
-import { useRef, ReactNode } from 'react';
+import { motion, useInView } from "framer-motion";
+import { useRef, ReactNode } from "react";
 
 interface ScrollRevealProps {
   children: ReactNode;
   delay?: number;
   className?: string;
-  direction?: 'up' | 'down' | 'left' | 'right' | 'none';
+  direction?: "up" | "down" | "left" | "right" | "none";
   once?: boolean;
 }
 
@@ -22,14 +22,14 @@ const directionVariants = {
 export function ScrollReveal({
   children,
   delay = 0,
-  className = '',
-  direction = 'up',
-  once = true,
+  className = "",
+  direction = "up",
+  once = false,
 }: ScrollRevealProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, {
     once,
-    margin: '-100px',
+    margin: "-100px",
   });
 
   return (
@@ -37,17 +37,14 @@ export function ScrollReveal({
       ref={ref}
       initial={directionVariants[direction]}
       animate={
-        isInView
-          ? { x: 0, y: 0, opacity: 1 }
-          : directionVariants[direction]
+        isInView ? { x: 0, y: 0, opacity: 1 } : directionVariants[direction]
       }
       transition={{
         duration: 0.6,
         delay,
         ease: [0.25, 0.1, 0.25, 1.0],
       }}
-      className={className}
-    >
+      className={className}>
       {children}
     </motion.div>
   );
@@ -61,20 +58,20 @@ interface StaggerContainerProps {
 
 export function StaggerContainer({
   children,
-  className = '',
+  className = "",
   staggerDelay = 0.1,
 }: StaggerContainerProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, {
-    once: true,
-    margin: '-100px',
+    once: false,
+    margin: "-100px",
   });
 
   return (
     <motion.div
       ref={ref}
       initial="hidden"
-      animate={isInView ? 'visible' : 'hidden'}
+      animate={isInView ? "visible" : "hidden"}
       variants={{
         visible: {
           transition: {
@@ -82,8 +79,7 @@ export function StaggerContainer({
           },
         },
       }}
-      className={className}
-    >
+      className={className}>
       {children}
     </motion.div>
   );
@@ -92,13 +88,13 @@ export function StaggerContainer({
 interface StaggerItemProps {
   children: ReactNode;
   className?: string;
-  direction?: 'up' | 'down' | 'left' | 'right' | 'none';
+  direction?: "up" | "down" | "left" | "right" | "none";
 }
 
 export function StaggerItem({
   children,
-  className = '',
-  direction = 'up',
+  className = "",
+  direction = "up",
 }: StaggerItemProps) {
   return (
     <motion.div
@@ -114,8 +110,7 @@ export function StaggerItem({
           },
         },
       }}
-      className={className}
-    >
+      className={className}>
       {children}
     </motion.div>
   );

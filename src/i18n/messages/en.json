@@ -84,6 +84,7 @@
     "tags": "Tags",
     "relatedPosts": "Related Posts",
     "noPosts": "No blog posts yet",
+    "backToBlog": "Back to Blog",
     "search": {
       "placeholder": "Search articles...",
       "searching": "Searching..."
@@ -245,6 +246,13 @@
       "inProgress": "In Progress",
       "planned": "Planned"
     },
+    "noProjects": "No projects yet"
+  },
+  "portfolio": {
+    "title": "Portfolio | Projects",
+    "description": "A collection of my projects and works",
+    "heading": "My Projects",
+    "subheading": "A collection of projects I've worked on",
     "noProjects": "No projects yet"
   },
   "watchlist": {

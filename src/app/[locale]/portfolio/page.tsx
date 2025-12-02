@@ -4,13 +4,30 @@ import { Project } from "@prisma/client";
 import { ProjectsGrid } from "@/components/portfolio/ProjectsGrid";
 import { isPageEnabled } from "@/lib/page-visibility";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
-export const metadata = {
-  title: "Portfolio | Projects",
-  description: "A collection of my projects and works",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "portfolio" });
 
-export default async function PortfolioPage() {
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
+
+export default async function PortfolioPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations("portfolio");
+
   // Check if page is enabled
   const pageEnabled = await isPageEnabled("page_portfolio");
   if (!pageEnabled) {
@@ -33,10 +50,10 @@ export default async function PortfolioPage() {
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            My Projects
+            {t("heading")}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 max-w-lg">
-            A collection of projects I&apos;ve worked on
+            {t("subheading")}
           </p>
           {/* Subtle gradient line */}
           <div className="mt-6 h-px bg-gradient-to-r from-blue-500/50 via-purple-500/50 to-transparent max-w-xs" />
@@ -49,11 +66,11 @@ export default async function PortfolioPage() {
           <div className="text-center py-20">
             <Briefcase className="mx-auto h-16 w-16 text-gray-300 dark:text-gray-600" />
             <p className="mt-4 text-gray-500 dark:text-gray-400">
-              No projects yet
+              {t("noProjects")}
             </p>
           </div>
         ) : (
-          <ProjectsGrid projects={projects} />
+          <ProjectsGrid projects={projects} locale={locale} />
         )}
       </div>
     </div>

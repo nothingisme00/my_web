@@ -84,6 +84,7 @@
     "tags": "Tag",
     "relatedPosts": "Posting Terkait",
     "noPosts": "Belum ada posting blog",
+    "backToBlog": "Kembali ke Blog",
     "search": {
       "placeholder": "Cari artikel...",
       "searching": "Mencari..."
@@ -245,6 +246,13 @@
       "inProgress": "Sedang Dikerjakan",
       "planned": "Direncanakan"
     },
+    "noProjects": "Belum ada proyek"
+  },
+  "portfolio": {
+    "title": "Portfolio | Proyek",
+    "description": "Koleksi proyek dan karya saya",
+    "heading": "Proyek Saya",
+    "subheading": "Koleksi proyek yang telah saya kerjakan",
     "noProjects": "Belum ada proyek"
   },
   "watchlist": {

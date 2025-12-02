@@ -13,6 +13,7 @@ import { ReadingProgress } from "@/components/blog/ReadingProgress";
 import { BlogContent } from "@/components/blog/BlogContent";
 import { ReactionButtons } from "@/components/blog/ReactionButtons";
 import { RelatedArticles } from "@/components/blog/RelatedArticles";
+import { getTranslations } from "next-intl/server";
 
 // Enable ISR - revalidate every hour
 export const revalidate = 3600;
@@ -24,17 +25,33 @@ type PostWithRelations = Prisma.PostGetPayload<{
   };
 }>;
 
+// Helper to get localized content
+function getLocalizedField(
+  id: string | null | undefined,
+  en: string | null | undefined,
+  locale: string
+): string | null {
+  if (locale === "en") {
+    return en || id || null;
+  }
+  return id || null;
+}
+
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const post = await prisma.post.findUnique({
     where: { slug },
     select: {
       title: true,
+      titleEn: true,
       excerpt: true,
+      excerptEn: true,
+      metaDescription: true,
+      metaDescriptionEn: true,
       image: true,
       author: true,
       publishedAt: true,
@@ -49,13 +66,20 @@ export async function generateMetadata({
     };
   }
 
+  const title =
+    getLocalizedField(post.title, post.titleEn, locale) || post.title;
+  const description =
+    getLocalizedField(post.metaDescription, post.metaDescriptionEn, locale) ||
+    getLocalizedField(post.excerpt, post.excerptEn, locale) ||
+    title;
+
   return {
-    title: post.title,
-    description: post.excerpt || post.title,
+    title,
+    description,
     authors: post.author ? [{ name: post.author }] : undefined,
     openGraph: {
-      title: post.title,
-      description: post.excerpt || post.title,
+      title,
+      description,
       type: "article",
       publishedTime: (post.publishedAt || post.createdAt).toISOString(),
       authors: post.author ? [post.author] : undefined,
@@ -63,8 +87,8 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: post.title,
-      description: post.excerpt || post.title,
+      title,
+      description,
       images: post.image ? [post.image] : [],
     },
   };
@@ -84,9 +108,10 @@ export async function generateStaticParams() {
 export default async function BlogPostPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
+  const t = await getTranslations("blog");
 
   const post = await prisma.post.findUnique({
     where: { slug },
@@ -110,12 +135,25 @@ export default async function BlogPostPage({
     3
   )) as PostWithRelations[];
 
+  // Get localized content
+  const localizedTitle =
+    getLocalizedField(post.title, post.titleEn, locale) || post.title;
+  const localizedExcerpt = getLocalizedField(
+    post.excerpt,
+    post.excerptEn,
+    locale
+  );
+  const localizedContent =
+    getLocalizedField(post.content, post.contentEn, locale) || post.content;
+
   // Sanitize HTML content (optimized for SSR)
-  const sanitizedContent = DOMPurify.sanitize(post.content);
+  const sanitizedContent = DOMPurify.sanitize(localizedContent);
 
   const postUrl = `${
     process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
   }/blog/${post.slug}`;
+
+  const dateLocale = locale === "id" ? "id-ID" : "en-US";
 
   return (
     <>
@@ -130,7 +168,7 @@ export default async function BlogPostPage({
                 href="/blog"
                 className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Blog
+                {t("backToBlog")}
               </Link>
 
               {/* Category */}
@@ -145,13 +183,13 @@ export default async function BlogPostPage({
 
             {/* Title */}
             <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-              {post.title}
+              {localizedTitle}
             </h1>
 
             {/* Excerpt */}
-            {post.excerpt && (
+            {localizedExcerpt && (
               <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
-                {post.excerpt}
+                {localizedExcerpt}
               </p>
             )}
 
@@ -164,21 +202,27 @@ export default async function BlogPostPage({
                     post.publishedAt?.toISOString() ||
                     post.createdAt.toISOString()
                   }>
-                  {formatDate(post.publishedAt || post.createdAt, "id-ID")}
+                  {formatDate(post.publishedAt || post.createdAt, dateLocale)}
                 </time>
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
-                <span>{post.readingTime} min read</span>
+                <span>
+                  {post.readingTime}{" "}
+                  {locale === "id" ? "menit baca" : "min read"}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <Eye className="h-4 w-4" />
-                <span>{formatViewCount(post.views + 1)} views</span>
+                <span>
+                  {formatViewCount(post.views + 1)}{" "}
+                  {locale === "id" ? "dilihat" : "views"}
+                </span>
               </div>
               {post.author && (
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-gray-900 dark:text-white">
-                    by {post.author}
+                    {locale === "id" ? "oleh" : "by"} {post.author}
                   </span>
                 </div>
               )}
@@ -192,7 +236,7 @@ export default async function BlogPostPage({
             <div className="relative w-full aspect-[21/9] rounded-2xl overflow-hidden">
               <Image
                 src={post.image}
-                alt={post.title}
+                alt={localizedTitle}
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1400px"
@@ -203,11 +247,11 @@ export default async function BlogPostPage({
         )}
 
         {/* Main Content */}
-        <div className="mx-auto max-w-4xl px-6 lg:px-8 py-12">
+        <div className="mx-auto max-w-4xl px-6 lg:px-8 py-12 backdrop-blur-[3px]">
           <div className="grid lg:grid-cols-12 gap-12">
             {/* Sidebar - Social Sharing */}
             <aside className="lg:col-span-2 order-2 lg:order-1">
-              <ShareButtons title={post.title} url={postUrl} />
+              <ShareButtons title={localizedTitle} url={postUrl} />
             </aside>
 
             {/* Article Content */}

@@ -11,17 +11,30 @@ import DOMPurify from "isomorphic-dompurify";
 // Enable ISR - revalidate every hour
 export const revalidate = 3600;
 
+// Helper to get localized content
+function getLocalizedField(
+  id: string | null | undefined,
+  en: string | null | undefined,
+  locale: string
+): string | null {
+  if (locale === "en") {
+    return en || id || null;
+  }
+  return id || null;
+}
+
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const project = await prisma.project.findUnique({
     where: { slug },
     select: {
       title: true,
       description: true,
+      descriptionEn: true,
       image: true,
       createdAt: true,
     },
@@ -33,19 +46,23 @@ export async function generateMetadata({
     };
   }
 
+  const localizedDescription =
+    getLocalizedField(project.description, project.descriptionEn, locale) ||
+    project.title;
+
   return {
     title: project.title,
-    description: project.description || project.title,
+    description: localizedDescription,
     openGraph: {
       title: project.title,
-      description: project.description || project.title,
+      description: localizedDescription,
       type: "website",
       images: project.image ? [{ url: project.image }] : [],
     },
     twitter: {
       card: "summary_large_image",
       title: project.title,
-      description: project.description || project.title,
+      description: localizedDescription,
       images: project.image ? [project.image] : [],
     },
   };
@@ -64,9 +81,9 @@ export async function generateStaticParams() {
 export default async function ProjectPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
 
   const project = await prisma.project.findUnique({
     where: { slug },
@@ -82,6 +99,13 @@ export default async function ProjectPage({
   const techStackArray = project.techStack
     ? project.techStack.split(",").map((t) => t.trim())
     : [];
+
+  // Get localized description
+  const localizedDescription = getLocalizedField(
+    project.description,
+    project.descriptionEn,
+    locale
+  );
 
   // Sanitize HTML content (optimized for SSR)
   const sanitizedContent = project.content
@@ -99,7 +123,8 @@ export default async function ProjectPage({
                 variant="ghost"
                 size="sm"
                 className="gap-2 pl-0 hover:bg-transparent hover:text-blue-600 dark:hover:text-blue-400">
-                <ArrowLeft className="h-4 w-4" /> Kembali ke Portfolio
+                <ArrowLeft className="h-4 w-4" />{" "}
+                {locale === "id" ? "Kembali ke Portfolio" : "Back to Portfolio"}
               </Button>
             </Link>
           </div>
@@ -107,14 +132,16 @@ export default async function ProjectPage({
           <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl mb-4">
             {project.title}
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
-            {project.description}
-          </p>
+          {localizedDescription && (
+            <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
+              {localizedDescription}
+            </p>
+          )}
 
           <div className="flex items-center gap-4 mb-6">
             <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
               <Eye className="h-4 w-4" />
-              {project.views + 1} views
+              {project.views + 1} {locale === "id" ? "dilihat" : "views"}
             </span>
           </div>
 
@@ -137,7 +164,8 @@ export default async function ProjectPage({
                 target="_blank"
                 rel="noopener noreferrer">
                 <Button className="gap-2">
-                  <ExternalLink className="h-4 w-4" /> Live Demo
+                  <ExternalLink className="h-4 w-4" />{" "}
+                  {locale === "id" ? "Demo" : "Live Demo"}
                 </Button>
               </a>
             )}
@@ -147,7 +175,8 @@ export default async function ProjectPage({
                 target="_blank"
                 rel="noopener noreferrer">
                 <Button variant="outline" className="gap-2">
-                  <Github className="h-4 w-4" /> Source Code
+                  <Github className="h-4 w-4" />{" "}
+                  {locale === "id" ? "Kode Sumber" : "Source Code"}
                 </Button>
               </a>
             )}

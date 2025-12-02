@@ -18,10 +18,18 @@ model User {
 
 model Post {
   id              String    @id @default(cuid())
-  title           String
+  // Indonesian fields (primary input)
+  title           String    // Title in Indonesian
   slug            String    @unique
-  content         String    @db.Text
-  excerpt         String?   @db.Text
+  content         String    @db.Text // Content in Indonesian
+  excerpt         String?   @db.Text // Excerpt in Indonesian
+  metaDescription String?   @db.Text // Meta description in Indonesian
+  // English fields (auto-translated)
+  titleEn         String?   // Auto-translated title
+  contentEn       String?   @db.Text // Auto-translated content
+  excerptEn       String?   @db.Text // Auto-translated excerpt
+  metaDescriptionEn String? @db.Text // Auto-translated meta description
+  // Other fields
   image           String?
   published       Boolean   @default(false)
   status          String    @default("draft") // draft, published, archived
@@ -34,7 +42,6 @@ model Post {
   author          String    @default("Alfattah")
   publishedAt     DateTime?
   archivedAt      DateTime?
-  metaDescription String?   @db.Text
   metaKeywords    String?
   categoryId      String?
   category        Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
@@ -57,7 +64,11 @@ model Project {
   id          String   @id @default(cuid())
   title       String
   slug        String   @unique
-  description String   @db.Text
+  // Indonesian fields (primary input)
+  description String   @db.Text // Description in Indonesian
+  // English fields (auto-translated)
+  descriptionEn String? @db.Text // Auto-translated description
+  // Other fields
   content     String?  @db.Text
   image       String?
   demoUrl     String?
@@ -134,4 +145,19 @@ model Watchlist {
   @@index([type])
   @@index([rating])
   @@index([createdAt])
+}
+
+model LoginActivity {
+  id        String   @id @default(cuid())
+  email     String
+  ipAddress String
+  userAgent String?  @db.Text
+  success   Boolean  @default(false)
+  reason    String?  // login-success, invalid-password, user-not-found, rate-limited
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([ipAddress])
+  @@index([createdAt])
+  @@index([success])
 }

@@ -234,7 +234,7 @@ function ExperienceCard({ experiences, t, locale }: ExperienceCardProps) {
             return (
               <div
                 key={exp.id}
-                className="relative p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
+                className="relative p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700">
                 <div className="pl-4 border-l-3 border-blue-400 dark:border-blue-500">
                   {/* Main Info - Always visible */}
                   <div
@@ -359,7 +359,7 @@ function EducationCard({ educations, t }: EducationCardProps) {
             return (
               <div
                 key={edu.id}
-                className="relative p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
+                className="relative p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700">
                 <div className="pl-4 border-l-3 border-orange-400 dark:border-orange-500">
                   {/* Main Info - Always visible */}
                   <div
@@ -510,7 +510,7 @@ function VolunteeringCard({ volunteering, t, locale }: VolunteeringCardProps) {
             return (
               <div
                 key={vol.id}
-                className="relative p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
+                className="relative p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700">
                 <div className="pl-4 border-l-3 border-teal-400 dark:border-teal-500">
                   {/* Main Info - Always visible */}
                   <div
@@ -771,12 +771,12 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
 
       {/* Know More About Me Section */}
       {hasKnowMoreContent && (
-        <section className="py-16 bg-gray-50 dark:bg-gray-900/50">
+        <section className="py-16">
           <div className="mx-auto max-w-6xl px-6 lg:px-8">
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
+              viewport={{ once: false, margin: "-100px" }}
               variants={containerVariants}>
               {/* Section Header */}
               <motion.div variants={itemVariants} className="text-center mb-12">
@@ -886,7 +886,7 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: false, margin: "-100px" }}
             variants={containerVariants}>
             {/* Section Header */}
             <motion.div variants={itemVariants} className="text-center mb-12">

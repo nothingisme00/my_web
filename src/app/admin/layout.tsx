@@ -12,6 +12,8 @@ import {
   X,
   UserCircle,
   Film,
+  PanelLeftClose,
+  PanelLeft,
 } from "lucide-react";
 import { logout } from "@/lib/actions";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -28,11 +30,13 @@ function NavLink({
   icon: Icon,
   children,
   pathname,
+  isCollapsed,
 }: {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   children: React.ReactNode;
   pathname: string;
+  isCollapsed?: boolean;
 }) {
   // Special case for dashboard: only active when exactly /admin
   const isActive =
@@ -43,8 +47,10 @@ function NavLink({
   return (
     <Link
       href={href}
+      title={isCollapsed ? String(children) : undefined}
       className={clsx(
-        "group relative flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 touch-manipulation overflow-hidden",
+        "group relative flex items-center gap-3 rounded-xl transition-all duration-300 touch-manipulation overflow-hidden",
+        isCollapsed ? "px-3 py-3 justify-center" : "px-4 py-3.5",
         isActive
           ? "bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/30"
           : "text-gray-300 hover:bg-gray-800/80 hover:text-white active:bg-gray-800"
@@ -63,13 +69,17 @@ function NavLink({
         <Icon className="h-5 w-5 flex-shrink-0" />
       </div>
 
-      {/* Text */}
-      <span className="relative z-10 font-medium transition-all duration-300 group-hover:translate-x-0.5">
+      {/* Text - hidden when collapsed */}
+      <span
+        className={clsx(
+          "relative z-10 font-medium transition-all duration-300 group-hover:translate-x-0.5 whitespace-nowrap",
+          isCollapsed ? "hidden" : "block"
+        )}>
         {children}
       </span>
 
       {/* Active indicator */}
-      {isActive && (
+      {isActive && !isCollapsed && (
         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-l-full shadow-lg" />
       )}
     </Link>
@@ -83,13 +93,30 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const { toasts, removeToast } = useToast();
 
-  // Close sidebar on route change
+  // Close sidebar on route change (mobile only)
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsSidebarOpen(false);
   }, [pathname]);
+
+  // Load collapsed state from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("admin-sidebar-collapsed");
+    if (saved === "true") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsCollapsed(true);
+    }
+  }, []);
+
+  // Save collapsed state to localStorage
+  const toggleCollapse = () => {
+    const newState = !isCollapsed;
+    setIsCollapsed(newState);
+    localStorage.setItem("admin-sidebar-collapsed", String(newState));
+  };
 
   // Prevent body scroll when sidebar is open on mobile
   useEffect(() => {
@@ -176,7 +203,13 @@ export default function AdminLayout({
             {/* Sidebar with smooth slide animation */}
             <aside
               className={clsx(
-                "fixed top-0 left-0 h-full z-30 w-[280px] sm:w-72 lg:w-64 bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950 text-white flex-shrink-0 border-r border-gray-700/50 transition-all duration-500 ease-out flex flex-col backdrop-blur-xl",
+                "fixed top-0 left-0 h-full z-30 bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950 text-white flex-shrink-0 border-r border-gray-700/50 flex flex-col backdrop-blur-xl",
+                // Smooth transition for width changes
+                "transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]",
+                // Width based on collapsed state
+                isCollapsed ? "lg:w-[72px]" : "lg:w-64",
+                // Mobile width
+                "w-[280px] sm:w-72",
                 // Mobile/Tablet: controlled by state
                 isSidebarOpen
                   ? "translate-x-0 shadow-2xl shadow-black/50"
@@ -186,18 +219,49 @@ export default function AdminLayout({
               <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-transparent to-purple-600/5 pointer-events-none" />
 
               {/* Desktop Header - Hidden on mobile */}
-              <div className="hidden lg:block relative p-6 border-b border-gray-700/50 flex-shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
-                    <LayoutDashboard className="h-5 w-5 text-white" />
+              <div
+                className={clsx(
+                  "hidden lg:flex relative border-b border-gray-700/50 flex-shrink-0 items-center justify-between transition-all duration-500 ease-out",
+                  isCollapsed ? "p-3" : "p-4"
+                )}>
+                {/* Hamburger Menu Toggle */}
+                <button
+                  onClick={toggleCollapse}
+                  className="p-2 rounded-lg bg-gray-800/60 hover:bg-gray-700 border border-gray-700/50 hover:border-gray-600 transition-all duration-300 group"
+                  title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
+                  <div className="relative w-5 h-5">
+                    <PanelLeft
+                      className={clsx(
+                        "absolute inset-0 h-5 w-5 text-gray-400 group-hover:text-white transition-all duration-300",
+                        isCollapsed
+                          ? "opacity-100 rotate-0 scale-100"
+                          : "opacity-0 -rotate-90 scale-75"
+                      )}
+                    />
+                    <PanelLeftClose
+                      className={clsx(
+                        "absolute inset-0 h-5 w-5 text-gray-400 group-hover:text-white transition-all duration-300",
+                        isCollapsed
+                          ? "opacity-0 rotate-90 scale-75"
+                          : "opacity-100 rotate-0 scale-100"
+                      )}
+                    />
                   </div>
-                  <div>
-                    <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                </button>
+
+                {/* Logo & Title - Animated */}
+                <div
+                  className={clsx(
+                    "flex items-center gap-3 transition-all duration-500 ease-out overflow-hidden",
+                    isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+                  )}>
+                  <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-blue-500/30 flex-shrink-0">
+                    <LayoutDashboard className="h-4 w-4 text-white" />
+                  </div>
+                  <div className="whitespace-nowrap">
+                    <h1 className="text-lg font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                       CMS Admin
                     </h1>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      Content Management
-                    </p>
                   </div>
                 </div>
               </div>
@@ -232,7 +296,8 @@ export default function AdminLayout({
               {/* Scrollable Navigation with stagger */}
               <nav
                 className={clsx(
-                  "admin-sidebar-nav relative flex-1 px-4 py-6 space-y-2 overflow-y-auto overscroll-contain transition-all duration-700",
+                  "admin-sidebar-nav relative flex-1 py-6 space-y-2 overflow-y-auto overscroll-contain transition-all duration-300",
+                  isCollapsed ? "px-2" : "px-4",
                   isSidebarOpen
                     ? "opacity-100 delay-200"
                     : "opacity-0 lg:opacity-100"
@@ -240,40 +305,50 @@ export default function AdminLayout({
                 <NavLink
                   href="/admin"
                   icon={LayoutDashboard}
-                  pathname={pathname}>
+                  pathname={pathname}
+                  isCollapsed={isCollapsed}>
                   Dashboard
                 </NavLink>
                 <NavLink
                   href="/admin/posts"
                   icon={FileText}
-                  pathname={pathname}>
+                  pathname={pathname}
+                  isCollapsed={isCollapsed}>
                   Posts
                 </NavLink>
                 <NavLink
                   href="/admin/projects"
                   icon={Briefcase}
-                  pathname={pathname}>
+                  pathname={pathname}
+                  isCollapsed={isCollapsed}>
                   Projects
                 </NavLink>
-                <NavLink href="/admin/media" icon={Image} pathname={pathname}>
+                <NavLink
+                  href="/admin/media"
+                  icon={Image}
+                  pathname={pathname}
+                  isCollapsed={isCollapsed}>
                   Media Library
                 </NavLink>
                 <NavLink
                   href="/admin/about"
                   icon={UserCircle}
-                  pathname={pathname}>
+                  pathname={pathname}
+                  isCollapsed={isCollapsed}>
                   About Page
                 </NavLink>
                 <NavLink
                   href="/admin/watchlist"
                   icon={Film}
-                  pathname={pathname}>
+                  pathname={pathname}
+                  isCollapsed={isCollapsed}>
                   Watchlist
                 </NavLink>
                 <NavLink
                   href="/admin/settings"
                   icon={Settings}
-                  pathname={pathname}>
+                  pathname={pathname}
+                  isCollapsed={isCollapsed}>
                   Settings
                 </NavLink>
               </nav>
@@ -281,36 +356,58 @@ export default function AdminLayout({
               {/* Bottom Actions with gradient border */}
               <div
                 className={clsx(
-                  "relative flex-shrink-0 p-4 border-t border-gray-700/50 space-y-3 bg-gradient-to-t from-gray-950 to-transparent transition-all duration-700",
+                  "relative flex-shrink-0 border-t border-gray-700/50 space-y-3 bg-gradient-to-t from-gray-950 to-transparent transition-all duration-500 ease-out",
+                  isCollapsed ? "p-2" : "p-4",
                   isSidebarOpen
                     ? "opacity-100 translate-y-0 delay-300"
                     : "opacity-0 lg:opacity-100 translate-y-4 lg:translate-y-0"
                 )}>
                 {/* Theme Toggle - Hidden on mobile (shown in header) */}
-                <div className="hidden lg:flex items-center justify-between px-4 py-2.5 bg-gray-800/50 rounded-xl border border-gray-700/50 hover:border-gray-600/50 transition-all duration-300">
-                  <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
-                    <span className="text-sm text-gray-300 font-medium">
-                      Theme
-                    </span>
+                {!isCollapsed && (
+                  <div className="hidden lg:flex items-center justify-between px-4 py-2.5 bg-gray-800/50 rounded-xl border border-gray-700/50 hover:border-gray-600/50 transition-all duration-300">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+                      <span className="text-sm text-gray-300 font-medium">
+                        Theme
+                      </span>
+                    </div>
+                    <ThemeToggle />
                   </div>
-                  <ThemeToggle />
-                </div>
+                )}
+                {isCollapsed && (
+                  <div className="hidden lg:flex items-center justify-center py-2.5 bg-gray-800/50 rounded-xl border border-gray-700/50 hover:border-gray-600/50 transition-all duration-300">
+                    <ThemeToggle />
+                  </div>
+                )}
 
                 {/* Logout Button */}
                 <form action={logout} className="w-full">
                   <button
                     type="submit"
-                    className="group w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 text-red-400 hover:text-white bg-red-900/0 hover:bg-red-600 border border-red-900/30 hover:border-red-600 active:scale-95 touch-manipulation shadow-lg shadow-red-900/0 hover:shadow-red-600/30">
+                    title={isCollapsed ? "Logout" : undefined}
+                    className={clsx(
+                      "group w-full flex items-center rounded-xl transition-all duration-300 text-red-400 hover:text-white bg-red-900/0 hover:bg-red-600 border border-red-900/30 hover:border-red-600 active:scale-95 touch-manipulation shadow-lg shadow-red-900/0 hover:shadow-red-600/30",
+                      isCollapsed
+                        ? "justify-center px-3 py-3"
+                        : "gap-3 px-4 py-3.5"
+                    )}>
                     <LogOut className="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" />
-                    <span className="font-medium">Logout</span>
+                    {!isCollapsed && (
+                      <span className="font-medium">Logout</span>
+                    )}
                   </button>
                 </form>
               </div>
             </aside>
 
-            {/* Main Content */}
-            <main className="flex-1 lg:ml-64 min-h-screen flex flex-col w-full">
+            {/* Main Content with smooth push effect */}
+            <main
+              className={clsx(
+                "flex-1 min-h-screen flex flex-col w-full",
+                // Smooth transition matching sidebar
+                "transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]",
+                isCollapsed ? "lg:ml-[72px]" : "lg:ml-64"
+              )}>
               {/* Breadcrumbs Bar */}
               <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 sm:px-6 lg:px-8 py-4 sticky top-16 lg:top-0 z-10 mt-16 lg:mt-0">
                 <Breadcrumbs />
