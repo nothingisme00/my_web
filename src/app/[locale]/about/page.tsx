@@ -1,5 +1,4 @@
 import { getSettings, getAboutContent } from "@/lib/actions";
-import { getTranslations } from "next-intl/server";
 import { AboutContent } from "@/components/about/AboutContent";
 import { isPageEnabled } from "@/lib/page-visibility";
 import { notFound } from "next/navigation";

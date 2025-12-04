@@ -31,7 +31,7 @@ export function PillSelector({
   onChange,
   onCreateNew,
   onDelete,
-  placeholder = "Select...",
+  // placeholder is reserved for future dropdown feature
   helperText,
   multiSelect = false,
   required = false,
@@ -42,9 +42,11 @@ export function PillSelector({
   const [isExpanded, setIsExpanded] = useState(false);
 
   const selectedOptions = options.filter((opt) => selectedIds.includes(opt.id));
-  const unselectedOptions = options.filter(
+  // Filter unselected options for dropdown
+  const _unselectedOptions = options.filter(
     (opt) => !selectedIds.includes(opt.id)
   );
+  void _unselectedOptions; // Reserved for future dropdown feature
 
   const handleToggle = (id: string) => {
     if (multiSelect) {

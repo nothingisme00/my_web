@@ -409,7 +409,7 @@ export default function PostForm({ categories, initialData }: PostFormProps) {
         setCategoriesState((prev) => prev.filter((cat) => cat.id !== id));
         setSelectedCategoryIds((prev) => prev.filter((catId) => catId !== id));
         addToast("success", "Category deleted successfully");
-      } catch (error) {
+      } catch {
         addToast("error", "Failed to delete category");
       }
     });

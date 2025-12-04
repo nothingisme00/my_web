@@ -28,7 +28,7 @@ export function NewsletterCTA() {
 
       addToast('success', 'Thanks for subscribing! Check your inbox for confirmation.');
       setEmail('');
-    } catch (error) {
+    } catch {
       addToast('error', 'Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);

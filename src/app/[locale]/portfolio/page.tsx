@@ -15,6 +15,7 @@ export default async function PortfolioPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations("portfolio");
+  void locale; // Used by ProjectsGrid
 
   let projects: Project[] = [];
 

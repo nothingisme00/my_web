@@ -4,7 +4,6 @@ import { Clock, Eye, ArrowLeft, Tag } from "lucide-react";
 import { getPostsByTag } from "@/lib/actions";
 import { formatDate, formatViewCount } from "@/lib/utils";
 import { Prisma } from "@prisma/client";
-import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
@@ -41,7 +40,6 @@ export default async function TagPage({
     console.error("Database error:", error);
   }
   
-  const t = await getTranslations("Blog");
   const dateLocale = locale === "id" ? "id-ID" : "en-US";
 
   return (

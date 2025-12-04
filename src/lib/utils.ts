@@ -51,7 +51,7 @@ export function formatDate(
  */
 export function formatRelativeTime(
   date: Date | string,
-  locale: string = "id-ID"
+  _locale: string = "id-ID"
 ): string {
   const dateObj = typeof date === "string" ? new Date(date) : date;
   const now = new Date();

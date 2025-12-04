@@ -87,7 +87,7 @@ export function TMDBSearch({ type, onSelect }: TMDBSearchProps) {
           setResults(data.results || []);
           setIsOpen(true);
         }
-      } catch (err) {
+      } catch {
         setError("Failed to search");
         setResults([]);
       } finally {
@@ -122,7 +122,7 @@ export function TMDBSearch({ type, onSelect }: TMDBSearchProps) {
       setQuery("");
       setResults([]);
       setIsOpen(false);
-    } catch (err) {
+    } catch {
       // Fallback to basic info if details fail
       onSelect({
         title: item.title,
