@@ -6,24 +6,6 @@ import { ContactForm } from "@/components/contact/ContactForm";
 
 export const dynamic = "force-dynamic";
 
-// Default empty about data structure
-const emptyAboutData = {
-  bio: "",
-  bioEn: "",
-  tagline: "",
-  taglineEn: "",
-  profileImage: "",
-  resumeUrl: "",
-  instagramUrl: "",
-  whatsappNumber: "",
-  githubUrl: "",
-  skills: [],
-  experiences: [],
-  educations: [],
-  certifications: [],
-  volunteering: [],
-};
-
 export default async function AboutPage() {
   let aboutData = null;
   let settings = null;
@@ -45,7 +27,7 @@ export default async function AboutPage() {
     hasError = true;
   }
 
-  // If there's an error or no data, show a minimal page with contact form
+  // If there's an error or no settings, show a minimal page with contact form
   if (hasError || !settings) {
     return (
       <div className="min-h-screen py-16 px-4">
@@ -69,8 +51,7 @@ export default async function AboutPage() {
     );
   }
 
-  // Use empty data if aboutData is null
-  const finalAboutData = aboutData || emptyAboutData;
-
-  return <AboutContent aboutData={finalAboutData} settings={settings} />;
+  // Pass aboutData (can be null) to AboutContent - it handles null case
+  return <AboutContent aboutData={aboutData} settings={settings} />;
+}
 }
