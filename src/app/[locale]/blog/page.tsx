@@ -13,10 +13,14 @@ type PostWithRelations = Prisma.PostGetPayload<{
   };
 }>;
 
+type CategoryWithCount = Prisma.CategoryGetPayload<{
+  include: { _count: { select: { posts: true } } };
+}>;
+
 export default async function BlogPage() {
   let pageEnabled = true;
   let posts: PostWithRelations[] = [];
-  let categories: { id: string; name: string; slug: string }[] = [];
+  let categories: CategoryWithCount[] = [];
 
   try {
     // Check if page is enabled
@@ -26,10 +30,12 @@ export default async function BlogPage() {
     }
 
     // Fetch all data on server
-    [posts, categories] = await Promise.all([
-      getPublishedPosts() as Promise<PostWithRelations[]>,
+    const [fetchedPosts, fetchedCategories] = await Promise.all([
+      getPublishedPosts(),
       getCategories(),
     ]);
+    posts = fetchedPosts as PostWithRelations[];
+    categories = fetchedCategories as CategoryWithCount[];
   } catch (error) {
     console.error("Database error:", error);
   }
