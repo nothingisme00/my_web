@@ -17,7 +17,7 @@ import { getTranslations } from "next-intl/server";
 
 // Force dynamic rendering - no build-time database queries
 export const dynamic = "force-dynamic";
-export const dynamicParams = true;
+export const fetchCache = "force-no-store";
 
 type PostWithRelations = Prisma.PostGetPayload<{
   include: {
@@ -37,75 +37,11 @@ function getLocalizedField(
   return id || null;
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string; locale: string }>;
-}): Promise<Metadata> {
-  const { slug, locale } = await params;
-  
-  try {
-    const post = await prisma.post.findUnique({
-      where: { slug },
-      select: {
-        title: true,
-        titleEn: true,
-        excerpt: true,
-        excerptEn: true,
-        metaDescription: true,
-        metaDescriptionEn: true,
-        image: true,
-        author: true,
-        publishedAt: true,
-        createdAt: true,
-        category: { select: { name: true } },
-      },
-    });
-
-    if (!post) {
-      return {
-        title: "Post Not Found",
-      };
-    }
-
-    const title =
-      getLocalizedField(post.title, post.titleEn, locale) || post.title;
-    const description =
-      getLocalizedField(post.metaDescription, post.metaDescriptionEn, locale) ||
-      getLocalizedField(post.excerpt, post.excerptEn, locale) ||
-      title;
-
-    return {
-      title,
-      description,
-      authors: post.author ? [{ name: post.author }] : undefined,
-      openGraph: {
-        title,
-        description,
-        type: "article",
-        publishedTime: (post.publishedAt || post.createdAt).toISOString(),
-        authors: post.author ? [post.author] : undefined,
-        images: post.image ? [{ url: post.image }] : [],
-      },
-      twitter: {
-        card: "summary_large_image",
-        title,
-        description,
-        images: post.image ? [post.image] : [],
-      },
-    };
-  } catch {
-    return {
-      title: "Blog Post",
-    };
-  }
-}
-
-// Return empty array to skip static generation at build time
-// Pages will be generated on-demand
-export async function generateStaticParams() {
-  return [];
-}
+// Static metadata - actual metadata will be set in the page component
+export const metadata: Metadata = {
+  title: "Blog Post",
+  description: "Read this blog post",
+};
 
 export default async function BlogPostPage({
   params,

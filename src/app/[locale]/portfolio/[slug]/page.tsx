@@ -10,7 +10,7 @@ import DOMPurify from "isomorphic-dompurify";
 
 // Force dynamic rendering - no build-time database queries
 export const dynamic = "force-dynamic";
-export const dynamicParams = true;
+export const fetchCache = "force-no-store";
 
 // Helper to get localized content
 function getLocalizedField(
@@ -24,62 +24,11 @@ function getLocalizedField(
   return id || null;
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string; locale: string }>;
-}): Promise<Metadata> {
-  const { slug, locale } = await params;
-  
-  try {
-    const project = await prisma.project.findUnique({
-      where: { slug },
-      select: {
-        title: true,
-        description: true,
-        descriptionEn: true,
-        image: true,
-        createdAt: true,
-      },
-    });
-
-    if (!project) {
-      return {
-        title: "Project Not Found",
-      };
-    }
-
-    const localizedDescription =
-      getLocalizedField(project.description, project.descriptionEn, locale) ||
-      project.title;
-
-    return {
-      title: project.title,
-      description: localizedDescription,
-      openGraph: {
-        title: project.title,
-        description: localizedDescription,
-        type: "website",
-        images: project.image ? [{ url: project.image }] : [],
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: project.title,
-        description: localizedDescription,
-        images: project.image ? [project.image] : [],
-      },
-    };
-  } catch {
-    return {
-      title: "Project",
-    };
-  }
-}
-
-// Return empty array to skip static generation at build time
-export async function generateStaticParams() {
-  return [];
-}
+// Static metadata
+export const metadata: Metadata = {
+  title: "Project",
+  description: "View this project",
+};
 
 export default async function ProjectPage({
   params,
