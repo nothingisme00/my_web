@@ -10,6 +10,7 @@ import DOMPurify from "isomorphic-dompurify";
 
 // Enable ISR - revalidate every hour
 export const revalidate = 3600;
+export const dynamicParams = true;
 
 // Helper to get localized content
 function getLocalizedField(
@@ -29,53 +30,55 @@ export async function generateMetadata({
   params: Promise<{ slug: string; locale: string }>;
 }): Promise<Metadata> {
   const { slug, locale } = await params;
-  const project = await prisma.project.findUnique({
-    where: { slug },
-    select: {
-      title: true,
-      description: true,
-      descriptionEn: true,
-      image: true,
-      createdAt: true,
-    },
-  });
+  
+  try {
+    const project = await prisma.project.findUnique({
+      where: { slug },
+      select: {
+        title: true,
+        description: true,
+        descriptionEn: true,
+        image: true,
+        createdAt: true,
+      },
+    });
 
-  if (!project) {
+    if (!project) {
+      return {
+        title: "Project Not Found",
+      };
+    }
+
+    const localizedDescription =
+      getLocalizedField(project.description, project.descriptionEn, locale) ||
+      project.title;
+
     return {
-      title: "Project Not Found",
+      title: project.title,
+      description: localizedDescription,
+      openGraph: {
+        title: project.title,
+        description: localizedDescription,
+        type: "website",
+        images: project.image ? [{ url: project.image }] : [],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: project.title,
+        description: localizedDescription,
+        images: project.image ? [project.image] : [],
+      },
+    };
+  } catch {
+    return {
+      title: "Project",
     };
   }
-
-  const localizedDescription =
-    getLocalizedField(project.description, project.descriptionEn, locale) ||
-    project.title;
-
-  return {
-    title: project.title,
-    description: localizedDescription,
-    openGraph: {
-      title: project.title,
-      description: localizedDescription,
-      type: "website",
-      images: project.image ? [{ url: project.image }] : [],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: project.title,
-      description: localizedDescription,
-      images: project.image ? [project.image] : [],
-    },
-  };
 }
 
+// Return empty array to skip static generation at build time
 export async function generateStaticParams() {
-  const projects = await prisma.project.findMany({
-    select: { slug: true },
-  });
-
-  return projects.map((project) => ({
-    slug: project.slug,
-  }));
+  return [];
 }
 
 export default async function ProjectPage({
