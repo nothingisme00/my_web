@@ -1,37 +1,41 @@
 import { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 3600; // Revalidate every hour
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
-  // Fetch all published posts with images
-  const posts = await prisma.post.findMany({
-    where: { published: true },
-    select: {
-      slug: true,
-      updatedAt: true,
-      image: true,
-    },
-    orderBy: { updatedAt: "desc" },
-  });
+  try {
+    // Fetch all published posts with images
+    const posts = await prisma.post.findMany({
+      where: { published: true },
+      select: {
+        slug: true,
+        updatedAt: true,
+        image: true,
+      },
+      orderBy: { updatedAt: "desc" },
+    });
 
-  // Fetch all projects with images
-  const projects = await prisma.project.findMany({
-    select: {
-      slug: true,
-      updatedAt: true,
-      image: true,
-    },
-    orderBy: { updatedAt: "desc" },
-  });
+    // Fetch all projects with images
+    const projects = await prisma.project.findMany({
+      select: {
+        slug: true,
+        updatedAt: true,
+        image: true,
+      },
+      orderBy: { updatedAt: "desc" },
+    });
 
-  // Fetch all categories
-  const categories = await prisma.category.findMany({
-    select: {
-      slug: true,
-      updatedAt: true,
-    },
-  });
+    // Fetch all categories
+    const categories = await prisma.category.findMany({
+      select: {
+        slug: true,
+        updatedAt: true,
+      },
+    });
 
   // Get most recent post/project date for static pages
   const latestPostDate = posts[0]?.updatedAt || new Date();
@@ -102,4 +106,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   return [...staticPages, ...postPages, ...projectPages, ...categoryPages];
+  } catch (error) {
+    console.error("Sitemap generation error:", error);
+    // Return basic sitemap if database is unavailable
+    return [
+      {
+        url: baseUrl,
+        lastModified: new Date(),
+        changeFrequency: "daily" as const,
+        priority: 1.0,
+      },
+      {
+        url: `${baseUrl}/blog`,
+        lastModified: new Date(),
+        changeFrequency: "daily" as const,
+        priority: 0.9,
+      },
+      {
+        url: `${baseUrl}/portfolio`,
+        lastModified: new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.9,
+      },
+      {
+        url: `${baseUrl}/about`,
+        lastModified: new Date(),
+        changeFrequency: "monthly" as const,
+        priority: 0.8,
+      },
+    ];
+  }
 }

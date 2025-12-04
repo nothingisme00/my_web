@@ -1,9 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
 export const revalidate = 3600; // Cache for 1 hour
 
 export async function GET() {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://hiatta.site";
+  
   try {
     // Fetch 20 most recent published posts
     const posts = await prisma.post.findMany({
@@ -31,7 +34,7 @@ export async function GET() {
 
     // Get base URL from environment or default
     const baseUrl =
-      process.env.NEXT_PUBLIC_SITE_URL || "https://yourdomain.com";
+      process.env.NEXT_PUBLIC_SITE_URL || "https://hiatta.site";
 
     // Generate RSS 2.0 XML
     const rss = `<?xml version="1.0" encoding="UTF-8"?>
@@ -92,7 +95,24 @@ ${posts
     });
   } catch (error) {
     console.error("RSS feed generation error:", error);
-    return new NextResponse("Error generating RSS feed", { status: 500 });
+    // Return empty RSS feed if database is unavailable
+    const emptyRss = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Hiatta Blog</title>
+    <description>Blog by Alfattah</description>
+    <link>${baseUrl}</link>
+    <language>id-ID</language>
+    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+    <atom:link href="${baseUrl}/feed.xml" rel="self" type="application/rss+xml" />
+  </channel>
+</rss>`;
+    return new NextResponse(emptyRss, {
+      headers: {
+        "Content-Type": "application/xml",
+        "Cache-Control": "public, s-maxage=60",
+      },
+    });
   }
 }
 
