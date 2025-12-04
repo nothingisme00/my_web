@@ -2,12 +2,32 @@ import { getSettings, getAboutContent } from "@/lib/actions";
 import { AboutContent } from "@/components/about/AboutContent";
 import { isPageEnabled } from "@/lib/page-visibility";
 import { notFound } from "next/navigation";
+import { ContactForm } from "@/components/contact/ContactForm";
 
 export const dynamic = "force-dynamic";
+
+// Default empty about data structure
+const emptyAboutData = {
+  bio: "",
+  bioEn: "",
+  tagline: "",
+  taglineEn: "",
+  profileImage: "",
+  resumeUrl: "",
+  instagramUrl: "",
+  whatsappNumber: "",
+  githubUrl: "",
+  skills: [],
+  experiences: [],
+  educations: [],
+  certifications: [],
+  volunteering: [],
+};
 
 export default async function AboutPage() {
   let aboutData = null;
   let settings = null;
+  let hasError = false;
 
   try {
     // Check if page is enabled
@@ -22,11 +42,35 @@ export default async function AboutPage() {
     ]);
   } catch (error) {
     console.error("Database error:", error);
+    hasError = true;
   }
 
-  if (!aboutData || !settings) {
-    return <div>Loading...</div>;
+  // If there's an error or no data, show a minimal page with contact form
+  if (hasError || !settings) {
+    return (
+      <div className="min-h-screen py-16 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+            About Me
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 text-center mb-12">
+            Content is being set up. Please check back later or contact me below.
+          </p>
+          
+          {/* Contact Form Section */}
+          <div className="mt-16">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
+              Get in Touch
+            </h2>
+            <ContactForm />
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  return <AboutContent aboutData={aboutData} settings={settings} />;
+  // Use empty data if aboutData is null
+  const finalAboutData = aboutData || emptyAboutData;
+
+  return <AboutContent aboutData={finalAboutData} settings={settings} />;
 }
