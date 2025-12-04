@@ -7,6 +7,9 @@ import { notFound } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 export default async function AboutPage() {
+  let aboutData = null;
+  let settings = null;
+
   try {
     // Check if page is enabled
     const pageEnabled = await isPageEnabled("page_about");
@@ -14,14 +17,17 @@ export default async function AboutPage() {
       notFound();
     }
 
-    const [aboutData, settings] = await Promise.all([
+    [aboutData, settings] = await Promise.all([
       getAboutContent(),
       getSettings(),
     ]);
-
-    return <AboutContent aboutData={aboutData} settings={settings} />;
   } catch (error) {
     console.error("Database error:", error);
+  }
+
+  if (!aboutData || !settings) {
     return <div>Loading...</div>;
   }
+
+  return <AboutContent aboutData={aboutData} settings={settings} />;
 }
