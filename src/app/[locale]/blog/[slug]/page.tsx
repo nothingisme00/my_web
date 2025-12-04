@@ -15,8 +15,8 @@ import { ReactionButtons } from "@/components/blog/ReactionButtons";
 import { RelatedArticles } from "@/components/blog/RelatedArticles";
 import { getTranslations } from "next-intl/server";
 
-// Enable ISR - revalidate every hour
-export const revalidate = 3600;
+// Force dynamic rendering - no build-time database queries
+export const dynamic = "force-dynamic";
 export const dynamicParams = true;
 
 type PostWithRelations = Prisma.PostGetPayload<{

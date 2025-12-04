@@ -8,8 +8,8 @@ import { Metadata } from "next";
 import Image from "next/image";
 import DOMPurify from "isomorphic-dompurify";
 
-// Enable ISR - revalidate every hour
-export const revalidate = 3600;
+// Force dynamic rendering - no build-time database queries
+export const dynamic = "force-dynamic";
 export const dynamicParams = true;
 
 // Helper to get localized content

@@ -4,12 +4,12 @@ import { Tv } from "lucide-react";
 import { isPageEnabled } from "@/lib/page-visibility";
 import { notFound } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Watchlist | Anime & Film",
   description: "My personal anime and film watchlist with ratings",
 };
-
-export const revalidate = 3600; // Revalidate every hour
 
 export default async function WatchlistPage() {
   // Check if page is enabled

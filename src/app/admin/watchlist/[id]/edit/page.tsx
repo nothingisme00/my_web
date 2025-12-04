@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { WatchlistForm } from "@/components/watchlist/WatchlistForm";
 
+export const dynamic = "force-dynamic";
+
 interface Props {
   params: Promise<{ id: string }>;
 }
