@@ -4,9 +4,7 @@ import {
   createPost,
   updatePost,
   deleteCategory,
-  deleteTag,
   quickCreateCategory,
-  quickCreateTag,
   archivePost,
 } from "@/lib/actions";
 import { Button } from "@/components/ui/Button";
@@ -23,21 +21,38 @@ import {
   Clock,
   Languages,
   AlertTriangle,
+  Wand2,
 } from "lucide-react";
-import { Category, Tag, Post } from "@prisma/client";
+import { Category, Post } from "@prisma/client";
 import { TipTapEditor } from "@/components/editor/TipTapEditor";
 import { useState, useTransition, useEffect, useRef, useCallback } from "react";
 import { useToast } from "@/hooks/useToast";
 import { useRouter } from "next/navigation";
 
-interface PostWithRelations extends Post {
-  tags: Tag[];
+// Helper function to generate slug from text
+function generateSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[àáâãäå]/g, "a")
+    .replace(/[èéêë]/g, "e")
+    .replace(/[ìíîï]/g, "i")
+    .replace(/[òóôõö]/g, "o")
+    .replace(/[ùúûü]/g, "u")
+    .replace(/[ñ]/g, "n")
+    .replace(/[ç]/g, "c")
+    .replace(/[^a-z0-9\s-]/g, "") // Remove special characters
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/-+/g, "-") // Replace multiple hyphens with single
+    .replace(/^-|-$/g, ""); // Remove leading/trailing hyphens
 }
+
+// PostWithTags is now just Post since tags is a string field
+type PostWithTags = Post;
 
 interface PostFormProps {
   categories: Category[];
-  tags: Tag[];
-  initialData?: PostWithRelations;
+  initialData?: PostWithTags;
 }
 
 interface TranslateResponse {
@@ -51,7 +66,7 @@ function SubmitButton({
   disabled,
   isTranslating,
 }: {
-  type: "draft" | "publish";
+  type: "draft" | "publish" | "update";
   disabled?: boolean;
   isTranslating?: boolean;
 }) {
@@ -60,45 +75,56 @@ function SubmitButton({
 
   if (type === "draft") {
     return (
-      <Button
+      <button
         type="submit"
         name="status"
         value="draft"
         disabled={isPending}
-        variant="outline"
-        className="flex-1 min-w-0 gap-2 justify-center whitespace-nowrap">
-        <FileText className="h-4 w-4 shrink-0" />
+        className="flex-1 min-w-0 inline-flex items-center gap-2 justify-center px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 active:scale-[0.98]">
+        <FileText
+          className={`h-4 w-4 shrink-0 ${isPending ? "animate-pulse" : ""}`}
+        />
         {isTranslating
-          ? "Menerjemahkan..."
+          ? "Translating..."
           : pending
-          ? "Menyimpan..."
-          : "Simpan Draft"}
-      </Button>
+          ? "Saving..."
+          : "Save Draft"}
+      </button>
+    );
+  }
+
+  if (type === "update") {
+    return (
+      <button
+        type="submit"
+        name="status"
+        value="published"
+        disabled={isPending}
+        className="flex-1 min-w-0 inline-flex items-center gap-2 justify-center px-4 py-2.5 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 rounded-lg shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 active:scale-[0.98]">
+        <Save
+          className={`h-4 w-4 shrink-0 ${isPending ? "animate-spin" : ""}`}
+        />
+        {isTranslating ? "Translating..." : pending ? "Updating..." : "Update"}
+      </button>
     );
   }
 
   return (
-    <Button
+    <button
       type="submit"
       name="status"
       value="published"
       disabled={isPending}
-      className="flex-1 min-w-0 gap-2 justify-center whitespace-nowrap">
-      <Send className="h-4 w-4 shrink-0" />
-      {isTranslating
-        ? "Menerjemahkan..."
-        : pending
-        ? "Mempublish..."
-        : "Publish"}
-    </Button>
+      className="flex-1 min-w-0 inline-flex items-center gap-2 justify-center px-4 py-2.5 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 rounded-lg shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 active:scale-[0.98]">
+      <Send
+        className={`h-4 w-4 shrink-0 ${isPending ? "animate-pulse" : ""}`}
+      />
+      {isTranslating ? "Translating..." : pending ? "Publishing..." : "Publish"}
+    </button>
   );
 }
 
-export default function PostForm({
-  categories,
-  tags,
-  initialData,
-}: PostFormProps) {
+export default function PostForm({ categories, initialData }: PostFormProps) {
   const [content, setContent] = useState(initialData?.content || "");
   const [title, setTitle] = useState(initialData?.title || "");
   const [slug, setSlug] = useState(initialData?.slug || "");
@@ -110,14 +136,10 @@ export default function PostForm({
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>(
     initialData?.categoryId ? [initialData.categoryId] : []
   );
-  const [selectedTagIds, setSelectedTagIds] = useState<string[]>(
-    initialData?.tags.map((t) => t.id) || []
-  );
+  const [tags, setTags] = useState(initialData?.tags || "");
   const [categoriesState, setCategoriesState] =
     useState<Category[]>(categories);
-  const [tagsState, setTagsState] = useState<Tag[]>(tags);
   const [newCategoryName, setNewCategoryName] = useState("");
-  const [newTagName, setNewTagName] = useState("");
   const [isPending, startTransition] = useTransition();
   const { addToast } = useToast();
   const router = useRouter();
@@ -205,13 +227,7 @@ export default function PostForm({
       formData.append("metaDescriptionEn", translatedMetaDescription);
       formData.append("image", imagePreview);
       formData.append("categoryId", selectedCategoryIds[0] || "");
-      formData.append(
-        "tagsInput",
-        selectedTagIds
-          .map((id) => tagsState.find((t) => t.id === id)?.name)
-          .filter(Boolean)
-          .join(", ")
-      );
+      formData.append("tags", tags);
 
       // Get status from the clicked button
       const submitter = (e.nativeEvent as SubmitEvent)
@@ -283,7 +299,7 @@ export default function PostForm({
           excerpt,
           image: imagePreview,
           categoryId: selectedCategoryIds[0] || null,
-          tagIds: selectedTagIds,
+          tags: tags,
         }),
       });
 
@@ -312,21 +328,13 @@ export default function PostForm({
     excerpt,
     imagePreview,
     selectedCategoryIds,
-    selectedTagIds,
+    tags,
   ]);
 
   // Mark as having unsaved changes when content changes
   useEffect(() => {
     hasUnsavedChanges.current = true;
-  }, [
-    title,
-    slug,
-    content,
-    excerpt,
-    imagePreview,
-    selectedCategoryIds,
-    selectedTagIds,
-  ]);
+  }, [title, slug, content, excerpt, imagePreview, selectedCategoryIds, tags]);
 
   // Auto-save timer (every 30 seconds)
   useEffect(() => {
@@ -386,21 +394,6 @@ export default function PostForm({
     });
   };
 
-  const handleCreateTag = async (name: string) => {
-    startTransition(async () => {
-      try {
-        const newTag = await quickCreateTag(name);
-        setTagsState((prev) => [...prev, newTag]);
-        setSelectedTagIds((prev) => [...prev, newTag.id]);
-        setNewTagName("");
-        addToast("success", `Tag "${name}" created`);
-      } catch (error) {
-        addToast("error", "Failed to create tag");
-        console.error("Error creating tag:", error);
-      }
-    });
-  };
-
   const handleDeleteCategory = async (id: string) => {
     if (
       !confirm(
@@ -418,23 +411,6 @@ export default function PostForm({
         addToast("success", "Category deleted successfully");
       } catch (error) {
         addToast("error", "Failed to delete category");
-      }
-    });
-  };
-
-  const handleDeleteTag = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this tag?")) {
-      return;
-    }
-
-    startTransition(async () => {
-      try {
-        await deleteTag(id);
-        setTagsState((prev) => prev.filter((tag) => tag.id !== id));
-        setSelectedTagIds((prev) => prev.filter((tagId) => tagId !== id));
-        addToast("success", "Tag deleted successfully");
-      } catch (error) {
-        addToast("error", "Failed to delete tag");
       }
     });
   };
@@ -496,9 +472,9 @@ export default function PostForm({
       </div>
 
       <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+        {/* Main Content - Full Width */}
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="space-y-6">
             <Input
               label="Judul (Indonesia)"
               name="title"
@@ -509,15 +485,37 @@ export default function PostForm({
               placeholder="Masukkan judul post"
             />
 
-            <Input
-              label="Slug"
-              name="slug"
-              id="slug"
-              required
-              value={slug}
-              onChange={(e) => setSlug(e.target.value)}
-              placeholder="url-friendly-slug"
-            />
+            <div>
+              <label
+                htmlFor="slug"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Slug <span className="text-red-500">*</span>
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  name="slug"
+                  id="slug"
+                  required
+                  value={slug}
+                  onChange={(e) => setSlug(generateSlug(e.target.value))}
+                  placeholder="url-friendly-slug"
+                  className="flex-1 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-gray-900 dark:text-white transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:shadow-sm hover:border-gray-400 dark:hover:border-gray-600"
+                />
+                <button
+                  type="button"
+                  onClick={() => setSlug(generateSlug(title))}
+                  disabled={!title}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  title="Generate slug dari judul">
+                  <Wand2 className="h-4 w-4" />
+                  <span className="hidden sm:inline">Generate</span>
+                </button>
+              </div>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Hanya huruf kecil, angka, dan tanda hubung (-)
+              </p>
+            </div>
 
             <div>
               <label
@@ -565,193 +563,223 @@ export default function PostForm({
               />
             </div>
           </div>
+        </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Featured Image Section */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-              <div className="flex items-center gap-2 mb-5 pb-4 border-b border-gray-200 dark:border-gray-700">
-                <div className="p-1.5 rounded-lg bg-green-100 dark:bg-green-900/30">
-                  <Save className="h-4 w-4 text-green-600 dark:text-green-400" />
-                </div>
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                  Featured Image
-                </h3>
+        {/* Bottom Section - Featured Image & Publishing Options in Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Featured Image Section */}
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-2 mb-5 pb-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="p-1.5 rounded-lg bg-green-100 dark:bg-green-900/30">
+                <Save className="h-4 w-4 text-green-600 dark:text-green-400" />
               </div>
-
-              <div className="space-y-3">
-                <Input
-                  label="Image URL"
-                  name="image"
-                  id="image"
-                  type="url"
-                  value={imagePreview}
-                  onChange={(e) => setImagePreview(e.target.value)}
-                  placeholder="https://images.unsplash.com/..."
-                  helperText="Paste image URL"
-                />
-
-                {/* Image Preview */}
-                {imagePreview && (
-                  <div className="relative aspect-video w-full bg-gray-100 dark:bg-gray-900 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700">
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src =
-                          'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="%23ddd" width="100" height="100"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%23999">Invalid URL</text></svg>';
-                      }}
-                    />
-                    <div className="absolute top-2 right-2 px-2 py-1 bg-green-500 text-white text-xs font-medium rounded-full">
-                      Preview
-                    </div>
-                  </div>
-                )}
-              </div>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                Featured Image
+              </h3>
             </div>
 
-            {/* Publishing Options */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-              <div className="flex items-center gap-2 mb-5 pb-4 border-b border-gray-200 dark:border-gray-700">
-                <div className="p-1.5 rounded-lg bg-purple-100 dark:bg-purple-900/30">
-                  <Save className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+            <div className="space-y-3">
+              <Input
+                label="Image URL"
+                name="image"
+                id="image"
+                type="url"
+                value={imagePreview}
+                onChange={(e) => setImagePreview(e.target.value)}
+                placeholder="https://images.unsplash.com/..."
+                helperText="Paste image URL"
+              />
+
+              {/* Image Preview */}
+              {imagePreview && (
+                <div className="relative aspect-video w-full bg-gray-100 dark:bg-gray-900 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src =
+                        'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="%23ddd" width="100" height="100"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%23999">Invalid URL</text></svg>';
+                    }}
+                  />
+                  <div className="absolute top-2 right-2 px-2 py-1 bg-green-500 text-white text-xs font-medium rounded-full">
+                    Preview
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Publishing Options */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-shadow duration-300 hover:shadow-md">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/40">
+                  <Save className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                 </div>
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
                   Publishing
                 </h3>
               </div>
-
-              <div className="space-y-6">
-                {/* Category Selection */}
-                <div>
-                  <input
-                    type="hidden"
-                    name="categoryId"
-                    value={selectedCategoryIds[0] || ""}
-                  />
-                  <input
-                    type="hidden"
-                    name="newCategory"
-                    value={newCategoryName}
-                  />
-                  <PillSelector
-                    label="Category"
-                    options={categoriesState.map((c) => ({
-                      id: c.id,
-                      name: c.name,
-                    }))}
-                    selectedIds={selectedCategoryIds}
-                    onChange={setSelectedCategoryIds}
-                    onCreateNew={handleCreateCategory}
-                    onDelete={handleDeleteCategory}
-                    placeholder="No categories available. Create one!"
-                    helperText="Select one category for this post"
-                    multiSelect={false}
-                  />
-                </div>
-
-                {/* Tags Selection */}
-                <div>
-                  <input
-                    type="hidden"
-                    name="tagsInput"
-                    value={selectedTagIds
-                      .map((id) => tagsState.find((t) => t.id === id)?.name)
-                      .filter(Boolean)
-                      .join(", ")}
-                  />
-                  <input type="hidden" name="newTag" value={newTagName} />
-                  <PillSelector
-                    label="Tags"
-                    options={tagsState.map((t) => ({ id: t.id, name: t.name }))}
-                    selectedIds={selectedTagIds}
-                    onChange={setSelectedTagIds}
-                    onCreateNew={handleCreateTag}
-                    onDelete={handleDeleteTag}
-                    placeholder="No tags available. Create one!"
-                    helperText="Select multiple tags for this post"
-                    multiSelect={true}
-                  />
-                </div>
-
-                {/* Auto-save Status */}
-                <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 pt-2">
-                  <Clock className="h-3.5 w-3.5" />
-                  {isAutoSaving ? (
-                    <span className="text-blue-500">Auto-saving...</span>
-                  ) : lastSaved ? (
-                    <span>Auto-saved at {lastSaved.toLocaleTimeString()}</span>
-                  ) : (
-                    <span>Auto-save enabled (every 30s)</span>
-                  )}
-                </div>
-
-                {/* Current Status Badge */}
-                {isEditing && (
-                  <div className="pt-2">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      Current status:{" "}
-                    </span>
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                        currentStatus === "published"
-                          ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-                          : currentStatus === "archived"
-                          ? "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
-                          : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
-                      }`}>
-                      {currentStatus === "published"
-                        ? "Published"
+              {/* Status Badge */}
+              {isEditing && (
+                <span
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all duration-200 ${
+                    currentStatus === "published"
+                      ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400"
+                      : currentStatus === "archived"
+                      ? "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                      : "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
+                  }`}>
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      currentStatus === "published"
+                        ? "bg-emerald-500 animate-pulse"
                         : currentStatus === "archived"
-                        ? "Archived"
-                        : "Draft"}
+                        ? "bg-gray-400"
+                        : "bg-amber-500"
+                    }`}
+                  />
+                  {currentStatus === "published"
+                    ? "Published"
+                    : currentStatus === "archived"
+                    ? "Archived"
+                    : "Draft"}
+                </span>
+              )}
+            </div>
+
+            <div className="p-4 space-y-4">
+              {/* Category Selection */}
+              <div>
+                <input
+                  type="hidden"
+                  name="categoryId"
+                  value={selectedCategoryIds[0] || ""}
+                />
+                <input
+                  type="hidden"
+                  name="newCategory"
+                  value={newCategoryName}
+                />
+                <PillSelector
+                  label="Category"
+                  options={categoriesState.map((c) => ({
+                    id: c.id,
+                    name: c.name,
+                  }))}
+                  selectedIds={selectedCategoryIds}
+                  onChange={setSelectedCategoryIds}
+                  onCreateNew={handleCreateCategory}
+                  onDelete={handleDeleteCategory}
+                  placeholder="No categories available"
+                  helperText="Select one category"
+                  multiSelect={false}
+                />
+              </div>
+
+              {/* Tags Input - Comma separated */}
+              <div>
+                <label
+                  htmlFor="tags"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Tags
+                </label>
+                <input
+                  type="text"
+                  name="tags"
+                  id="tags"
+                  value={tags}
+                  onChange={(e) => setTags(e.target.value)}
+                  placeholder="tech, programming, web development"
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-gray-900 dark:text-white transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:shadow-sm hover:border-gray-400 dark:hover:border-gray-600"
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  Pisahkan tags dengan koma (contoh: tech, tips, tutorial)
+                </p>
+              </div>
+
+              {/* Auto-save Status */}
+              <div className="flex items-center gap-2.5 px-3 py-2.5 bg-gray-50 dark:bg-gray-900/50 rounded-lg text-xs border border-gray-100 dark:border-gray-700/50">
+                <div
+                  className={`p-1 rounded-full ${
+                    isAutoSaving
+                      ? "bg-indigo-100 dark:bg-indigo-900/50"
+                      : "bg-gray-100 dark:bg-gray-700"
+                  }`}>
+                  <Clock
+                    className={`h-3 w-3 transition-colors duration-200 ${
+                      isAutoSaving
+                        ? "text-indigo-600 dark:text-indigo-400 animate-spin"
+                        : "text-gray-400"
+                    }`}
+                  />
+                </div>
+                <span className="text-gray-600 dark:text-gray-400">
+                  {isAutoSaving ? (
+                    <span className="text-indigo-600 dark:text-indigo-400 font-medium">
+                      Saving...
                     </span>
+                  ) : lastSaved ? (
+                    <>
+                      Saved at{" "}
+                      <span className="font-medium text-gray-700 dark:text-gray-300">
+                        {lastSaved.toLocaleTimeString()}
+                      </span>
+                    </>
+                  ) : (
+                    "Auto-save enabled"
+                  )}
+                </span>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
+                {/* Translating indicator */}
+                {isTranslating && (
+                  <div className="flex items-center gap-3 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg text-sm text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800">
+                    <div className="animate-spin h-4 w-4 border-2 border-indigo-600 dark:border-indigo-400 border-t-transparent rounded-full" />
+                    <span className="font-medium">Translating content...</span>
                   </div>
                 )}
 
-                {/* Action Buttons */}
-                <div className="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
-                  {/* Translating indicator */}
-                  {isTranslating && (
-                    <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
-                      <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full" />
-                      <span>Menerjemahkan ke English...</span>
-                    </div>
-                  )}
-
-                  {/* Save Draft & Publish Buttons */}
-                  <div className="flex gap-2 w-full overflow-hidden">
-                    {/* Save Draft - always show */}
+                {/* Buttons */}
+                <div className="grid gap-2">
+                  {currentStatus === "published" ? (
                     <SubmitButton
-                      type="draft"
+                      type="update"
                       disabled={isPending}
                       isTranslating={isTranslating}
                     />
-
-                    {/* Publish - only show if not already published */}
-                    {currentStatus !== "published" && (
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2">
+                      <SubmitButton
+                        type="draft"
+                        disabled={isPending}
+                        isTranslating={isTranslating}
+                      />
                       <SubmitButton
                         type="publish"
                         disabled={isPending}
                         isTranslating={isTranslating}
                       />
-                    )}
-                  </div>
-
-                  {/* Archive Button (only for published posts, not for archived) */}
-                  {isEditing && currentStatus === "published" && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleArchive}
-                      disabled={isPending || isTranslating}
-                      className="w-full gap-2 justify-center text-gray-600 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 hover:border-orange-300 dark:hover:border-orange-700">
-                      <Archive className="h-4 w-4" />
-                      Arsipkan Post
-                    </Button>
+                    </div>
                   )}
                 </div>
+
+                {/* Archive Button */}
+                {isEditing && currentStatus === "published" && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleArchive}
+                    disabled={isPending || isTranslating}
+                    className="w-full gap-2 justify-center text-sm text-gray-500 hover:text-amber-600 dark:hover:text-amber-400 hover:border-amber-300 dark:hover:border-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-200">
+                    <Archive className="h-4 w-4" />
+                    Archive
+                  </Button>
+                )}
               </div>
             </div>
           </div>

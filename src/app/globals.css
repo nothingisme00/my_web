@@ -5,6 +5,7 @@
 
 @theme {
   --color-scheme: light dark;
+  --font-google-sans: "Google Sans Flex", sans-serif;
 }
 
 :root {
@@ -17,6 +18,14 @@
   color-scheme: dark;
   --background: #111827;
   --foreground: #ededed;
+}
+
+/* Google Sans Flex font class */
+.font-google-sans {
+  font-family: "Google Sans Flex", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-variation-settings: "slnt" 0, "wdth" 100, "GRAD" 0, "ROND" 0;
 }
 
 /* Prevent flash of unstyled content */
@@ -83,7 +92,7 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Google Sans Flex", sans-serif;
   transition: none !important;
 }
 
@@ -135,6 +144,61 @@ body {
   }
   .hover-glow:hover {
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  }
+
+  /* Modern card styles */
+  .card-modern {
+    background: white;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(229, 231, 235, 0.8);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark .card-modern {
+    background: rgba(31, 41, 55, 0.8);
+    border-color: rgba(75, 85, 99, 0.5);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  .card-modern:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+    transform: translateY(-1px);
+  }
+
+  .dark .card-modern:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Row hover with accent indicator */
+  .row-hover-accent {
+    border-left: 2px solid transparent;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .row-hover-accent:hover {
+    background-color: rgba(99, 102, 241, 0.05);
+    border-left-color: rgb(99, 102, 241);
+  }
+
+  .dark .row-hover-accent:hover {
+    background-color: rgba(99, 102, 241, 0.1);
+  }
+
+  /* Smooth shadow utilities */
+  .shadow-smooth {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.04),
+      0 4px 8px rgba(0, 0, 0, 0.04);
+  }
+
+  .shadow-smooth-lg {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04), 0 4px 8px rgba(0, 0, 0, 0.04),
+      0 8px 16px rgba(0, 0, 0, 0.04), 0 16px 32px rgba(0, 0, 0, 0.04);
+  }
+
+  .dark .shadow-smooth,
+  .dark .shadow-smooth-lg {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.15);
   }
 
   .animate-fade-in {

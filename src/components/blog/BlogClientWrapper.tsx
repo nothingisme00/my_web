@@ -8,7 +8,7 @@ import { Search, FileText } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 type PostWithRelations = Prisma.PostGetPayload<{
-  include: { category: true; tags: true };
+  include: { category: true };
 }>;
 
 type Category = Prisma.CategoryGetPayload<{

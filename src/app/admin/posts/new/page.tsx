@@ -1,11 +1,8 @@
-import PostForm from '@/components/admin/PostForm';
-import { getCategories, getTags } from '@/lib/actions';
+import PostForm from "@/components/admin/PostForm";
+import { getCategories } from "@/lib/actions";
 
 export default async function NewPostPage() {
-  const [categories, tags] = await Promise.all([
-    getCategories(),
-    getTags()
-  ]);
+  const categories = await getCategories();
 
-  return <PostForm categories={categories} tags={tags} />;
+  return <PostForm categories={categories} />;
 }

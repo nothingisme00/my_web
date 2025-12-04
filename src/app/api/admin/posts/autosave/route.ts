@@ -6,8 +6,7 @@ import { calculateReadingTime } from "@/lib/utils";
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
-    const { id, title, slug, content, excerpt, image, categoryId, tagIds } =
-      data;
+    const { id, title, slug, content, excerpt, image, categoryId, tags } = data;
 
     // Basic validation - at least title and slug required
     if (!title || title.length < 3) {
@@ -27,12 +26,6 @@ export async function POST(request: NextRequest) {
     // Calculate reading time if content exists
     const readingTime = content ? calculateReadingTime(content) : 5;
 
-    // Prepare tag connections
-    const tagConnections =
-      tagIds && tagIds.length > 0
-        ? { connect: tagIds.map((tagId: string) => ({ id: tagId })) }
-        : undefined;
-
     if (id) {
       // Update existing draft
       await prisma.post.update({
@@ -45,15 +38,7 @@ export async function POST(request: NextRequest) {
           image: image || null,
           readingTime,
           categoryId: categoryId || null,
-          tags: tagIds
-            ? {
-                set: [],
-                connect:
-                  tagIds.length > 0
-                    ? tagIds.map((tagId: string) => ({ id: tagId }))
-                    : [],
-              }
-            : undefined,
+          tags: tags || null,
           // Keep status as draft
           status: "draft",
           published: false,
@@ -88,7 +73,7 @@ export async function POST(request: NextRequest) {
           image: image || null,
           readingTime,
           categoryId: categoryId || null,
-          tags: tagConnections,
+          tags: tags || null,
           status: "draft",
           published: false,
         },

@@ -13,7 +13,6 @@ import {
   PostSchema,
   ProjectSchema,
   CategorySchema,
-  TagSchema,
 } from "@/lib/validations";
 import { calculateReadingTime } from "@/lib/utils";
 import { verifyPassword, generateToken } from "@/lib/auth";
@@ -136,7 +135,6 @@ export async function getPosts() {
     orderBy: { createdAt: "desc" },
     include: {
       category: true,
-      tags: true,
     },
   });
 }
@@ -153,7 +151,15 @@ export async function createPost(formData: FormData) {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, "");
 
-      // Check if exists first
+      // Check if category with same name already exists
+      const existingByName = await prisma.category.findUnique({
+        where: { name: newCategoryName.trim() },
+      });
+      if (existingByName) {
+        throw new Error(`Kategori "${newCategoryName}" sudah ada`);
+      }
+
+      // Check if exists by slug
       const existingCategory = await prisma.category.findUnique({
         where: { slug },
       });
@@ -161,65 +167,16 @@ export async function createPost(formData: FormData) {
         categoryId = existingCategory.id;
       } else {
         const newCategory = await prisma.category.create({
-          data: { name: newCategoryName, slug },
+          data: { name: newCategoryName.trim(), slug },
         });
         categoryId = newCategory.id;
       }
       formData.set("categoryId", categoryId);
     }
 
-    // Handle Tags: Parse comma-separated string and new tag
-    const tagsInput = formData.get("tagsInput") as string;
-    const newTagName = formData.get("newTag") as string;
-    const tagIds: string[] = [];
-
-    // Add new tag if provided
-    if (newTagName && newTagName.trim()) {
-      const slug = newTagName
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-
-      let tag = await prisma.tag.findUnique({ where: { slug } });
-      if (!tag) {
-        tag = await prisma.tag.create({
-          data: { name: newTagName.trim(), slug },
-        });
-      }
-      tagIds.push(tag.id);
-    }
-
-    // Add existing selected tags
-    if (tagsInput) {
-      const tagNames = tagsInput
-        .split(",")
-        .map((t) => t.trim())
-        .filter((t) => t.length > 0);
-
-      for (const tagName of tagNames) {
-        const slug = tagName
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/(^-|-$)/g, "");
-
-        // Find or create tag
-        let tag = await prisma.tag.findUnique({ where: { slug } });
-        if (!tag) {
-          tag = await prisma.tag.create({ data: { name: tagName, slug } });
-        }
-        if (!tagIds.includes(tag.id)) {
-          tagIds.push(tag.id);
-        }
-      }
-    }
-
-    // Fallback to existing checkbox tags if any (legacy support or mixed usage)
-    const existingTags = formData.getAll("tags") as string[];
-    existingTags.forEach((id) => {
-      if (!tagIds.includes(id)) tagIds.push(id);
-    });
-
-    formData.set("tagIds", JSON.stringify(tagIds));
+    // Handle Tags: Get as comma-separated string
+    const tagsInput = formData.get("tags") as string;
+    const tags = tagsInput ? tagsInput.trim() : null;
 
     // Handle status: draft or published
     const status = (formData.get("status") as string) || "draft";
@@ -262,12 +219,7 @@ export async function createPost(formData: FormData) {
         readingTime,
         publishedAt: published ? new Date() : null,
         categoryId: categoryId || null,
-        tags:
-          tagIds.length > 0
-            ? {
-                connect: tagIds.map((tagId) => ({ id: tagId })),
-              }
-            : undefined,
+        tags: tags,
       },
     });
 
@@ -330,6 +282,14 @@ export async function updatePost(id: string, formData: FormData) {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, "");
 
+      // Check if category with same name already exists
+      const existingByName = await prisma.category.findUnique({
+        where: { name: newCategoryName.trim() },
+      });
+      if (existingByName) {
+        throw new Error(`Kategori "${newCategoryName}" sudah ada`);
+      }
+
       const existingCategory = await prisma.category.findUnique({
         where: { slug },
       });
@@ -337,64 +297,16 @@ export async function updatePost(id: string, formData: FormData) {
         categoryId = existingCategory.id;
       } else {
         const newCategory = await prisma.category.create({
-          data: { name: newCategoryName, slug },
+          data: { name: newCategoryName.trim(), slug },
         });
         categoryId = newCategory.id;
       }
       formData.set("categoryId", categoryId);
     }
 
-    // Handle Tags: Parse comma-separated string and new tag
-    const tagsInput = formData.get("tagsInput") as string;
-    const newTagName = formData.get("newTag") as string;
-    const tagIds: string[] = [];
-
-    // Add new tag if provided
-    if (newTagName && newTagName.trim()) {
-      const slug = newTagName
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-
-      let tag = await prisma.tag.findUnique({ where: { slug } });
-      if (!tag) {
-        tag = await prisma.tag.create({
-          data: { name: newTagName.trim(), slug },
-        });
-      }
-      tagIds.push(tag.id);
-    }
-
-    // Add existing selected tags
-    if (tagsInput) {
-      const tagNames = tagsInput
-        .split(",")
-        .map((t) => t.trim())
-        .filter((t) => t.length > 0);
-
-      for (const tagName of tagNames) {
-        const slug = tagName
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/(^-|-$)/g, "");
-
-        let tag = await prisma.tag.findUnique({ where: { slug } });
-        if (!tag) {
-          tag = await prisma.tag.create({ data: { name: tagName, slug } });
-        }
-        if (!tagIds.includes(tag.id)) {
-          tagIds.push(tag.id);
-        }
-      }
-    }
-
-    // Fallback to existing checkbox tags
-    const existingTags = formData.getAll("tags") as string[];
-    existingTags.forEach((id) => {
-      if (!tagIds.includes(id)) tagIds.push(id);
-    });
-
-    formData.set("tagIds", JSON.stringify(tagIds));
+    // Handle Tags: Get as comma-separated string
+    const tagsInput = formData.get("tags") as string;
+    const tags = tagsInput ? tagsInput.trim() : null;
 
     // Handle status: draft or published
     const status = (formData.get("status") as string) || "draft";
@@ -442,11 +354,7 @@ export async function updatePost(id: string, formData: FormData) {
         publishedAt: shouldSetPublishedAt ? new Date() : undefined,
         archivedAt: null, // Clear archivedAt when updating normally
         categoryId: categoryId || null,
-        tags: {
-          set: [],
-          connect:
-            tagIds.length > 0 ? tagIds.map((tagId) => ({ id: tagId })) : [],
-        },
+        tags: tags,
       },
     });
 
@@ -600,54 +508,8 @@ export async function updateCategory(id: string, formData: FormData) {
   redirect("/admin/categories");
 }
 
-// Tags
-export async function getTags() {
-  return await prisma.tag.findMany({
-    orderBy: { name: "asc" },
-    include: { _count: { select: { posts: true } } },
-  });
-}
-
-export async function createTag(formData: FormData) {
-  const name = formData.get("name") as string;
-  const slug = formData.get("slug") as string;
-
-  await prisma.tag.create({
-    data: {
-      name,
-      slug,
-    },
-  });
-
-  revalidatePath("/admin/tags");
-}
-
-export async function deleteTag(id: string) {
-  await prisma.tag.delete({ where: { id } });
-  revalidatePath("/admin/tags");
-}
-
-export async function getTagById(id: string) {
-  return await prisma.tag.findUnique({ where: { id } });
-}
-
-export async function updateTag(id: string, formData: FormData) {
-  const validation = validateFormData(TagSchema, formData);
-  if (!validation.success) {
-    throw new Error(validation.error);
-  }
-
-  const { name, slug } = validation.data;
-
-  await prisma.tag.update({
-    where: { id },
-    data: { name, slug },
-  });
-
-  revalidatePath("/admin/tags");
-  revalidatePath("/blog");
-  redirect("/admin/tags");
-}
+// Tags - removed since tags are now comma-separated string in Post
+// export async function getTags() { }
 
 // Quick create actions for PostForm (return created items)
 export async function quickCreateCategory(name: string) {
@@ -657,7 +519,15 @@ export async function quickCreateCategory(name: string) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 
-  // Check if exists first
+  // Check if category with same name already exists
+  const existingByName = await prisma.category.findUnique({
+    where: { name: name.trim() },
+  });
+  if (existingByName) {
+    throw new Error(`Kategori "${name}" sudah ada`);
+  }
+
+  // Check if exists by slug
   const existingCategory = await prisma.category.findUnique({
     where: { slug },
   });
@@ -666,34 +536,12 @@ export async function quickCreateCategory(name: string) {
   }
 
   const newCategory = await prisma.category.create({
-    data: { name, slug },
+    data: { name: name.trim(), slug },
   });
 
   revalidatePath("/admin/posts");
   revalidatePath("/admin/categories");
   return newCategory;
-}
-
-export async function quickCreateTag(name: string) {
-  "use server";
-  const slug = name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-
-  // Check if exists first
-  const existingTag = await prisma.tag.findUnique({ where: { slug } });
-  if (existingTag) {
-    return existingTag;
-  }
-
-  const newTag = await prisma.tag.create({
-    data: { name, slug },
-  });
-
-  revalidatePath("/admin/posts");
-  revalidatePath("/admin/tags");
-  return newTag;
 }
 
 // Media
@@ -819,12 +667,11 @@ export async function deleteMedia(id: string) {
 
 // Dashboard
 export async function getDashboardStats() {
-  const [postsCount, projectsCount, categoriesCount, tagsCount, recentPosts] =
+  const [postsCount, projectsCount, categoriesCount, recentPosts] =
     await Promise.all([
       prisma.post.count(),
       prisma.project.count(),
       prisma.category.count(),
-      prisma.tag.count(),
       prisma.post.findMany({
         take: 5,
         orderBy: { createdAt: "desc" },
@@ -838,7 +685,6 @@ export async function getDashboardStats() {
     postsCount,
     projectsCount,
     categoriesCount,
-    tagsCount,
     recentPosts,
   };
 }
@@ -936,7 +782,6 @@ export async function getFeaturedPosts(limit: number = 6) {
     take: limit,
     include: {
       category: true,
-      tags: true,
     },
   });
 }
@@ -960,81 +805,82 @@ export async function getPostsByCategory(categorySlug: string, limit?: number) {
     take: limit,
     include: {
       category: true,
-      tags: true,
     },
   });
 }
 
 /**
- * Get posts by tag
+ * Get posts by tag (search in comma-separated tags string)
  */
-export async function getPostsByTag(tagSlug: string, limit?: number) {
-  const tag = await prisma.tag.findUnique({
-    where: { slug: tagSlug },
-  });
-
-  if (!tag) return [];
-
+export async function getPostsByTag(tagName: string, limit?: number) {
+  // Since tags is now a comma-separated string, we search using contains
   return await prisma.post.findMany({
     where: {
       status: "published",
       tags: {
-        some: {
-          id: tag.id,
-        },
+        contains: tagName,
       },
     },
     orderBy: { publishedAt: "desc" },
     take: limit,
     include: {
       category: true,
-      tags: true,
     },
   });
 }
 
 /**
- * Get related posts based on category and tags
+ * Get related posts based on category and/or tags
+ * Matches posts that share the same category OR have any matching tags
  */
 export async function getRelatedPosts(
   postId: string,
   categoryId?: string | null,
+  tags?: string | null,
   limit: number = 3
 ) {
-  const currentPost = await prisma.post.findUnique({
-    where: { id: postId },
-    include: { tags: true },
-  });
+  // Parse tags into array
+  const tagArray = tags
+    ? tags
+        .split(",")
+        .map((t) => t.trim().toLowerCase())
+        .filter(Boolean)
+    : [];
 
-  if (!currentPost) return [];
+  // Build OR conditions for matching tags
+  const tagConditions = tagArray.map((tag) => ({
+    tags: { contains: tag },
+  }));
 
-  const tagIds = currentPost.tags.map((tag) => tag.id);
+  // Build the where clause
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const whereClause: any = {
+    id: { not: postId },
+    status: "published",
+  };
 
-  // Find posts with same category or shared tags
+  // Add OR conditions: match by category OR any of the tags
+  const orConditions: object[] = [];
+
+  if (categoryId) {
+    orConditions.push({ categoryId });
+  }
+
+  if (tagConditions.length > 0) {
+    orConditions.push(...tagConditions);
+  }
+
+  if (orConditions.length > 0) {
+    whereClause.OR = orConditions;
+  }
+
+  // Find posts with same category or matching tags
   const relatedPosts = await prisma.post.findMany({
-    where: {
-      status: "published",
-      id: { not: postId },
-      OR: [
-        // Same category
-        categoryId ? { categoryId } : {},
-        // Has shared tags
-        tagIds.length > 0
-          ? {
-              tags: {
-                some: {
-                  id: { in: tagIds },
-                },
-              },
-            }
-          : {},
-      ],
-    },
+    where: whereClause,
     orderBy: [{ views: "desc" }, { publishedAt: "desc" }],
     take: limit,
     include: {
       category: true,
-      tags: true,
     },
   });
 
@@ -1055,7 +901,6 @@ export async function getPublishedPosts(query?: string) {
     orderBy: { publishedAt: "desc" },
     include: {
       category: true,
-      tags: true,
     },
   });
 }
@@ -1068,7 +913,6 @@ export async function getPostBySlug(slug: string) {
     where: { slug },
     include: {
       category: true,
-      tags: true,
     },
   });
 }
@@ -1087,19 +931,7 @@ export async function getCategoryBySlug(slug: string) {
   });
 }
 
-/**
- * Get tag by slug with post count
- */
-export async function getTagBySlug(slug: string) {
-  return await prisma.tag.findUnique({
-    where: { slug },
-    include: {
-      _count: {
-        select: { posts: true },
-      },
-    },
-  });
-}
+// getTagBySlug - removed since Tag model no longer exists
 
 // About Page Data
 export interface Experience {
@@ -1135,12 +967,15 @@ export interface Education {
 export interface AboutData {
   name: string;
   title: string;
+  titleEn?: string;
   tagline: string;
+  taglineEn?: string;
   profileImage: string;
   location: string;
   email: string;
   website: string;
   bio: string;
+  bioEn?: string;
   cvUrl: string;
   portfolioUrl: string;
   techStack: string;

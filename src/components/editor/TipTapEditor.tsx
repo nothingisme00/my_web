@@ -1,24 +1,30 @@
-"use client"
+"use client";
 
-import { useEditor, EditorContent } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
-import Image from '@tiptap/extension-image'
-import Link from '@tiptap/extension-link'
-import Placeholder from '@tiptap/extension-placeholder'
-import { TextStyle } from '@tiptap/extension-text-style'
-import HorizontalRule from '@tiptap/extension-horizontal-rule'
-import { EditorToolbar } from './EditorToolbar'
-import { FontSize } from '@/lib/tiptap-extensions/fontSize'
-import { CodeBlockHighlight } from '@/lib/tiptap-extensions/codeBlockHighlight'
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Image from "@tiptap/extension-image";
+import Link from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
+import { TextStyle } from "@tiptap/extension-text-style";
+import HorizontalRule from "@tiptap/extension-horizontal-rule";
+import { EditorToolbar } from "./EditorToolbar";
+import { FontSize } from "@/lib/tiptap-extensions/fontSize";
+import { CodeBlockHighlight } from "@/lib/tiptap-extensions/codeBlockHighlight";
+import { Video } from "@/lib/tiptap-extensions/video";
 
 interface TipTapEditorProps {
-  content: string
-  onChange: (content: string) => void
-  placeholder?: string
-  className?: string
+  content: string;
+  onChange: (content: string) => void;
+  placeholder?: string;
+  className?: string;
 }
 
-export function TipTapEditor({ content, onChange, placeholder = 'Start writing...', className }: TipTapEditorProps) {
+export function TipTapEditor({
+  content,
+  onChange,
+  placeholder = "Start writing...",
+  className,
+}: TipTapEditorProps) {
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -34,18 +40,24 @@ export function TipTapEditor({ content, onChange, placeholder = 'Start writing..
       CodeBlockHighlight,
       HorizontalRule.configure({
         HTMLAttributes: {
-          class: 'my-8 border-gray-300 dark:border-gray-700',
+          class: "my-8 border-gray-300 dark:border-gray-700",
         },
       }),
       Image.configure({
         HTMLAttributes: {
-          class: 'rounded-lg max-w-full h-auto',
+          class: "rounded-lg max-w-full h-auto",
+        },
+      }),
+      Video.configure({
+        HTMLAttributes: {
+          class: "rounded-lg max-w-full",
         },
       }),
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-blue-600 dark:text-blue-400 underline hover:text-blue-700 dark:hover:text-blue-300',
+          class:
+            "text-blue-600 dark:text-blue-400 underline hover:text-blue-700 dark:hover:text-blue-300",
         },
       }),
       Placeholder.configure({
@@ -55,13 +67,14 @@ export function TipTapEditor({ content, onChange, placeholder = 'Start writing..
     content,
     editorProps: {
       attributes: {
-        class: 'prose dark:prose-invert max-w-none focus:outline-none min-h-[300px] px-4 py-3',
+        class:
+          "prose dark:prose-invert max-w-none focus:outline-none min-h-[300px] px-4 py-3",
       },
     },
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML())
+      onChange(editor.getHTML());
     },
-  })
+  });
 
   return (
     <div className={className}>
@@ -70,5 +83,5 @@ export function TipTapEditor({ content, onChange, placeholder = 'Start writing..
         <EditorContent editor={editor} />
       </div>
     </div>
-  )
+  );
 }

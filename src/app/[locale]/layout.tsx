@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -9,10 +8,9 @@ import { getSettings } from "@/lib/actions";
 import { ScrollToTop } from "@/components/blog/ScrollToTop";
 import { ReCaptchaProvider } from "@/components/providers/ReCaptchaProvider";
 import { NavigationProvider } from "@/components/providers/NavigationProvider";
+import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 import { locales } from "@/i18n/config";
 import "../globals.css";
-
-const inter = Inter({ subsets: ["latin"] });
 
 // Force dynamic rendering to ensure settings are always fresh
 export const dynamic = "force-dynamic";
@@ -62,8 +60,19 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <head />
-      <body className={`${inter.className} min-h-screen flex flex-col`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="font-google-sans min-h-screen flex flex-col">
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -86,10 +95,12 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <ReCaptchaProvider>
             <NavigationProvider>
-              <ScrollToTop />
-              <LayoutWrapper settings={settings} footer={<Footer />}>
-                {children}
-              </LayoutWrapper>
+              <SmoothScrollProvider>
+                <ScrollToTop />
+                <LayoutWrapper settings={settings} footer={<Footer />}>
+                  {children}
+                </LayoutWrapper>
+              </SmoothScrollProvider>
             </NavigationProvider>
           </ReCaptchaProvider>
         </NextIntlClientProvider>

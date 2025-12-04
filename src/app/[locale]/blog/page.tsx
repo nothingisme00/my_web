@@ -8,7 +8,6 @@ import { notFound } from "next/navigation";
 type PostWithRelations = Prisma.PostGetPayload<{
   include: {
     category: true;
-    tags: true;
   };
 }>;
 

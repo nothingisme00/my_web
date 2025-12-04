@@ -25,6 +25,8 @@ export default async function WatchlistPage() {
   // Serialize dates for client component
   const serializedItems = items.map((item) => ({
     ...item,
+    notesId: item.notesId,
+    notesEn: item.notesEn,
     completedAt: item.completedAt?.toISOString() || null,
     createdAt: item.createdAt.toISOString(),
     updatedAt: item.updatedAt.toISOString(),

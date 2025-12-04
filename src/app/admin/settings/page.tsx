@@ -85,6 +85,7 @@ export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [openSection, setOpenSection] = useState<string | null>("site"); // Controlled accordion state
 
   // Password change states
   const [currentPassword, setCurrentPassword] = useState("");
@@ -253,7 +254,8 @@ export default function SettingsPage() {
           title="Site Information"
           subtitle="Your website identity and contact details"
           color="blue"
-          defaultOpen={true}>
+          isOpen={openSection === "site"}
+          onToggle={(open) => setOpenSection(open ? "site" : null)}>
           <div className="space-y-5">
             <Input
               label="Site Name"
@@ -312,7 +314,8 @@ export default function SettingsPage() {
           title="Social Media"
           subtitle="Connect your social profiles"
           color="violet"
-          defaultOpen={false}>
+          isOpen={openSection === "social"}
+          onToggle={(open) => setOpenSection(open ? "social" : null)}>
           <div className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <Input
@@ -395,7 +398,8 @@ export default function SettingsPage() {
           title="SEO Settings"
           subtitle="Optimize for search engines"
           color="emerald"
-          defaultOpen={false}>
+          isOpen={openSection === "seo"}
+          onToggle={(open) => setOpenSection(open ? "seo" : null)}>
           <div className="space-y-5">
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -458,7 +462,8 @@ export default function SettingsPage() {
           title="Page Visibility"
           subtitle="Show or hide pages from visitors"
           color="amber"
-          defaultOpen={false}>
+          isOpen={openSection === "visibility"}
+          onToggle={(open) => setOpenSection(open ? "visibility" : null)}>
           <div className="divide-y divide-slate-100 dark:divide-slate-800">
             <Toggle
               checked={settings.page_blog !== "false"}
@@ -536,7 +541,8 @@ export default function SettingsPage() {
           title="DeepL Translation"
           subtitle="Monitor penggunaan kuota terjemahan otomatis"
           color="blue"
-          defaultOpen={false}>
+          isOpen={openSection === "deepl"}
+          onToggle={(open) => setOpenSection(open ? "deepl" : null)}>
           <DeepLUsageWidget />
         </AccordionSection>
 
@@ -546,7 +552,8 @@ export default function SettingsPage() {
           title="Account Security"
           subtitle="Manage your password and security settings"
           color="rose"
-          defaultOpen={false}>
+          isOpen={openSection === "security"}
+          onToggle={(open) => setOpenSection(open ? "security" : null)}>
           <div className="space-y-5">
             {/* Error Message */}
             {passwordError && (
@@ -632,8 +639,9 @@ export default function SettingsPage() {
           title="Login Activity"
           subtitle="Monitor recent login attempts to your account"
           color="slate"
-          defaultOpen={false}
+          isOpen={openSection === "activity"}
           onToggle={(isOpen) => {
+            setOpenSection(isOpen ? "activity" : null);
             if (isOpen && loginActivity.length === 0) {
               fetchLoginActivity();
             }

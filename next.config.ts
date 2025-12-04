@@ -8,11 +8,26 @@ const isDev = process.env.NODE_ENV === "development";
 const nextConfig: NextConfig = {
   /* config options here */
 
+  // Increase body size limit for video uploads
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "100mb",
+    },
+  },
+
   images: {
     remotePatterns: [
       {
         protocol: "https",
         hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "encrypted-tbn0.gstatic.com",
+      },
+      {
+        protocol: "https",
+        hostname: "**.gstatic.com",
       },
       // Only allow localhost in development
       ...(isDev

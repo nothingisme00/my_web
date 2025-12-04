@@ -51,7 +51,7 @@ export function ProjectsGrid({ projects, locale = "id" }: ProjectsGridProps) {
 
         return (
           <StaggerItem key={project.id}>
-            <article className="group flex flex-col h-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/60 dark:border-gray-700/60 rounded-2xl overflow-hidden hover:border-blue-400 dark:hover:border-blue-600 shadow-md hover:shadow-xl transition-all duration-300 ease-out hover:-translate-y-1">
+            <article className="group flex flex-col h-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200/60 dark:border-gray-700/60 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300">
               {/* Project Image */}
               {project.image && (
                 <div className="relative w-full h-48 overflow-hidden bg-gray-100 dark:bg-gray-800">
@@ -66,14 +66,14 @@ export function ProjectsGrid({ projects, locale = "id" }: ProjectsGridProps) {
               )}
 
               {/* Project Content */}
-              <div className="p-6 flex flex-col flex-grow">
+              <div className="p-6 flex flex-col grow">
                 <Link href={`/portfolio/${project.slug}`}>
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
                     {project.title}
                   </h3>
                 </Link>
 
-                <p className="text-gray-600 dark:text-gray-400 mb-4 flex-grow line-clamp-2">
+                <p className="text-gray-600 dark:text-gray-400 mb-4 grow line-clamp-2">
                   {localizedDescription}
                 </p>
 

@@ -10,12 +10,58 @@ import {
   X,
   ChevronUp,
   ChevronDown,
-  MessageSquare,
-  Tag,
-  Hash,
+  RotateCcw,
+  SlidersHorizontal,
+  LayoutGrid,
+  LayoutList,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { SelectCompact } from "@/components/ui/SelectCompact";
+import { useLocale } from "next-intl";
+
+// Rating label system
+function getRatingLabel(
+  rating: number,
+  locale: "id" | "en" = "en"
+): { label: string; color: string } {
+  if (rating >= 9.0) {
+    return {
+      label: locale === "id" ? "Sempurna" : "Masterpiece",
+      color:
+        "text-amber-600 bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-700",
+    };
+  } else if (rating >= 8.4) {
+    return {
+      label: locale === "id" ? "Sangat Bagus!" : "Highly Rec.",
+      color:
+        "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-700",
+    };
+  } else if (rating >= 7.5) {
+    return {
+      label: locale === "id" ? "Bagus Banget" : "Very Good",
+      color:
+        "text-blue-600 bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700",
+    };
+  } else if (rating >= 6.0) {
+    return {
+      label: locale === "id" ? "Bagus" : "Good",
+      color:
+        "text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700",
+    };
+  } else if (rating >= 4.0) {
+    return {
+      label: locale === "id" ? "Biasa Saja" : "Average",
+      color:
+        "text-gray-600 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600",
+    };
+  } else {
+    return {
+      label: locale === "id" ? "Kurang" : "Poor",
+      color:
+        "text-red-600 bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-700",
+    };
+  }
+}
 
 interface WatchlistItem {
   id: string;
@@ -25,7 +71,8 @@ interface WatchlistItem {
   totalEpisode: number | null;
   status: string;
   rating: number | null;
-  notes: string | null;
+  notesId: string | null;
+  notesEn: string | null;
   imageUrl: string | null;
   year: number | null;
   completedAt: string | null;
@@ -73,32 +120,52 @@ const typeConfig: Record<string, { icon: typeof Tv; color: string }> = {
   Donghua: { icon: Tv, color: "text-red-500" },
 };
 
-function RatingStars({ rating }: { rating: number | null }) {
+function RatingStars({
+  rating,
+  locale = "en",
+  showLabel = false,
+}: {
+  rating: number | null;
+  locale?: "id" | "en";
+  showLabel?: boolean;
+}) {
   if (!rating) return <span className="text-gray-400 text-sm">-</span>;
 
   const fullStars = Math.floor(rating / 2);
   const hasHalfStar = rating % 2 >= 1;
+  const ratingInfo = getRatingLabel(rating, locale);
 
   return (
-    <div className="flex items-center gap-1">
-      <div className="flex">
-        {[...Array(5)].map((_, i) => (
-          <Star
-            key={i}
-            className={clsx(
-              "h-4 w-4",
-              i < fullStars
-                ? "fill-amber-400 text-amber-400"
-                : i === fullStars && hasHalfStar
-                ? "fill-amber-400/50 text-amber-400"
-                : "text-gray-300 dark:text-gray-600"
-            )}
-          />
-        ))}
+    <div className="flex flex-col items-center gap-1">
+      <div className="flex items-center gap-1">
+        <div className="flex">
+          {[...Array(5)].map((_, i) => (
+            <Star
+              key={i}
+              className={clsx(
+                "h-4 w-4",
+                i < fullStars
+                  ? "fill-amber-400 text-amber-400"
+                  : i === fullStars && hasHalfStar
+                  ? "fill-amber-400/50 text-amber-400"
+                  : "text-gray-300 dark:text-gray-600"
+              )}
+            />
+          ))}
+        </div>
+        <span className="text-sm font-semibold text-gray-900 dark:text-white ml-1">
+          {rating.toFixed(1)}
+        </span>
       </div>
-      <span className="text-sm font-medium text-gray-700 dark:text-gray-300 ml-1">
-        {rating.toFixed(1)}
-      </span>
+      {showLabel && (
+        <span
+          className={clsx(
+            "text-[10px] font-medium px-1.5 py-0.5 rounded border",
+            ratingInfo.color
+          )}>
+          {ratingInfo.label}
+        </span>
+      )}
     </div>
   );
 }
@@ -154,6 +221,7 @@ function SortableHeader({
 }
 
 export function WatchlistTable({ items }: WatchlistTableProps) {
+  const locale = useLocale();
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterType, setFilterType] = useState<string>("all");
@@ -161,6 +229,23 @@ export function WatchlistTable({ items }: WatchlistTableProps) {
   const [sortBy, setSortBy] = useState<string>("rating");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [selectedItem, setSelectedItem] = useState<WatchlistItem | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
+
+  // Count active filters for badge
+  const activeFilterCount = [
+    filterGenre !== "all",
+    filterStatus !== "all",
+    filterType !== "all",
+  ].filter(Boolean).length;
+
+  // Helper to get localized notes
+  const getLocalizedNotes = (item: WatchlistItem) => {
+    if (locale === "en") {
+      return item.notesEn || item.notesId || null;
+    }
+    return item.notesId || null;
+  };
 
   const stats = useMemo(() => {
     const completed = items.filter((i) => i.status === "Completed");
@@ -275,218 +360,496 @@ export function WatchlistTable({ items }: WatchlistTableProps) {
         </div>
       </div>
 
-      {/* Filters - Simplified */}
-      <div className="bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-        <div className="flex flex-col sm:flex-row gap-3">
-          {/* Search */}
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search title or genre..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            {search && (
-              <button
-                onClick={() => setSearch("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
+      {/* Filters - Collapsible on Mobile */}
+      <div className="bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        {/* Search Row */}
+        <div className="p-4">
+          <div className="flex gap-2">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search title or genre..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-9 pr-10 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
 
-          {/* Filter Dropdowns */}
-          <div className="flex gap-2 flex-wrap sm:flex-nowrap">
+            {/* Filter Toggle Button - Mobile Only */}
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="sm:hidden flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+              <SlidersHorizontal className="h-4 w-4" />
+              {activeFilterCount > 0 && (
+                <span className="flex items-center justify-center w-5 h-5 text-xs font-bold bg-blue-500 text-white rounded-full">
+                  {activeFilterCount}
+                </span>
+              )}
+              <ChevronDown
+                className={clsx(
+                  "h-4 w-4 transition-transform duration-200",
+                  showFilters && "rotate-180"
+                )}
+              />
+            </button>
+
+            {/* Desktop Filters - Always visible on sm+ */}
+            <div className="hidden sm:flex gap-2 flex-nowrap">
+              {/* Genre Filter */}
+              <SelectCompact
+                value={filterGenre}
+                onChange={setFilterGenre}
+                options={[
+                  { value: "all", label: "All Genres" },
+                  ...uniqueGenres.map((genre) => ({
+                    value: genre,
+                    label: genre,
+                  })),
+                ]}
+                className="sm:min-w-[130px]"
+              />
+
+              {/* Status Filter */}
+              <SelectCompact
+                value={filterStatus}
+                onChange={setFilterStatus}
+                options={[
+                  { value: "all", label: "All Status" },
+                  ...Object.keys(statusConfig).map((status) => ({
+                    value: status,
+                    label: status,
+                  })),
+                ]}
+                className="sm:min-w-[130px]"
+              />
+
+              {/* Type Filter */}
+              <SelectCompact
+                value={filterType}
+                onChange={setFilterType}
+                options={[
+                  { value: "all", label: "All Types" },
+                  ...uniqueTypes.map((type) => ({ value: type, label: type })),
+                ]}
+                className="sm:min-w-[120px]"
+              />
+
+              {/* Reset Button - Desktop */}
+              {(search ||
+                filterGenre !== "all" ||
+                filterStatus !== "all" ||
+                filterType !== "all") && (
+                <button
+                  onClick={() => {
+                    setSearch("");
+                    setFilterGenre("all");
+                    setFilterStatus("all");
+                    setFilterType("all");
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 text-sm font-medium transition-colors border border-red-200 dark:border-red-800"
+                  title="Reset all filters">
+                  <RotateCcw className="h-4 w-4" />
+                  <span>Reset</span>
+                </button>
+              )}
+
+              {/* View Mode Toggle - More Visible */}
+              <div className="flex items-center gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                <button
+                  onClick={() => setViewMode("table")}
+                  className={clsx(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all",
+                    viewMode === "table"
+                      ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm"
+                      : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                  )}
+                  title="Table view">
+                  <LayoutList className="h-4 w-4" />
+                  <span className="hidden lg:inline">Table</span>
+                </button>
+                <button
+                  onClick={() => setViewMode("grid")}
+                  className={clsx(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all",
+                    viewMode === "grid"
+                      ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm"
+                      : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                  )}
+                  title="Grid view">
+                  <LayoutGrid className="h-4 w-4" />
+                  <span className="hidden lg:inline">Grid</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Filter Dropdown - Collapsible */}
+        <div
+          className={clsx(
+            "sm:hidden border-t border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out overflow-hidden",
+            showFilters
+              ? "max-h-96 opacity-100"
+              : "max-h-0 opacity-0 border-t-0"
+          )}>
+          <div className="p-4 pt-3 space-y-3 bg-gray-50 dark:bg-gray-800/30">
             {/* Genre Filter */}
-            <SelectCompact
-              value={filterGenre}
-              onChange={setFilterGenre}
-              options={[
-                { value: "all", label: "All Genres" },
-                ...uniqueGenres.map((genre) => ({
-                  value: genre,
-                  label: genre,
-                })),
-              ]}
-              className="w-full sm:w-auto sm:min-w-[130px]"
-            />
+            <div>
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
+                Genre
+              </label>
+              <SelectCompact
+                value={filterGenre}
+                onChange={setFilterGenre}
+                options={[
+                  { value: "all", label: "All Genres" },
+                  ...uniqueGenres.map((genre) => ({
+                    value: genre,
+                    label: genre,
+                  })),
+                ]}
+                className="w-full"
+              />
+            </div>
 
             {/* Status Filter */}
-            <SelectCompact
-              value={filterStatus}
-              onChange={setFilterStatus}
-              options={[
-                { value: "all", label: "All Status" },
-                ...Object.keys(statusConfig).map((status) => ({
-                  value: status,
-                  label: status,
-                })),
-              ]}
-              className="w-full sm:w-auto sm:min-w-[130px]"
-            />
+            <div>
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
+                Status
+              </label>
+              <SelectCompact
+                value={filterStatus}
+                onChange={setFilterStatus}
+                options={[
+                  { value: "all", label: "All Status" },
+                  ...Object.keys(statusConfig).map((status) => ({
+                    value: status,
+                    label: status,
+                  })),
+                ]}
+                className="w-full"
+              />
+            </div>
 
             {/* Type Filter */}
-            <SelectCompact
-              value={filterType}
-              onChange={setFilterType}
-              options={[
-                { value: "all", label: "All Types" },
-                ...uniqueTypes.map((type) => ({ value: type, label: type })),
-              ]}
-              className="w-full sm:w-auto sm:min-w-[120px]"
-            />
+            <div>
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
+                Type
+              </label>
+              <SelectCompact
+                value={filterType}
+                onChange={setFilterType}
+                options={[
+                  { value: "all", label: "All Types" },
+                  ...uniqueTypes.map((type) => ({ value: type, label: type })),
+                ]}
+                className="w-full"
+              />
+            </div>
+
+            {/* Reset Button - Mobile */}
+            {(filterGenre !== "all" ||
+              filterStatus !== "all" ||
+              filterType !== "all") && (
+              <button
+                onClick={() => {
+                  setFilterGenre("all");
+                  setFilterStatus("all");
+                  setFilterType("all");
+                }}
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 text-sm font-medium transition-colors border border-red-200 dark:border-red-800">
+                <RotateCcw className="h-4 w-4" />
+                <span>Reset Filters</span>
+              </button>
+            )}
+
+            {/* View Mode Toggle - Mobile */}
+            <div className="flex items-center justify-center border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setViewMode("table")}
+                className={clsx(
+                  "flex-1 flex items-center justify-center gap-2 p-2 transition-colors",
+                  viewMode === "table"
+                    ? "bg-blue-500 text-white"
+                    : "bg-white dark:bg-gray-900 text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800"
+                )}>
+                <LayoutList className="h-4 w-4" />
+                <span className="text-sm">Table</span>
+              </button>
+              <button
+                onClick={() => setViewMode("grid")}
+                className={clsx(
+                  "flex-1 flex items-center justify-center gap-2 p-2 transition-colors",
+                  viewMode === "grid"
+                    ? "bg-blue-500 text-white"
+                    : "bg-white dark:bg-gray-900 text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800"
+                )}>
+                <LayoutGrid className="h-4 w-4" />
+                <span className="text-sm">Grid</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                <SortableHeader
-                  label="Title"
-                  sortKey="title"
-                  currentSortBy={sortBy}
-                  currentSortOrder={sortOrder}
-                  onSort={handleSort}
-                  className="text-left"
-                />
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                  Type
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider hidden md:table-cell">
-                  Genre
-                </th>
-                <SortableHeader
-                  label="Episodes"
-                  sortKey="episodes"
-                  currentSortBy={sortBy}
-                  currentSortOrder={sortOrder}
-                  onSort={handleSort}
-                  className="text-center hidden sm:table-cell"
-                />
-                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                  Status
-                </th>
-                <SortableHeader
-                  label="Rating"
-                  sortKey="rating"
-                  currentSortBy={sortBy}
-                  currentSortOrder={sortOrder}
-                  onSort={handleSort}
-                  className="text-center"
-                />
-                <SortableHeader
-                  label="Year"
-                  sortKey="year"
-                  currentSortBy={sortBy}
-                  currentSortOrder={sortOrder}
-                  onSort={handleSort}
-                  className="text-center hidden lg:table-cell"
-                />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredItems.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={7}
-                    className="px-4 py-12 text-center text-gray-500 dark:text-gray-400">
-                    No items found
-                  </td>
+      {/* Table View */}
+      {viewMode === "table" && (
+        <div className="bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                  <SortableHeader
+                    label="Title"
+                    sortKey="title"
+                    currentSortBy={sortBy}
+                    currentSortOrder={sortOrder}
+                    onSort={handleSort}
+                    className="text-left"
+                  />
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                    Type
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider hidden md:table-cell">
+                    Genre
+                  </th>
+                  <SortableHeader
+                    label="Episodes"
+                    sortKey="episodes"
+                    currentSortBy={sortBy}
+                    currentSortOrder={sortOrder}
+                    onSort={handleSort}
+                    className="text-center hidden sm:table-cell"
+                  />
+                  <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <SortableHeader
+                    label="Rating"
+                    sortKey="rating"
+                    currentSortBy={sortBy}
+                    currentSortOrder={sortOrder}
+                    onSort={handleSort}
+                    className="text-center"
+                  />
+                  <SortableHeader
+                    label="Year"
+                    sortKey="year"
+                    currentSortBy={sortBy}
+                    currentSortOrder={sortOrder}
+                    onSort={handleSort}
+                    className="text-center hidden lg:table-cell"
+                  />
                 </tr>
-              ) : (
-                filteredItems.map((item) => {
-                  const TypeIcon = typeConfig[item.type]?.icon || Tv;
-                  const typeColor =
-                    typeConfig[item.type]?.color || "text-gray-500";
-                  const status =
-                    statusConfig[item.status] || statusConfig["Completed"];
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                {filteredItems.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={7}
+                      className="px-4 py-12 text-center text-gray-500 dark:text-gray-400">
+                      No items found
+                    </td>
+                  </tr>
+                ) : (
+                  filteredItems.map((item) => {
+                    const TypeIcon = typeConfig[item.type]?.icon || Tv;
+                    const typeColor =
+                      typeConfig[item.type]?.color || "text-gray-500";
+                    const status =
+                      statusConfig[item.status] || statusConfig["Completed"];
 
-                  return (
-                    <tr
-                      key={item.id}
-                      onClick={() => setSelectedItem(item)}
-                      className="group cursor-pointer border-l-2 border-transparent hover:border-l-blue-500 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all duration-200">
-                      <td className="px-4 py-4">
-                        <div className="flex items-center gap-3">
-                          {item.imageUrl ? (
-                            <img
-                              src={item.imageUrl}
-                              alt={item.title}
-                              className="w-10 h-14 object-cover rounded-md shrink-0"
-                            />
-                          ) : (
-                            <div className="w-10 h-14 bg-gray-200 dark:bg-gray-700 rounded-md flex items-center justify-center shrink-0">
-                              <TypeIcon
-                                className={clsx("h-5 w-5", typeColor)}
+                    return (
+                      <tr
+                        key={item.id}
+                        onClick={() => setSelectedItem(item)}
+                        className="group cursor-pointer border-l-2 border-transparent hover:border-l-blue-500 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all duration-200">
+                        <td className="px-4 py-4">
+                          <div className="flex items-center gap-3">
+                            {item.imageUrl ? (
+                              <img
+                                src={item.imageUrl}
+                                alt={item.title}
+                                className="w-10 h-14 object-cover rounded-md shrink-0"
                               />
-                            </div>
-                          )}
-                          <div className="min-w-0">
-                            <p className="font-medium text-gray-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                              {item.title}
-                            </p>
-                            {item.notes && (
-                              <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[200px]">
-                                {item.notes.length > 40
-                                  ? `${item.notes.slice(0, 40)}…`
-                                  : item.notes}
-                              </p>
+                            ) : (
+                              <div className="w-10 h-14 bg-gray-200 dark:bg-gray-700 rounded-md flex items-center justify-center shrink-0">
+                                <TypeIcon
+                                  className={clsx("h-5 w-5", typeColor)}
+                                />
+                              </div>
                             )}
+                            <div className="min-w-0">
+                              <p className="font-medium text-gray-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                {item.title}
+                              </p>
+                              {(() => {
+                                const notes = getLocalizedNotes(item);
+                                return (
+                                  notes && (
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[200px]">
+                                      {notes.length > 40
+                                        ? `${notes.slice(0, 40)}…`
+                                        : notes}
+                                    </p>
+                                  )
+                                );
+                              })()}
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="flex items-center gap-2">
-                          <TypeIcon className={clsx("h-4 w-4", typeColor)} />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">
-                            {item.type}
+                        </td>
+                        <td className="px-4 py-4">
+                          <div className="flex items-center gap-2">
+                            <TypeIcon className={clsx("h-4 w-4", typeColor)} />
+                            <span className="text-sm text-gray-700 dark:text-gray-300">
+                              {item.type}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4 hidden md:table-cell">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            {item.genre || "-"}
                           </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 hidden md:table-cell">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
-                          {item.genre || "-"}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 text-center hidden sm:table-cell">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
-                          {item.totalEpisode || "-"}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 text-center">
-                        <span
-                          className={clsx(
-                            "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium",
-                            status.bgColor,
-                            status.color
-                          )}>
-                          {status.label}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="flex justify-center">
-                          <RatingStars rating={item.rating} />
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 text-center hidden lg:table-cell">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
-                          {item.year || "-"}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                        </td>
+                        <td className="px-4 py-4 text-center hidden sm:table-cell">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            {item.totalEpisode || "-"}
+                          </span>
+                        </td>
+                        <td className="px-4 py-4 text-center">
+                          <span
+                            className={clsx(
+                              "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium",
+                              status.bgColor,
+                              status.color
+                            )}>
+                            {status.label}
+                          </span>
+                        </td>
+                        <td className="px-4 py-4">
+                          <div className="flex justify-center">
+                            <RatingStars
+                              rating={item.rating}
+                              locale={locale as "id" | "en"}
+                              showLabel
+                            />
+                          </div>
+                        </td>
+                        <td className="px-4 py-4 text-center hidden lg:table-cell">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            {item.year || "-"}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Grid View */}
+      {viewMode === "grid" && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-5">
+          {filteredItems.length === 0 ? (
+            <div className="col-span-full py-12 text-center text-gray-500 dark:text-gray-400">
+              No items found
+            </div>
+          ) : (
+            filteredItems.map((item) => {
+              const TypeIcon = typeConfig[item.type]?.icon || Tv;
+              const typeColor = typeConfig[item.type]?.color || "text-gray-500";
+              const status =
+                statusConfig[item.status] || statusConfig["Completed"];
+
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => setSelectedItem(item)}
+                  className="group cursor-pointer bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-xl hover:scale-[1.02] hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300">
+                  {/* Poster */}
+                  <div className="relative aspect-[2/3] overflow-hidden bg-gray-100 dark:bg-gray-900">
+                    {item.imageUrl ? (
+                      <img
+                        src={item.imageUrl}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
+                        <TypeIcon
+                          className={clsx("h-12 w-12 opacity-30", typeColor)}
+                        />
+                      </div>
+                    )}
+
+                    {/* Rating Badge - Combined */}
+                    {item.rating && (
+                      <div className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-1 bg-black/70 backdrop-blur-sm rounded-full">
+                        <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                        <span className="text-xs font-bold text-white">
+                          {item.rating.toFixed(1)}
+                        </span>
+                        <span className="text-[9px] font-medium text-amber-300">
+                          {
+                            getRatingLabel(item.rating, locale as "id" | "en")
+                              .label
+                          }
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Status Badge */}
+                    <div className="absolute bottom-2 left-2">
+                      <span
+                        className={clsx(
+                          "px-2 py-0.5 rounded-full text-[10px] font-medium backdrop-blur-sm",
+                          status.bgColor,
+                          status.color
+                        )}>
+                        {status.label}
+                      </span>
+                    </div>
+
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </div>
+
+                  {/* Info */}
+                  <div className="p-2.5 sm:p-3">
+                    <h3 className="font-medium text-xs sm:text-sm text-gray-900 dark:text-white line-clamp-2 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors leading-tight">
+                      {item.title}
+                    </h3>
+                    <div className="flex items-center gap-1.5 mt-1.5 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                      <TypeIcon className={clsx("h-3 w-3", typeColor)} />
+                      <span>{item.type}</span>
+                      {item.year && (
+                        <>
+                          <span className="text-gray-300 dark:text-gray-600">
+                            •
+                          </span>
+                          <span>{item.year}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
 
       {/* Results count */}
       <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
@@ -502,151 +865,183 @@ export function WatchlistTable({ items }: WatchlistTableProps) {
           const modalStatus =
             statusConfig[selectedItem.status] || statusConfig["Completed"];
 
+          const localizedNotes = getLocalizedNotes(selectedItem);
+
           return (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
               {/* Backdrop */}
               <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                className="absolute inset-0 bg-black/50 backdrop-blur-md"
                 onClick={() => setSelectedItem(null)}
               />
 
-              {/* Modal Card */}
-              <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 rounded-2xl shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-                {/* Close Button */}
-                <button
-                  onClick={() => setSelectedItem(null)}
-                  className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/20 hover:bg-black/40 text-white transition-colors">
-                  <X className="h-5 w-5" />
-                </button>
-
-                {/* Header with Poster */}
-                <div className="relative h-48 bg-gradient-to-br from-gray-800 to-gray-900">
-                  {selectedItem.imageUrl ? (
-                    <>
-                      <img
-                        src={selectedItem.imageUrl}
-                        alt={selectedItem.title}
-                        className="w-full h-full object-cover opacity-40"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent" />
-                    </>
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <ModalTypeIcon
-                        className={clsx("h-20 w-20 opacity-20", modalTypeColor)}
-                      />
-                    </div>
-                  )}
-
-                  {/* Title overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <div className="flex items-center gap-2 mb-2">
-                      <ModalTypeIcon
-                        className={clsx("h-5 w-5", modalTypeColor)}
-                      />
-                      <span className="text-sm font-medium text-gray-300">
-                        {selectedItem.type}
-                      </span>
-                      {selectedItem.year && (
-                        <>
-                          <span className="text-gray-500">•</span>
-                          <span className="text-sm text-gray-300">
-                            {selectedItem.year}
-                          </span>
-                        </>
-                      )}
-                    </div>
-                    <h2 className="text-2xl font-bold text-white">
-                      {selectedItem.title}
-                    </h2>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-6 space-y-5">
-                  {/* Status & Rating Row */}
-                  <div className="flex items-center justify-between flex-wrap gap-3">
-                    <span
-                      className={clsx(
-                        "inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium",
-                        modalStatus.bgColor,
-                        modalStatus.color
-                      )}>
-                      {modalStatus.label}
-                    </span>
-                    {selectedItem.rating && (
-                      <div className="flex items-center gap-1">
-                        <div className="flex">
-                          {[...Array(10)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={clsx(
-                                "h-4 w-4",
-                                i < selectedItem.rating!
-                                  ? "fill-amber-400 text-amber-400"
-                                  : "text-gray-300 dark:text-gray-600"
-                              )}
-                            />
-                          ))}
+              {/* Modal Card - Modern Glass Design */}
+              <div className="relative w-full max-w-lg max-h-[90vh] bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-2xl animate-in fade-in zoom-in-95 duration-300 border border-gray-200/50 dark:border-gray-700/50 overflow-y-auto">
+                {/* Hero Section with Gradient Overlay */}
+                <div className="relative h-52">
+                  {/* Background Image Container */}
+                  <div className="absolute inset-0 overflow-hidden rounded-t-3xl">
+                    {selectedItem.imageUrl ? (
+                      <>
+                        <img
+                          src={selectedItem.imageUrl}
+                          alt={selectedItem.title}
+                          className="w-full h-full object-cover scale-110 blur-sm"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/50 to-white dark:to-gray-900" />
+                      </>
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400 dark:from-gray-700 dark:via-gray-800 dark:to-gray-900">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <ModalTypeIcon
+                            className={clsx(
+                              "h-20 w-20 opacity-20",
+                              modalTypeColor
+                            )}
+                          />
                         </div>
-                        <span className="text-lg font-bold text-amber-500 ml-2">
-                          {selectedItem.rating}/10
-                        </span>
                       </div>
                     )}
                   </div>
 
-                  {/* Info Grid */}
+                  {/* Close Button */}
+                  <button
+                    onClick={() => setSelectedItem(null)}
+                    className="absolute top-4 right-4 z-10 p-2.5 rounded-full bg-white/20 backdrop-blur-md hover:bg-white/30 text-white transition-all duration-200 hover:scale-105">
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+
+                {/* Floating Elements - Outside hero for proper visibility */}
+                <div className="relative">
+                  {/* Floating Poster */}
+                  <div className="absolute -top-16 left-6">
+                    {selectedItem.imageUrl ? (
+                      <img
+                        src={selectedItem.imageUrl}
+                        alt={selectedItem.title}
+                        className="w-28 h-40 object-cover rounded-2xl shadow-2xl ring-4 ring-white dark:ring-gray-900"
+                      />
+                    ) : (
+                      <div className="w-28 h-40 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-2xl shadow-2xl ring-4 ring-white dark:ring-gray-900 flex items-center justify-center">
+                        <ModalTypeIcon
+                          className={clsx(
+                            "h-12 w-12 opacity-50",
+                            modalTypeColor
+                          )}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Rating Badge - Compact */}
+                  {selectedItem.rating && (
+                    <div className="absolute -top-4 right-6 flex flex-col items-center">
+                      <div className="flex items-center gap-1.5 bg-amber-500 rounded-full shadow-lg px-3 py-1.5">
+                        <Star className="h-4 w-4 fill-white text-white" />
+                        <span className="text-sm font-bold text-white">
+                          {selectedItem.rating.toFixed(1)}
+                        </span>
+                      </div>
+                      <span className="text-xs font-medium text-gray-600 dark:text-gray-400 mt-1">
+                        {
+                          getRatingLabel(
+                            selectedItem.rating,
+                            locale as "id" | "en"
+                          ).label
+                        }
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Content */}
+                <div className="pt-6 pb-6 px-6">
+                  {/* Title & Meta - with left padding to avoid poster overlap */}
+                  <div className="mb-5 pl-36">
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 leading-tight">
+                      {selectedItem.title}
+                    </h2>
+                    <div className="flex items-center flex-wrap gap-2">
+                      {/* Type Badge */}
+                      <span
+                        className={clsx(
+                          "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800",
+                          modalTypeColor
+                        )}>
+                        <ModalTypeIcon className="h-3.5 w-3.5" />
+                        {selectedItem.type}
+                      </span>
+                      {/* Year */}
+                      {selectedItem.year && (
+                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
+                          {selectedItem.year}
+                        </span>
+                      )}
+                      {/* Status */}
+                      <span
+                        className={clsx(
+                          "px-3 py-1 rounded-full text-xs font-medium",
+                          modalStatus.bgColor,
+                          modalStatus.color
+                        )}>
+                        {modalStatus.label}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Spacer for poster height */}
+                  <div className="h-14" />
+
+                  {/* Info Cards */}
                   {(selectedItem.genre || selectedItem.totalEpisode) && (
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="flex gap-3 mb-5">
                       {selectedItem.genre && (
-                        <div className="flex items-start gap-2">
-                          <Tag className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
-                          <div>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Genre
-                            </p>
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">
-                              {selectedItem.genre}
-                            </p>
-                          </div>
+                        <div className="flex-1 p-3 rounded-xl bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+                          <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">
+                            Genre
+                          </p>
+                          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 line-clamp-2">
+                            {selectedItem.genre}
+                          </p>
                         </div>
                       )}
                       {selectedItem.totalEpisode && (
-                        <div className="flex items-start gap-2">
-                          <Hash className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
-                          <div>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Episodes
-                            </p>
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">
-                              {selectedItem.totalEpisode}
-                            </p>
-                          </div>
+                        <div className="p-3 rounded-xl bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 min-w-[80px]">
+                          <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-1">
+                            Episodes
+                          </p>
+                          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {selectedItem.totalEpisode}
+                          </p>
                         </div>
                       )}
                     </div>
                   )}
 
-                  {/* Notes/Review */}
-                  <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                  {/* Review Section */}
+                  <div className="pt-4 border-t border-gray-100 dark:border-gray-800">
                     <div className="flex items-center gap-2 mb-3">
-                      <MessageSquare className="h-4 w-4 text-gray-400" />
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        My Review
-                      </span>
+                      <div className="w-1 h-4 rounded-full bg-gradient-to-b from-blue-500 to-purple-500" />
+                      <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        {locale === "id" ? "Review Saya" : "My Review"}
+                      </p>
                     </div>
-                    <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
-                      {selectedItem.notes ? (
-                        <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
-                          {selectedItem.notes}
+                    {localizedNotes ? (
+                      <div className="p-4 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100/50 dark:from-gray-800/50 dark:to-gray-800/30">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-wrap">
+                          {localizedNotes}
                         </p>
-                      ) : (
-                        <p className="text-sm text-gray-400 dark:text-gray-500 italic text-center py-2">
-                          No review written for this title
+                      </div>
+                    ) : (
+                      <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/30 text-center">
+                        <p className="text-sm text-gray-400 dark:text-gray-600 italic">
+                          {locale === "id"
+                            ? "Belum ada review untuk judul ini"
+                            : "No review written for this title"}
                         </p>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

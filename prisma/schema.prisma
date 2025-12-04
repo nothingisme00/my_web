@@ -43,9 +43,9 @@ model Post {
   publishedAt     DateTime?
   archivedAt      DateTime?
   metaKeywords    String?
+  tags            String?   // Comma-separated tags (e.g., "tech, programming, web")
   categoryId      String?
   category        Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  tags            Tag[]     @relation("PostTags")
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -96,17 +96,6 @@ model Category {
   @@index([slug])
 }
 
-model Tag {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  slug      String   @unique
-  posts     Post[]   @relation("PostTags")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([slug])
-}
-
 model Media {
   id           String   @id @default(cuid())
   filename     String
@@ -134,7 +123,8 @@ model Watchlist {
   totalEpisode Int?
   status       String    @default("Completed") // Watching, Completed, Dropped, On Hold, Plan to Watch
   rating       Float?    // 1-10
-  notes        String?   @db.Text
+  notesId      String?   @db.Text // Review in Indonesian (primary input)
+  notesEn      String?   @db.Text // Review in English (auto-translated)
   imageUrl     String?
   year         Int?
   completedAt  DateTime?

@@ -24,7 +24,7 @@ export const PostSchema = z.object({
   published: z.boolean().default(false),
   status: z.enum(["draft", "published", "archived"]).default("draft"),
   categoryId: z.string().optional().or(z.literal("")),
-  tagIds: z.array(z.string()).optional(),
+  tags: z.string().optional(), // Comma-separated tags
   metaDescription: z.string().max(160, "Meta description too long").optional(),
   metaKeywords: z.string().optional(),
 });
@@ -66,20 +66,6 @@ export const CategorySchema = z.object({
       "Slug must contain only lowercase letters, numbers, and hyphens"
     ),
   description: z.string().max(200, "Description too long").optional(),
-});
-
-// Tag Schemas
-export const TagSchema = z.object({
-  name: z
-    .string()
-    .min(2, "Name must be at least 2 characters")
-    .max(30, "Name too long"),
-  slug: z
-    .string()
-    .regex(
-      /^[a-z0-9-]+$/,
-      "Slug must contain only lowercase letters, numbers, and hyphens"
-    ),
 });
 
 // Settings Schema

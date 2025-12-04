@@ -8,6 +8,7 @@ interface AccordionProps {
   trigger: ReactNode;
   children: ReactNode;
   defaultOpen?: boolean;
+  isOpen?: boolean; // Controlled mode
   helperText?: string;
   meta?: ReactNode;
   headerClassName?: string;
@@ -18,17 +19,22 @@ export function Accordion({
   trigger,
   children,
   defaultOpen = false,
+  isOpen: controlledIsOpen,
   helperText,
   meta,
   headerClassName,
   onToggle,
 }: AccordionProps) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const isControlled = controlledIsOpen !== undefined;
+  const [internalIsOpen, setInternalIsOpen] = useState(defaultOpen);
+  const isOpen = isControlled ? controlledIsOpen : internalIsOpen;
   const [isAnimating, setIsAnimating] = useState(false);
 
   const handleToggle = () => {
     const newState = !isOpen;
-    setIsOpen(newState);
+    if (!isControlled) {
+      setInternalIsOpen(newState);
+    }
     onToggle?.(newState);
   };
 
@@ -54,7 +60,7 @@ export function Accordion({
           <motion.div
             animate={{ rotate: isOpen ? 180 : 0 }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
-            className="flex-shrink-0 p-1 rounded-full bg-gray-100 dark:bg-gray-800 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 transition-colors">
+            className="shrink-0 p-1 rounded-full bg-gray-100 dark:bg-gray-800 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 transition-colors">
             <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
           </motion.div>
         </div>

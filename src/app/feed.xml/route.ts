@@ -12,7 +12,6 @@ export async function GET() {
       take: 20,
       include: {
         category: true,
-        tags: true,
       },
     });
 
@@ -70,9 +69,14 @@ ${posts
           ? `<category>${escapeXml(post.category.name)}</category>`
           : ""
       }
-      ${post.tags
-        .map((tag) => `<category>${escapeXml(tag.name)}</category>`)
-        .join("\n      ")}
+      ${
+        post.tags
+          ? post.tags
+              .split(",")
+              .map((tag) => `<category>${escapeXml(tag.trim())}</category>`)
+              .join("\n      ")
+          : ""
+      }
       ${post.image ? `<enclosure url="${post.image}" type="image/jpeg" />` : ""}
     </item>`;
   })

@@ -8,12 +8,11 @@ import { NewsletterCTA } from "@/components/home/NewsletterCTA";
 type PostWithRelations = Prisma.PostGetPayload<{
   include: {
     category: true;
-    tags: true;
-  }
+  };
 }>;
 
 export default async function Home() {
-  const allPosts = await getFeaturedPosts(12) as PostWithRelations[];
+  const allPosts = (await getFeaturedPosts(12)) as PostWithRelations[];
 
   // First 3 posts for carousel, next 9 for article feed
   const featuredPosts = allPosts.slice(0, 3);
@@ -22,7 +21,9 @@ export default async function Home() {
   return (
     <div className="min-h-screen">
       {/* Featured Posts Carousel */}
-      {featuredPosts.length > 0 && <FeaturedPostsCarousel posts={featuredPosts} />}
+      {featuredPosts.length > 0 && (
+        <FeaturedPostsCarousel posts={featuredPosts} />
+      )}
 
       {/* Article Feed */}
       {recentPosts.length > 0 && <ArticleFeed posts={recentPosts} />}

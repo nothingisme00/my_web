@@ -14,9 +14,75 @@ import {
   Calendar,
   Film,
   Tag,
+  Languages,
 } from "lucide-react";
 import Link from "next/link";
 import { clsx } from "clsx";
+
+// Rating label system
+function getRatingLabel(
+  rating: number,
+  locale: "id" | "en" = "en"
+): { label: string; color: string; description: string } {
+  if (rating >= 9.0) {
+    return {
+      label: locale === "id" ? "Sempurna" : "Masterpiece",
+      color:
+        "text-amber-500 bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-700",
+      description:
+        locale === "id"
+          ? "Wajib tonton seumur hidup"
+          : "Must watch in a lifetime",
+    };
+  } else if (rating >= 8.4) {
+    return {
+      label: locale === "id" ? "Sangat Direkomendasikan" : "Highly Recommended",
+      color:
+        "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-700",
+      description:
+        locale === "id"
+          ? "Sangat bagus, hampir sempurna"
+          : "Excellent, nearly perfect",
+    };
+  } else if (rating >= 7.5) {
+    return {
+      label: locale === "id" ? "Sangat Bagus" : "Very Good",
+      color:
+        "text-blue-600 bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700",
+      description:
+        locale === "id"
+          ? "Tontonan solid, memuaskan"
+          : "Solid watch, satisfying",
+    };
+  } else if (rating >= 6.0) {
+    return {
+      label: locale === "id" ? "Bagus" : "Good",
+      color:
+        "text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700",
+      description:
+        locale === "id"
+          ? "Layak ditonton, menghibur"
+          : "Worth watching, entertaining",
+    };
+  } else if (rating >= 4.0) {
+    return {
+      label: locale === "id" ? "Biasa Saja" : "Average",
+      color:
+        "text-gray-600 bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600",
+      description:
+        locale === "id"
+          ? "Tidak jelek, tapi tidak spesial"
+          : "Not bad, but not special",
+    };
+  } else {
+    return {
+      label: locale === "id" ? "Kurang" : "Poor",
+      color:
+        "text-red-600 bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-700",
+      description: locale === "id" ? "Skip saja" : "Skip it",
+    };
+  }
+}
 
 interface WatchlistFormData {
   title: string;
@@ -25,7 +91,8 @@ interface WatchlistFormData {
   totalEpisode: string;
   status: string;
   rating: string;
-  notes: string;
+  notesId: string;
+  notesEn: string;
   imageUrl: string;
   year: string;
 }
@@ -50,6 +117,7 @@ export function WatchlistForm({
 }: WatchlistFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
   const [hoveredRating, setHoveredRating] = useState<number | null>(null);
   const [formData, setFormData] = useState<WatchlistFormData>({
     title: initialData?.title || "",
@@ -58,10 +126,35 @@ export function WatchlistForm({
     totalEpisode: initialData?.totalEpisode || "",
     status: initialData?.status || "Completed",
     rating: initialData?.rating || "",
-    notes: initialData?.notes || "",
+    notesId: initialData?.notesId || "",
+    notesEn: initialData?.notesEn || "",
     imageUrl: initialData?.imageUrl || "",
     year: initialData?.year || "",
   });
+
+  // Auto-translate Indonesian to English
+  async function translateToEnglish(text: string) {
+    if (!text.trim()) return;
+
+    setIsTranslating(true);
+    try {
+      const res = await fetch("/api/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ text }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.translatedText) {
+        setFormData((prev) => ({ ...prev, notesEn: data.translatedText }));
+      }
+    } catch (error) {
+      console.error("Translation failed:", error);
+    } finally {
+      setIsTranslating(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -219,19 +312,19 @@ export function WatchlistForm({
               }))}
             />
 
-            {/* Rating */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Rating
+            {/* Rating with Slider */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                Rating <span className="text-red-500">*</span>
               </label>
-              <div className="flex items-center gap-3">
+
+              {/* Star Display */}
+              <div className="flex items-center gap-4 mb-3">
                 <div className="flex gap-0.5">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
                     <button
                       key={value}
                       type="button"
-                      onMouseEnter={() => setHoveredRating(value)}
-                      onMouseLeave={() => setHoveredRating(null)}
                       onClick={() =>
                         setFormData({ ...formData, rating: value.toString() })
                       }
@@ -241,41 +334,129 @@ export function WatchlistForm({
                           "h-5 w-5 transition-colors",
                           value <= displayRating
                             ? "fill-amber-400 text-amber-400"
+                            : value - 0.5 <= displayRating
+                            ? "fill-amber-400/50 text-amber-400"
                             : "text-gray-300 dark:text-gray-600"
                         )}
                       />
                     </button>
                   ))}
                 </div>
-                <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                  {displayRating > 0 ? `${displayRating}/10` : "-"}
+                <span className="text-lg font-bold text-gray-900 dark:text-white min-w-[3rem]">
+                  {displayRating > 0 ? displayRating.toFixed(1) : "-"}
                 </span>
-                {currentRating > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, rating: "" })}
-                    className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                    Clear
-                  </button>
-                )}
               </div>
+
+              {/* Rating Slider */}
+              <div className="space-y-2">
+                <input
+                  type="range"
+                  min="0"
+                  max="10"
+                  step="0.1"
+                  value={formData.rating || 0}
+                  onChange={(e) =>
+                    setFormData({ ...formData, rating: e.target.value })
+                  }
+                  onMouseEnter={() =>
+                    setHoveredRating(parseFloat(formData.rating) || null)
+                  }
+                  onMouseLeave={() => setHoveredRating(null)}
+                  className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                />
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                  <span>0</span>
+                  <span>2</span>
+                  <span>4</span>
+                  <span>6</span>
+                  <span>8</span>
+                  <span>10</span>
+                </div>
+              </div>
+
+              {/* Rating Label Badge */}
+              {displayRating > 0 && (
+                <div className="mt-3 flex items-center gap-3">
+                  <span
+                    className={clsx(
+                      "inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold border",
+                      getRatingLabel(displayRating, "en").color
+                    )}>
+                    {getRatingLabel(displayRating, "en").label}
+                  </span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {getRatingLabel(displayRating, "en").description}
+                  </span>
+                </div>
+              )}
+
+              {/* Clear button */}
+              {currentRating > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, rating: "" })}
+                  className="mt-2 text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 underline">
+                  Clear rating
+                </button>
+              )}
+
+              <input
+                type="hidden"
+                name="rating"
+                value={formData.rating}
+                required
+              />
             </div>
           </div>
 
-          {/* Notes */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Notes (optional)
-            </label>
-            <textarea
-              value={formData.notes}
-              onChange={(e) =>
-                setFormData({ ...formData, notes: e.target.value })
-              }
-              rows={4}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-              placeholder="Your thoughts or review..."
-            />
+          {/* Notes - Bilingual */}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Review (ID) <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={formData.notesId}
+                onChange={(e) =>
+                  setFormData({ ...formData, notesId: e.target.value })
+                }
+                onBlur={() => {
+                  if (formData.notesId && formData.notesId.trim()) {
+                    translateToEnglish(formData.notesId);
+                  }
+                }}
+                rows={3}
+                required
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                placeholder="Tulis review dalam Bahasa Indonesia..."
+              />
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Akan otomatis diterjemahkan ke Inggris
+              </p>
+            </div>
+
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Review (EN)
+                </label>
+                {isTranslating && (
+                  <span className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
+                    <Languages className="h-3 w-3 animate-pulse" />
+                    Translating...
+                  </span>
+                )}
+              </div>
+              <textarea
+                value={formData.notesEn}
+                onChange={(e) =>
+                  setFormData({ ...formData, notesEn: e.target.value })
+                }
+                rows={3}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                placeholder="Automatically translated from Indonesian..."
+              />
+            </div>
           </div>
         </div>
 

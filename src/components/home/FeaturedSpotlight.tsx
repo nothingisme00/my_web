@@ -1,14 +1,13 @@
-import Link from 'next/link';
-import Image from 'next/image';
-import { Calendar, Clock, Eye, ArrowRight } from 'lucide-react';
-import { formatDate, formatViewCount } from '@/lib/utils';
-import type { Prisma } from '@prisma/client';
+import Link from "next/link";
+import Image from "next/image";
+import { Calendar, Clock, Eye, ArrowRight } from "lucide-react";
+import { formatDate, formatViewCount } from "@/lib/utils";
+import type { Prisma } from "@prisma/client";
 
 type PostWithRelations = Prisma.PostGetPayload<{
   include: {
     category: true;
-    tags: true;
-  }
+  };
 }>;
 
 interface FeaturedSpotlightProps {
@@ -29,10 +28,7 @@ export function FeaturedSpotlight({ post }: FeaturedSpotlightProps) {
           </span>
         </div>
 
-        <Link
-          href={`/blog/${post.slug}`}
-          className="group block"
-        >
+        <Link href={`/blog/${post.slug}`} className="group block">
           <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-2xl transition-all duration-300">
             <div className="grid md:grid-cols-2 gap-0">
               {/* Image Side */}
@@ -70,14 +66,16 @@ export function FeaturedSpotlight({ post }: FeaturedSpotlightProps) {
                 </h2>
 
                 <p className="text-lg text-gray-600 dark:text-gray-400 mb-6 line-clamp-3">
-                  {post.excerpt || post.content.substring(0, 150) + '...'}
+                  {post.excerpt || post.content.substring(0, 150) + "..."}
                 </p>
 
                 {/* Meta Info */}
                 <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-500 mb-6">
                   <div className="flex items-center gap-1.5">
                     <Calendar className="w-4 h-4" />
-                    <span>{formatDate(post.publishedAt || post.createdAt)}</span>
+                    <span>
+                      {formatDate(post.publishedAt || post.createdAt)}
+                    </span>
                   </div>
 
                   <div className="flex items-center gap-1.5">

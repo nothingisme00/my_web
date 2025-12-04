@@ -9,6 +9,7 @@ interface AccordionSectionProps {
   title: string;
   subtitle?: string;
   defaultOpen?: boolean;
+  isOpen?: boolean; // Controlled mode
   itemCount?: number;
   color?: ColorScheme;
   onToggle?: (isOpen: boolean) => void;
@@ -67,6 +68,7 @@ export function AccordionSection({
   title,
   subtitle,
   defaultOpen = false,
+  isOpen,
   itemCount,
   color = "blue",
   onToggle,
@@ -102,10 +104,13 @@ export function AccordionSection({
 
   return (
     <div
-      className={`bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 ${styles.hoverBorder} overflow-hidden`}>
+      className={`relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 ${
+        styles.hoverBorder
+      } ${isOpen ? "z-20" : "z-0"}`}>
       <Accordion
         trigger={trigger}
         defaultOpen={defaultOpen}
+        isOpen={isOpen}
         headerClassName={headerBg}
         onToggle={onToggle}>
         <div className="px-6 pb-6 pt-4 bg-white dark:bg-slate-900">

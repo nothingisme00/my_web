@@ -20,6 +20,7 @@ import {
   X,
   Heart,
   Loader2,
+  Languages,
 } from "lucide-react";
 
 interface Experience {
@@ -54,20 +55,21 @@ interface Education {
   description: string;
   gpa?: string;
   thesis?: string;
-  achievements?: string;
-  activities?: string;
   locationUrl?: string;
 }
 
 interface AboutData {
   name: string;
   title: string;
+  titleEn?: string;
   tagline: string;
+  taglineEn?: string;
   profileImage: string;
   location: string;
   email: string;
   website: string;
   bio: string;
+  bioEn?: string;
   cvUrl: string;
   portfolioUrl: string;
   techStack: string;
@@ -81,12 +83,15 @@ interface AboutData {
 const defaultData: AboutData = {
   name: "",
   title: "",
+  titleEn: "",
   tagline: "",
+  taglineEn: "",
   profileImage: "",
   location: "",
   email: "",
   website: "",
   bio: "",
+  bioEn: "",
   cvUrl: "",
   portfolioUrl: "",
   techStack: "",
@@ -103,6 +108,10 @@ export default function AdminAboutPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [openSection, setOpenSection] = useState<string | null>("profile");
+  const [translatingIds, setTranslatingIds] = useState<Record<string, boolean>>(
+    {}
+  );
 
   useEffect(() => {
     fetch("/api/about")
@@ -223,6 +232,72 @@ export default function AdminAboutPage() {
 
   function removeImage() {
     setData((prev) => ({ ...prev, profileImage: "" }));
+  }
+
+  // Auto-translate field to English
+  async function translateField(
+    field: "title" | "tagline" | "bio",
+    text: string
+  ) {
+    if (!text.trim()) return;
+
+    const trackingId = `field-${field}`;
+    setTranslatingIds((prev) => ({ ...prev, [trackingId]: true }));
+
+    try {
+      const res = await fetch("/api/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ text }),
+      });
+
+      const result = await res.json();
+
+      if (res.ok && result.translatedText) {
+        const enField = `${field}En` as "titleEn" | "taglineEn" | "bioEn";
+        setData((prev) => ({ ...prev, [enField]: result.translatedText }));
+      }
+    } catch (error) {
+      console.error("Translation failed:", error);
+    } finally {
+      setTranslatingIds((prev) => ({ ...prev, [trackingId]: false }));
+    }
+  }
+
+  // Auto-translate Indonesian to English
+  async function translateToEnglish(
+    id: string,
+    text: string,
+    type: "experience" | "volunteer"
+  ) {
+    if (!text.trim()) return;
+
+    const trackingId = type === "experience" ? `exp-${id}` : `vol-${id}`;
+    setTranslatingIds((prev) => ({ ...prev, [trackingId]: true }));
+
+    try {
+      const res = await fetch("/api/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ text }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.translatedText) {
+        if (type === "experience") {
+          updateExperience(id, "descriptionEn", data.translatedText);
+        } else {
+          updateVolunteer(id, "descriptionEn", data.translatedText);
+        }
+      }
+    } catch (error) {
+      console.error("Translation failed:", error);
+    } finally {
+      setTranslatingIds((prev) => ({ ...prev, [trackingId]: false }));
+    }
   }
 
   const months = [
@@ -391,7 +466,8 @@ export default function AdminAboutPage() {
           title="Profile Information"
           subtitle="Basic details and bio"
           color="blue"
-          defaultOpen={true}>
+          isOpen={openSection === "profile"}
+          onToggle={(open) => setOpenSection(open ? "profile" : null)}>
           <div className="space-y-6">
             {/* Profile Photo */}
             <div>
@@ -476,19 +552,62 @@ export default function AdminAboutPage() {
                 onChange={(e) =>
                   setData((prev) => ({ ...prev, title: e.target.value }))
                 }
-                placeholder="Learning Enthusiast"
+                placeholder="Enthusiast & Writer"
               />
             </div>
 
-            <Input
-              label="Tagline"
-              value={data.tagline}
-              onChange={(e) =>
-                setData((prev) => ({ ...prev, tagline: e.target.value }))
-              }
-              placeholder="Crafting digital experiences with passion..."
-              helperText="This text will appear under the 'About Me' header"
-            />
+            {/* Tagline - Bilingual */}
+            <div className="space-y-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+              <div className="flex items-center gap-2 mb-2">
+                <Languages className="h-4 w-4 text-blue-500" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Tagline (Bilingual)
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                <div>
+                  <Input
+                    label="Tagline (ID)"
+                    value={data.tagline}
+                    onChange={(e) =>
+                      setData((prev) => ({ ...prev, tagline: e.target.value }))
+                    }
+                    onBlur={() => {
+                      if (data.tagline && data.tagline.trim()) {
+                        translateField("tagline", data.tagline);
+                      }
+                    }}
+                    placeholder="Mendokumentasikan perjalanan belajar saya..."
+                  />
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Akan otomatis diterjemahkan ke Inggris
+                  </p>
+                </div>
+                <div>
+                  <Input
+                    label={
+                      <span className="flex items-center gap-2">
+                        Tagline (EN)
+                        {translatingIds["field-tagline"] && (
+                          <span className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
+                            <Languages className="h-3 w-3 animate-pulse" />
+                            Menerjemahkan...
+                          </span>
+                        )}
+                      </span>
+                    }
+                    value={data.taglineEn || ""}
+                    onChange={(e) =>
+                      setData((prev) => ({
+                        ...prev,
+                        taglineEn: e.target.value,
+                      }))
+                    }
+                    placeholder="Documenting my learning journey..."
+                  />
+                </div>
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
@@ -536,19 +655,60 @@ export default function AdminAboutPage() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Bio
-              </label>
-              <textarea
-                value={data.bio}
-                onChange={(e) =>
-                  setData((prev) => ({ ...prev, bio: e.target.value }))
-                }
-                rows={4}
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Write about yourself..."
-              />
+            {/* Bio - Bilingual */}
+            <div className="space-y-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+              <div className="flex items-center gap-2 mb-2">
+                <Languages className="h-4 w-4 text-blue-500" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Bio (Bilingual)
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Bio (ID)
+                  </label>
+                  <textarea
+                    value={data.bio}
+                    onChange={(e) =>
+                      setData((prev) => ({ ...prev, bio: e.target.value }))
+                    }
+                    onBlur={() => {
+                      if (data.bio && data.bio.trim()) {
+                        translateField("bio", data.bio);
+                      }
+                    }}
+                    rows={4}
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Tulis tentang diri Anda..."
+                  />
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Akan otomatis diterjemahkan ke Inggris
+                  </p>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Bio (EN)
+                    </label>
+                    {translatingIds["field-bio"] && (
+                      <span className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
+                        <Languages className="h-3 w-3 animate-pulse" />
+                        Menerjemahkan...
+                      </span>
+                    )}
+                  </div>
+                  <textarea
+                    value={data.bioEn || ""}
+                    onChange={(e) =>
+                      setData((prev) => ({ ...prev, bioEn: e.target.value }))
+                    }
+                    rows={4}
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Write about yourself..."
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </AccordionSection>
@@ -559,7 +719,8 @@ export default function AdminAboutPage() {
           title="Tech Stack"
           subtitle="Technologies you work with"
           color="violet"
-          defaultOpen={false}>
+          isOpen={openSection === "techstack"}
+          onToggle={(open) => setOpenSection(open ? "techstack" : null)}>
           <TechStackInput
             label="Technologies"
             value={data.techStack}
@@ -577,7 +738,8 @@ export default function AdminAboutPage() {
           title="Tools & Software"
           subtitle="Development and design tools"
           color="violet"
-          defaultOpen={false}>
+          isOpen={openSection === "tools"}
+          onToggle={(open) => setOpenSection(open ? "tools" : null)}>
           <TechStackInput
             label="Tools"
             value={data.tools}
@@ -593,7 +755,8 @@ export default function AdminAboutPage() {
           title="Hobbies & Interests"
           subtitle="What you enjoy doing"
           color="rose"
-          defaultOpen={false}>
+          isOpen={openSection === "hobbies"}
+          onToggle={(open) => setOpenSection(open ? "hobbies" : null)}>
           <Input
             label="Hobbies"
             value={data.hobbies}
@@ -611,7 +774,8 @@ export default function AdminAboutPage() {
           title="Work Experience"
           subtitle="Your professional journey"
           color="amber"
-          defaultOpen={false}
+          isOpen={openSection === "experience"}
+          onToggle={(open) => setOpenSection(open ? "experience" : null)}
           itemCount={data.experiences.length}>
           <div className="space-y-4">
             <div className="flex justify-end">
@@ -649,6 +813,7 @@ export default function AdminAboutPage() {
                       updateExperience(exp.id, "title", e.target.value)
                     }
                     placeholder="Senior Developer"
+                    required
                   />
                   <Input
                     label="Company"
@@ -657,26 +822,35 @@ export default function AdminAboutPage() {
                       updateExperience(exp.id, "company", e.target.value)
                     }
                     placeholder="Tech Company"
+                    required
                   />
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <SelectCompact
-                    label="Start Month"
-                    value={exp.startMonth}
-                    onChange={(value) =>
-                      updateExperience(exp.id, "startMonth", value)
-                    }
-                    options={months}
-                  />
-                  <SelectCompact
-                    label="Year"
-                    value={exp.startYear}
-                    onChange={(value) =>
-                      updateExperience(exp.id, "startYear", value)
-                    }
-                    options={years}
-                  />
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Start Month <span className="text-red-500">*</span>
+                    </label>
+                    <SelectCompact
+                      value={exp.startMonth}
+                      onChange={(value) =>
+                        updateExperience(exp.id, "startMonth", value)
+                      }
+                      options={months}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Year <span className="text-red-500">*</span>
+                    </label>
+                    <SelectCompact
+                      value={exp.startYear}
+                      onChange={(value) =>
+                        updateExperience(exp.id, "startYear", value)
+                      }
+                      options={years}
+                    />
+                  </div>
                   <SelectCompact
                     label="End Month"
                     value={exp.endMonth}
@@ -711,28 +885,11 @@ export default function AdminAboutPage() {
                   </span>
                 </label>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Description Input */}
+                <div className="space-y-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Description (EN)
-                    </label>
-                    <textarea
-                      value={exp.descriptionEn}
-                      onChange={(e) =>
-                        updateExperience(
-                          exp.id,
-                          "descriptionEn",
-                          e.target.value
-                        )
-                      }
-                      rows={3}
-                      className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Describe your responsibilities..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Deskripsi (ID)
+                      Deskripsi (ID) <span className="text-red-500">*</span>
                     </label>
                     <textarea
                       value={exp.descriptionId}
@@ -743,9 +900,48 @@ export default function AdminAboutPage() {
                           e.target.value
                         )
                       }
+                      onBlur={() => {
+                        if (exp.descriptionId && exp.descriptionId.trim()) {
+                          translateToEnglish(
+                            exp.id,
+                            exp.descriptionId,
+                            "experience"
+                          );
+                        }
+                      }}
                       rows={3}
+                      required
                       className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Jelaskan tanggung jawab Anda..."
+                    />
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      Akan otomatis diterjemahkan ke Inggris
+                    </p>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Description (EN)
+                      </label>
+                      {translatingIds[`exp-${exp.id}`] && (
+                        <span className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
+                          <Languages className="h-3 w-3 animate-pulse" />
+                          Menerjemahkan...
+                        </span>
+                      )}
+                    </div>
+                    <textarea
+                      value={exp.descriptionEn}
+                      onChange={(e) =>
+                        updateExperience(
+                          exp.id,
+                          "descriptionEn",
+                          e.target.value
+                        )
+                      }
+                      rows={3}
+                      className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Automatically translated from Indonesian..."
                     />
                   </div>
                 </div>
@@ -768,7 +964,8 @@ export default function AdminAboutPage() {
           title="Volunteering & Organization"
           subtitle="Community involvement and activities"
           color="rose"
-          defaultOpen={false}
+          isOpen={openSection === "volunteering"}
+          onToggle={(open) => setOpenSection(open ? "volunteering" : null)}
           itemCount={data.volunteering.length}>
           <div className="space-y-4">
             <div className="flex justify-end">
@@ -806,6 +1003,7 @@ export default function AdminAboutPage() {
                       updateVolunteer(vol.id, "role", e.target.value)
                     }
                     placeholder="Member"
+                    required
                   />
                   <Input
                     label="Organization"
@@ -814,6 +1012,7 @@ export default function AdminAboutPage() {
                       updateVolunteer(vol.id, "organization", e.target.value)
                     }
                     placeholder="Org Name"
+                    required
                   />
                   <Input
                     label="Period"
@@ -822,34 +1021,59 @@ export default function AdminAboutPage() {
                       updateVolunteer(vol.id, "period", e.target.value)
                     }
                     placeholder="2024"
+                    required
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Description Input */}
+                <div className="space-y-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Description (EN)
-                    </label>
-                    <textarea
-                      value={vol.descriptionEn}
-                      onChange={(e) =>
-                        updateVolunteer(vol.id, "descriptionEn", e.target.value)
-                      }
-                      rows={2}
-                      className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Deskripsi (ID)
+                      Deskripsi (ID) <span className="text-red-500">*</span>
                     </label>
                     <textarea
                       value={vol.descriptionId}
                       onChange={(e) =>
                         updateVolunteer(vol.id, "descriptionId", e.target.value)
                       }
+                      onBlur={() => {
+                        if (vol.descriptionId && vol.descriptionId.trim()) {
+                          translateToEnglish(
+                            vol.id,
+                            vol.descriptionId,
+                            "volunteer"
+                          );
+                        }
+                      }}
                       rows={2}
+                      required
                       className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Jelaskan aktivitas Anda..."
+                    />
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      Akan otomatis diterjemahkan ke Inggris
+                    </p>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Description (EN)
+                      </label>
+                      {translatingIds[`vol-${vol.id}`] && (
+                        <span className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
+                          <Languages className="h-3 w-3 animate-pulse" />
+                          Menerjemahkan...
+                        </span>
+                      )}
+                    </div>
+                    <textarea
+                      value={vol.descriptionEn}
+                      onChange={(e) =>
+                        updateVolunteer(vol.id, "descriptionEn", e.target.value)
+                      }
+                      rows={2}
+                      className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Automatically translated from Indonesian..."
                     />
                   </div>
                 </div>
@@ -872,7 +1096,8 @@ export default function AdminAboutPage() {
           title="Education"
           subtitle="Academic background and qualifications"
           color="emerald"
-          defaultOpen={false}
+          isOpen={openSection === "education"}
+          onToggle={(open) => setOpenSection(open ? "education" : null)}
           itemCount={data.educations.length}>
           <div className="space-y-4">
             <div className="flex justify-end">
@@ -910,6 +1135,7 @@ export default function AdminAboutPage() {
                       updateEducation(edu.id, "institution", e.target.value)
                     }
                     placeholder="University Name"
+                    required
                   />
                   <Input
                     label="Degree"
@@ -918,6 +1144,7 @@ export default function AdminAboutPage() {
                       updateEducation(edu.id, "degree", e.target.value)
                     }
                     placeholder="Bachelor of Computer Science"
+                    required
                   />
                   <Input
                     label="GPA/IPK"
@@ -926,17 +1153,19 @@ export default function AdminAboutPage() {
                       updateEducation(edu.id, "gpa", e.target.value)
                     }
                     placeholder="3.85/4.00"
+                    required
                   />
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Start Year
+                        Start Year <span className="text-red-500">*</span>
                       </label>
                       <select
                         value={edu.startYear || ""}
                         onChange={(e) =>
                           updateEducation(edu.id, "startYear", e.target.value)
                         }
+                        required
                         className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         <option value="">Select</option>
                         {Array.from(
@@ -951,13 +1180,14 @@ export default function AdminAboutPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        End Year
+                        End Year <span className="text-red-500">*</span>
                       </label>
                       <select
                         value={edu.endYear || ""}
                         onChange={(e) =>
                           updateEducation(edu.id, "endYear", e.target.value)
                         }
+                        required
                         className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         <option value="">Present</option>
                         {Array.from(
@@ -980,60 +1210,41 @@ export default function AdminAboutPage() {
                     updateEducation(edu.id, "thesis", e.target.value)
                   }
                   placeholder="Title of your thesis or final project"
-                />
-
-                <Input
-                  label="Location URL (Google Maps)"
-                  value={edu.locationUrl || ""}
-                  onChange={(e) =>
-                    updateEducation(edu.id, "locationUrl", e.target.value)
-                  }
-                  placeholder="https://maps.google.com/..."
+                  required
                 />
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Achievements (Cum Laude, Dean&apos;s List, etc.)
+                    Location URL <span className="text-red-500">*</span>
                   </label>
-                  <textarea
-                    value={edu.achievements || ""}
-                    onChange={(e) =>
-                      updateEducation(edu.id, "achievements", e.target.value)
-                    }
-                    rows={2}
-                    placeholder="List your academic achievements..."
-                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Activities (Competitions, Organizations)
-                  </label>
-                  <textarea
-                    value={edu.activities || ""}
-                    onChange={(e) =>
-                      updateEducation(edu.id, "activities", e.target.value)
-                    }
-                    rows={2}
-                    placeholder="Competition wins, club memberships, etc."
-                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Description
-                  </label>
-                  <textarea
-                    value={edu.description}
-                    onChange={(e) =>
-                      updateEducation(edu.id, "description", e.target.value)
-                    }
-                    rows={2}
-                    placeholder="Additional notes about your education..."
-                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
+                  <div className="flex items-center gap-2">
+                    <div className="flex-shrink-0">
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="h-5 w-5"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
+                          fill="#EA4335"
+                        />
+                        <circle cx="12" cy="9" r="2.5" fill="#fff" />
+                      </svg>
+                    </div>
+                    <input
+                      type="url"
+                      value={edu.locationUrl || ""}
+                      onChange={(e) =>
+                        updateEducation(edu.id, "locationUrl", e.target.value)
+                      }
+                      placeholder="https://maps.google.com/..."
+                      required
+                      className="flex-1 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Paste Google Maps URL for the institution location
+                  </p>
                 </div>
               </div>
             ))}

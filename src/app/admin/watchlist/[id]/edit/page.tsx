@@ -25,7 +25,8 @@ export default async function EditWatchlistPage({ params }: Props) {
     totalEpisode: item.totalEpisode?.toString() || "",
     status: item.status,
     rating: item.rating?.toString() || "",
-    notes: item.notes || "",
+    notesId: item.notesId || "",
+    notesEn: item.notesEn || "",
     imageUrl: item.imageUrl || "",
     year: item.year?.toString() || "",
   };

@@ -17,7 +17,6 @@ import {
   Wrench,
   ExternalLink,
   ChevronDown,
-  MapPin,
 } from "lucide-react";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { getToolIcon } from "@/lib/tool-icons";
@@ -108,20 +107,21 @@ interface Education {
   description: string;
   gpa?: string;
   thesis?: string;
-  achievements?: string;
-  activities?: string;
   locationUrl?: string;
 }
 
 interface AboutData {
   name: string;
   title: string;
+  titleEn?: string;
   tagline: string;
+  taglineEn?: string;
   profileImage: string;
   location: string;
   email: string;
   website: string;
   bio: string;
+  bioEn?: string;
   cvUrl: string;
   portfolioUrl: string;
   techStack: string;
@@ -163,7 +163,7 @@ function InfoCard({
   return (
     <div
       className={clsx(
-        "bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col",
+        "bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col h-full",
         className
       )}>
       {/* Card Header */}
@@ -184,12 +184,13 @@ function InfoCard({
 // Icon Badge for Tech Stack & Tools - Icon only without frame
 function IconBadge({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
-    <div className="group relative inline-flex items-center justify-center p-1.5 hover:scale-110 transition-transform duration-300">
+    <div className="group relative inline-flex items-center justify-center p-1.5 hover:scale-110 transition-transform duration-300 z-0 hover:z-50">
       <div className="grayscale group-hover:grayscale-0 opacity-70 group-hover:opacity-100 transition-all duration-500 ease-out">
         {icon}
       </div>
-      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 pointer-events-none z-10">
+      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 pointer-events-none z-[100] shadow-lg">
         {label}
+        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
       </div>
     </div>
   );
@@ -210,7 +211,7 @@ function ExperienceCard({ experiences, t, locale }: ExperienceCardProps) {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col md:col-span-3">
+    <div className="md:col-span-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col h-full">
       {/* Card Header */}
       <div className="p-4 border-b border-gray-100 dark:border-gray-700">
         <div className="flex items-center gap-3">
@@ -327,7 +328,7 @@ function EducationCard({ educations, t }: EducationCardProps) {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col md:col-span-3">
+    <div className="md:col-span-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col h-full">
       {/* Card Header */}
       <div className="p-4 border-b border-gray-100 dark:border-gray-700">
         <div className="flex items-center gap-3">
@@ -344,12 +345,8 @@ function EducationCard({ educations, t }: EducationCardProps) {
         <div className="space-y-3">
           {educations.map((edu) => {
             const isExpanded = expandedId === edu.id;
-            // Check for expandable details (excluding GPA since it's shown outside)
-            const hasDetails =
-              edu.thesis ||
-              edu.achievements ||
-              edu.activities ||
-              edu.locationUrl;
+            // Check for expandable details
+            const hasDetails = edu.thesis || edu.locationUrl;
 
             // Format period from startYear and endYear, fallback to legacy period field
             const periodDisplay = edu.startYear
@@ -427,35 +424,31 @@ function EducationCard({ educations, t }: EducationCardProps) {
                               </p>
                             </div>
                           )}
-                          {edu.achievements && (
-                            <div>
-                              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                Achievements:
-                              </span>
-                              <p className="text-sm text-gray-700 dark:text-gray-300 mt-0.5 whitespace-pre-line">
-                                {edu.achievements}
-                              </p>
-                            </div>
-                          )}
-                          {edu.activities && (
-                            <div>
-                              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                Activities:
-                              </span>
-                              <p className="text-sm text-gray-700 dark:text-gray-300 mt-0.5 whitespace-pre-line">
-                                {edu.activities}
-                              </p>
-                            </div>
-                          )}
                           {edu.locationUrl && (
-                            <a
-                              href={edu.locationUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 text-sm text-orange-600 dark:text-orange-400 hover:underline mt-1">
-                              <MapPin className="h-4 w-4" />
-                              View Location
-                            </a>
+                            <div
+                              className={clsx(
+                                edu.thesis &&
+                                  "pt-2 mt-2 border-t border-gray-100 dark:border-gray-600"
+                              )}>
+                              <a
+                                href={edu.locationUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 text-sm text-orange-600 dark:text-orange-400 hover:underline">
+                                <svg
+                                  viewBox="0 0 24 24"
+                                  className="h-4 w-4"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg">
+                                  <path
+                                    d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
+                                    fill="#EA4335"
+                                  />
+                                  <circle cx="12" cy="9" r="2.5" fill="#fff" />
+                                </svg>
+                                View Location
+                              </a>
+                            </div>
                           )}
                         </div>
                       </motion.div>
@@ -486,7 +479,7 @@ function VolunteeringCard({ volunteering, t, locale }: VolunteeringCardProps) {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col md:col-span-3">
+    <div className="md:col-span-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col h-full">
       {/* Card Header */}
       <div className="p-4 border-b border-gray-100 dark:border-gray-700">
         <div className="flex items-center gap-3">
@@ -579,10 +572,20 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
 
   // Use aboutData or fallback to settings/defaults
   const name = aboutData?.name || settings?.owner_name || "Alfattah";
-  const title = aboutData?.title || "Learning Enthusiast";
-  const tagline = aboutData?.tagline || "";
+  // Bilingual support for title, tagline, bio
+  const title =
+    locale === "en" && aboutData?.titleEn
+      ? aboutData.titleEn
+      : aboutData?.title || "Learning Enthusiast";
+  const tagline =
+    locale === "en" && aboutData?.taglineEn
+      ? aboutData.taglineEn
+      : aboutData?.tagline || "";
+  const bio =
+    locale === "en" && aboutData?.bioEn
+      ? aboutData.bioEn
+      : aboutData?.bio || "";
   const profileImage = aboutData?.profileImage || "";
-  const bio = aboutData?.bio || "";
   const cvUrl = aboutData?.cvUrl || "";
   const portfolioUrl = aboutData?.portfolioUrl || "";
   const techStack = aboutData?.techStack
@@ -641,7 +644,7 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
     <div className="transition-colors duration-300 min-h-screen">
       {/* Hero Section - Split Layout */}
       <section className="relative pt-20 pb-16">
-        <div className="mx-auto max-w-6xl px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial="hidden"
             animate="visible"
@@ -655,11 +658,11 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
             </motion.div>
 
             {/* Hero Content */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-              {/* Left - Text Content */}
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-16 items-center">
+              {/* Left - Text Content (wider: 3 columns) */}
               <motion.div
                 variants={itemVariants}
-                className="order-2 lg:order-1">
+                className="order-2 lg:order-1 lg:col-span-3">
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight mb-6">
                   {locale === "id" ? "Saya " : "I'm "}
                   <span className="text-blue-600 dark:text-blue-400">
@@ -673,13 +676,13 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
                 </h1>
 
                 {tagline && (
-                  <p className="text-xl text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+                  <p className="text-xl text-gray-600 dark:text-gray-400 mb-6 leading-relaxed max-w-2xl">
                     {tagline}
                   </p>
                 )}
 
                 {bio && (
-                  <p className="text-base text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
+                  <p className="text-base text-gray-500 dark:text-gray-400 mb-8 leading-relaxed max-w-2xl">
                     {bio.split("\n")[0]}
                   </p>
                 )}
@@ -743,11 +746,11 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
                 </div>
               </motion.div>
 
-              {/* Right - Profile Image */}
+              {/* Right - Profile Image (narrower: 2 columns) */}
               <motion.div
                 variants={itemVariants}
-                className="order-1 lg:order-2 flex justify-center lg:justify-end">
-                <div className="relative w-64 h-80 md:w-72 md:h-96 lg:w-80 lg:h-[28rem]">
+                className="order-1 lg:order-2 lg:col-span-2 flex justify-center lg:justify-end">
+                <div className="relative w-64 h-80 md:w-72 md:h-96 lg:w-80 lg:h-112">
                   {profileImage ? (
                     <Image
                       src={profileImage}

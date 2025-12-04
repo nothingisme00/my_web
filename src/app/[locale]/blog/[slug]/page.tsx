@@ -21,7 +21,6 @@ export const revalidate = 3600;
 type PostWithRelations = Prisma.PostGetPayload<{
   include: {
     category: true;
-    tags: true;
   };
 }>;
 
@@ -117,7 +116,6 @@ export default async function BlogPostPage({
     where: { slug },
     include: {
       category: true,
-      tags: true,
     },
   });
 
@@ -128,10 +126,11 @@ export default async function BlogPostPage({
   // Increment view count
   await incrementPostViews(slug);
 
-  // Get related posts
+  // Get related posts (by category and/or tags)
   const relatedPosts = (await getRelatedPosts(
     post.id,
     post.categoryId,
+    post.tags,
     3
   )) as PostWithRelations[];
 
@@ -272,18 +271,20 @@ export default async function BlogPostPage({
               </div>
 
               {/* Tags */}
-              {post.tags && post.tags.length > 0 && (
+              {post.tags && (
                 <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
                   <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 uppercase tracking-wider">
                     Tags
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {post.tags.map((tag) => (
+                    {post.tags.split(",").map((tag, index) => (
                       <Link
-                        key={tag.id}
-                        href={`/blog/tag/${tag.slug}`}
-                        className="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                        #{tag.name}
+                        key={index}
+                        href={`/${locale}/blog/tag/${encodeURIComponent(
+                          tag.trim()
+                        )}`}
+                        className="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors">
+                        #{tag.trim()}
                       </Link>
                     ))}
                   </div>

@@ -1,15 +1,18 @@
-import Link from 'next/link';
-import Image from 'next/image';
-import { Calendar, Clock, Eye } from 'lucide-react';
-import { formatDate, formatViewCount } from '@/lib/utils';
-import type { Prisma } from '@prisma/client';
-import { StaggerContainer, StaggerItem, ScaleOnHover } from '@/components/animations';
+import Link from "next/link";
+import Image from "next/image";
+import { Calendar, Clock, Eye } from "lucide-react";
+import { formatDate, formatViewCount } from "@/lib/utils";
+import type { Prisma } from "@prisma/client";
+import {
+  StaggerContainer,
+  StaggerItem,
+  ScaleOnHover,
+} from "@/components/animations";
 
 type PostWithRelations = Prisma.PostGetPayload<{
   include: {
     category: true;
-    tags: true;
-  }
+  };
 }>;
 
 interface ArticleFeedProps {
@@ -70,14 +73,17 @@ export function ArticleFeed({ posts }: ArticleFeedProps) {
 
                         {/* Excerpt */}
                         <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2 text-sm leading-relaxed">
-                          {post.excerpt || post.content.substring(0, 120) + '...'}
+                          {post.excerpt ||
+                            post.content.substring(0, 120) + "..."}
                         </p>
 
                         {/* Meta Info */}
                         <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-gray-500">
                           <div className="flex items-center gap-1">
                             <Calendar className="w-3.5 h-3.5" />
-                            <span>{formatDate(post.publishedAt || post.createdAt)}</span>
+                            <span>
+                              {formatDate(post.publishedAt || post.createdAt)}
+                            </span>
                           </div>
 
                           <span>·</span>
