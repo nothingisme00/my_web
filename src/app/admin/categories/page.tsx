@@ -4,6 +4,8 @@ import { getCategories, deleteCategory } from "@/lib/actions";
 import { Plus, Trash2, Pencil } from "lucide-react";
 import { Category } from "@prisma/client";
 
+export const dynamic = "force-dynamic";
+
 type CategoryWithCount = Category & {
   _count?: {
     posts: number;

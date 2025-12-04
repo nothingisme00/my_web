@@ -2,6 +2,8 @@ import { getPosts, getCategories } from '@/lib/actions';
 import { PostsTable } from '@/components/admin/PostsTable';
 import { Post, Category } from '@prisma/client';
 
+export const dynamic = "force-dynamic";
+
 type PostWithCategory = Post & {
   category: Category | null;
 };

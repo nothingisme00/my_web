@@ -1,6 +1,8 @@
 import { getDashboardStats, getProjects } from "@/lib/actions";
 import { DashboardClient } from "@/components/admin/DashboardClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboard() {
   const [stats, recentProjects] = await Promise.all([
     getDashboardStats(),

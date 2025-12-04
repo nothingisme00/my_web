@@ -2,6 +2,8 @@ import { getMedia } from '@/lib/actions';
 import MediaGallery from '@/components/admin/MediaGallery';
 import { Media } from '@prisma/client';
 
+export const dynamic = "force-dynamic";
+
 export default async function MediaPage() {
   const media: Media[] = await getMedia();
 
