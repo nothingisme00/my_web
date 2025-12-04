@@ -14,32 +14,19 @@ import "../globals.css";
 
 // Force dynamic rendering to ensure settings are always fresh
 export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
-export function generateStaticParams() {
-  return locales.map((locale) => ({ locale }));
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
-  await params; // Consume params to avoid unused warning if linter is strict about awaiting
-  const settings = await getSettings();
-
-  return {
-    metadataBase: new URL(
-      process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-    ),
-    title: {
-      default: settings.site_name || "My Portfolio",
-      template: `%s | ${settings.site_name || "My Portfolio"}`,
-    },
-    description:
-      settings.seo_description || "Personal portfolio and blog website",
-    keywords: settings.seo_keywords || undefined,
-  };
-}
+// Static metadata - no database query
+export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+  ),
+  title: {
+    default: "Hiatta",
+    template: `%s | Hiatta`,
+  },
+  description: "Personal portfolio and blog website",
+};
 
 export default async function LocaleLayout({
   children,
@@ -56,7 +43,13 @@ export default async function LocaleLayout({
   }
 
   const messages = await getMessages();
-  const settings = await getSettings();
+  
+  let settings = {};
+  try {
+    settings = await getSettings();
+  } catch (error) {
+    console.error("Failed to load settings:", error);
+  }
 
   return (
     <html lang={locale} suppressHydrationWarning>
