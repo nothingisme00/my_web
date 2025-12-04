@@ -22,6 +22,7 @@ Panduan lengkap untuk deploy website **hiatta.site** menggunakan **Vercel** (hos
 ## 1. Persiapan Awal
 
 ### Yang Dibutuhkan:
+
 - ✅ Akun GitHub (sudah ada - nothingisme00)
 - ✅ Akun Vercel (gratis) - https://vercel.com
 - ✅ Akun Supabase (gratis) - https://supabase.com
@@ -57,12 +58,12 @@ git push origin main
 2. Pilih **Organization** (buat baru jika belum ada)
 3. Isi detail project:
 
-   | Field | Nilai |
-   |-------|-------|
-   | **Name** | `hiatta` |
+   | Field                 | Nilai                                     |
+   | --------------------- | ----------------------------------------- |
+   | **Name**              | `hiatta`                                  |
    | **Database Password** | Buat password kuat, **SIMPAN BAIK-BAIK!** |
-   | **Region** | `Southeast Asia (Singapore)` ← Pilih ini! |
-   | **Pricing Plan** | `Free` |
+   | **Region**            | `Southeast Asia (Singapore)` ← Pilih ini! |
+   | **Pricing Plan**      | `Free`                                    |
 
 4. Klik **"Create new project"**
 5. Tunggu ~2 menit sampai project siap
@@ -76,6 +77,7 @@ git push origin main
 5. Klik **Copy** untuk menyalin
 
 Connection string akan seperti ini:
+
 ```
 postgresql://postgres.[project-ref]:[YOUR-PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres
 ```
@@ -91,7 +93,8 @@ DATABASE_URL="postgresql://postgres.[project-ref]:[PASSWORD]@aws-0-ap-southeast-
 DIRECT_URL="postgresql://postgres.[project-ref]:[PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres"
 ```
 
-> **Catatan**: 
+> **Catatan**:
+>
 > - Port `6543` = untuk pooler (aplikasi)
 > - Port `5432` = untuk direct connection (migrasi)
 
@@ -178,18 +181,18 @@ npm run db:seed
 
 Di halaman konfigurasi:
 
-| Setting | Nilai |
-|---------|-------|
-| **Project Name** | `hiatta` |
+| Setting              | Nilai                           |
+| -------------------- | ------------------------------- |
+| **Project Name**     | `hiatta`                        |
 | **Framework Preset** | `Next.js` (otomatis terdeteksi) |
-| **Root Directory** | `./` (default) |
-| **Build Command** | `prisma generate && next build` |
-| **Output Directory** | (biarkan default) |
-| **Install Command** | `npm install` |
+| **Root Directory**   | `./` (default)                  |
+| **Build Command**    | `prisma generate && next build` |
+| **Output Directory** | (biarkan default)               |
+| **Install Command**  | `npm install`                   |
 
 ### Langkah 4.4: Jangan Deploy Dulu!
 
-⚠️ **JANGAN KLIK DEPLOY DULU!** 
+⚠️ **JANGAN KLIK DEPLOY DULU!**
 
 Kita perlu setup Environment Variables terlebih dahulu.
 
@@ -203,20 +206,20 @@ Kita perlu setup Environment Variables terlebih dahulu.
 2. Pilih **"Environment Variables"** di sidebar
 3. Tambahkan variabel berikut satu per satu:
 
-| Name | Value | Environment |
-|------|-------|-------------|
-| `DATABASE_URL` | `postgresql://postgres.[ref]:[PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true` | Production, Preview |
-| `DIRECT_URL` | `postgresql://postgres.[ref]:[PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres` | Production, Preview |
-| `NEXT_PUBLIC_SITE_URL` | `https://hiatta.site` | Production |
-| `NEXT_PUBLIC_SITE_URL` | `https://hiatta.vercel.app` | Preview |
-| `JWT_SECRET` | `[buat-random-string-32-karakter-atau-lebih]` | Production, Preview |
-| `JWT_EXPIRATION` | `7d` | Production, Preview |
-| `RESEND_API_KEY` | `re_xxxxx` (dari Resend.com) | Production, Preview |
-| `CONTACT_EMAIL` | `alfattah@hiatta.site` (email kamu) | Production, Preview |
-| `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | `6Lexxxxx` (dari Google reCAPTCHA) | Production, Preview |
-| `RECAPTCHA_SECRET_KEY` | `6Lexxxxx` (dari Google reCAPTCHA) | Production, Preview |
-| `ADMIN_EMAIL` | `admin@hiatta.site` | Production |
-| `ADMIN_PASSWORD` | `[password-admin-kamu]` | Production |
+| Name                             | Value                                                                                                          | Environment         |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------- | ------------------- |
+| `DATABASE_URL`                   | `postgresql://postgres.[ref]:[PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true` | Production, Preview |
+| `DIRECT_URL`                     | `postgresql://postgres.[ref]:[PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres`                | Production, Preview |
+| `NEXT_PUBLIC_SITE_URL`           | `https://hiatta.site`                                                                                          | Production          |
+| `NEXT_PUBLIC_SITE_URL`           | `https://hiatta.vercel.app`                                                                                    | Preview             |
+| `JWT_SECRET`                     | `[buat-random-string-32-karakter-atau-lebih]`                                                                  | Production, Preview |
+| `JWT_EXPIRATION`                 | `7d`                                                                                                           | Production, Preview |
+| `RESEND_API_KEY`                 | `re_xxxxx` (dari Resend.com)                                                                                   | Production, Preview |
+| `CONTACT_EMAIL`                  | `alfattah@hiatta.site` (email kamu)                                                                            | Production, Preview |
+| `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | `6Lexxxxx` (dari Google reCAPTCHA)                                                                             | Production, Preview |
+| `RECAPTCHA_SECRET_KEY`           | `6Lexxxxx` (dari Google reCAPTCHA)                                                                             | Production, Preview |
+| `ADMIN_EMAIL`                    | `admin@hiatta.site`                                                                                            | Production          |
+| `ADMIN_PASSWORD`                 | `[password-admin-kamu]`                                                                                        | Production          |
 
 ### Langkah 5.2: Generate JWT Secret
 
@@ -244,7 +247,7 @@ Copy hasilnya dan paste sebagai nilai `JWT_SECRET`.
 4. Isi:
    - **Label**: `hiatta.site`
    - **reCAPTCHA type**: `reCAPTCHA v3`
-   - **Domains**: 
+   - **Domains**:
      - `hiatta.site`
      - `www.hiatta.site`
      - `hiatta.vercel.app`
@@ -277,6 +280,7 @@ git push origin main
 3. Pastikan tidak ada error
 
 Build yang sukses akan menunjukkan:
+
 ```
 ✓ Compiled successfully
 ✓ Linting and checking validity
@@ -334,9 +338,9 @@ npx prisma db seed
 
 Login ke Niagahoster dan update DNS records:
 
-| Type | Name | Value | TTL |
-|------|------|-------|-----|
-| `A` | `@` | `76.76.21.21` | 3600 |
+| Type    | Name  | Value                  | TTL  |
+| ------- | ----- | ---------------------- | ---- |
+| `A`     | `@`   | `76.76.21.21`          | 3600 |
 | `CNAME` | `www` | `cname.vercel-dns.com` | 3600 |
 
 > **Catatan**: IP `76.76.21.21` adalah IP Vercel. Vercel juga akan memberikan instruksi spesifik.
@@ -369,9 +373,9 @@ Supabase menyediakan storage gratis 1GB.
 
 #### Update Code untuk Upload ke Supabase:
 
-Kita perlu update API upload untuk menggunakan Supabase Storage. 
+Kita perlu update API upload untuk menggunakan Supabase Storage.
 
-*(Ini memerlukan perubahan code - bisa diimplementasi nanti)*
+_(Ini memerlukan perubahan code - bisa diimplementasi nanti)_
 
 ### Opsi 2: Cloudinary (Alternatif Gratis)
 
@@ -465,8 +469,8 @@ const config = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: '*.supabase.co',
+        protocol: "https",
+        hostname: "*.supabase.co",
       },
     ],
   },
@@ -506,17 +510,17 @@ const config = {
 
 ## 💰 Estimasi Biaya Bulanan
 
-| Service | Free Tier | Batas |
-|---------|-----------|-------|
-| **Vercel** | Gratis | 100GB bandwidth, unlimited deployments |
-| **Supabase** | Gratis | 500MB database, 1GB storage, 2GB transfer |
-| **Resend** | Gratis | 100 emails/day |
-| **reCAPTCHA** | Gratis | 1M requests/month |
-| **Domain** | Rp ~150k/tahun | - |
+| Service       | Free Tier      | Batas                                     |
+| ------------- | -------------- | ----------------------------------------- |
+| **Vercel**    | Gratis         | 100GB bandwidth, unlimited deployments    |
+| **Supabase**  | Gratis         | 500MB database, 1GB storage, 2GB transfer |
+| **Resend**    | Gratis         | 100 emails/day                            |
+| **reCAPTCHA** | Gratis         | 1M requests/month                         |
+| **Domain**    | Rp ~150k/tahun | -                                         |
 
 **Total: Rp ~150k/tahun** (hanya domain!)
 
 ---
 
-*Panduan dibuat: 4 Desember 2025*
-*Untuk project: hiatta.site*
+_Panduan dibuat: 4 Desember 2025_
+_Untuk project: hiatta.site_
