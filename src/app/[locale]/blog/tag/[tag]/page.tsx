@@ -6,6 +6,8 @@ import { formatDate, formatViewCount } from "@/lib/utils";
 import { Prisma } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 
+export const dynamic = "force-dynamic";
+
 type PostWithRelations = Prisma.PostGetPayload<{
   include: {
     category: true;
@@ -24,37 +26,22 @@ function getLocalizedField(
   return id || null;
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ tag: string; locale: string }>;
-}) {
-  const { tag, locale } = await params;
-  const decodedTag = decodeURIComponent(tag);
-
-  return {
-    title: `${
-      locale === "id" ? "Artikel dengan tag" : "Articles tagged"
-    } "${decodedTag}"`,
-    description: `${
-      locale === "id"
-        ? "Temukan semua artikel dengan tag"
-        : "Find all articles tagged with"
-    } "${decodedTag}"`,
-  };
-}
-
 export default async function TagPage({
   params,
 }: {
   params: Promise<{ tag: string; locale: string }>;
 }) {
   const { tag, locale } = await params;
-  const t = await getTranslations("Blog");
   const decodedTag = decodeURIComponent(tag);
 
-  const posts = (await getPostsByTag(decodedTag)) as PostWithRelations[];
-
+  let posts: PostWithRelations[] = [];
+  try {
+    posts = (await getPostsByTag(decodedTag)) as PostWithRelations[];
+  } catch (error) {
+    console.error("Database error:", error);
+  }
+  
+  const t = await getTranslations("Blog");
   const dateLocale = locale === "id" ? "id-ID" : "en-US";
 
   return (

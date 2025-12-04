@@ -6,19 +6,7 @@ import { isPageEnabled } from "@/lib/page-visibility";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "portfolio" });
-
-  return {
-    title: t("title"),
-    description: t("description"),
-  };
-}
+export const dynamic = "force-dynamic";
 
 export default async function PortfolioPage({
   params,
@@ -28,13 +16,19 @@ export default async function PortfolioPage({
   const { locale } = await params;
   const t = await getTranslations("portfolio");
 
-  // Check if page is enabled
-  const pageEnabled = await isPageEnabled("page_portfolio");
-  if (!pageEnabled) {
-    notFound();
-  }
+  let projects: Project[] = [];
 
-  const projects = (await getProjects()) as Project[];
+  try {
+    // Check if page is enabled
+    const pageEnabled = await isPageEnabled("page_portfolio");
+    if (!pageEnabled) {
+      notFound();
+    }
+
+    projects = (await getProjects()) as Project[];
+  } catch (error) {
+    console.error("Database error:", error);
+  }
 
   return (
     <div className="min-h-screen">

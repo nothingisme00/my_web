@@ -5,6 +5,8 @@ import { BlogClientWrapper } from "@/components/blog/BlogClientWrapper";
 import { isPageEnabled } from "@/lib/page-visibility";
 import { notFound } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 type PostWithRelations = Prisma.PostGetPayload<{
   include: {
     category: true;
@@ -12,17 +14,25 @@ type PostWithRelations = Prisma.PostGetPayload<{
 }>;
 
 export default async function BlogPage() {
-  // Check if page is enabled
-  const pageEnabled = await isPageEnabled("page_blog");
-  if (!pageEnabled) {
-    notFound();
-  }
+  let pageEnabled = true;
+  let posts: PostWithRelations[] = [];
+  let categories: { id: string; name: string; slug: string }[] = [];
 
-  // Fetch all data on server
-  const [posts, categories] = await Promise.all([
-    getPublishedPosts(),
-    getCategories(),
-  ]);
+  try {
+    // Check if page is enabled
+    pageEnabled = await isPageEnabled("page_blog");
+    if (!pageEnabled) {
+      notFound();
+    }
+
+    // Fetch all data on server
+    [posts, categories] = await Promise.all([
+      getPublishedPosts() as Promise<PostWithRelations[]>,
+      getCategories(),
+    ]);
+  } catch (error) {
+    console.error("Database error:", error);
+  }
 
   return (
     <div className="min-h-screen">

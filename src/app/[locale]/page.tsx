@@ -5,6 +5,8 @@ import { FeaturedPostsCarousel } from "@/components/home/FeaturedPostsCarousel";
 import { ArticleFeed } from "@/components/home/ArticleFeed";
 import { NewsletterCTA } from "@/components/home/NewsletterCTA";
 
+export const dynamic = "force-dynamic";
+
 type PostWithRelations = Prisma.PostGetPayload<{
   include: {
     category: true;
@@ -12,7 +14,13 @@ type PostWithRelations = Prisma.PostGetPayload<{
 }>;
 
 export default async function Home() {
-  const allPosts = (await getFeaturedPosts(12)) as PostWithRelations[];
+  let allPosts: PostWithRelations[] = [];
+
+  try {
+    allPosts = (await getFeaturedPosts(12)) as PostWithRelations[];
+  } catch (error) {
+    console.error("Database error:", error);
+  }
 
   // First 3 posts for carousel, next 9 for article feed
   const featuredPosts = allPosts.slice(0, 3);

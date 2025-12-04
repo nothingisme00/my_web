@@ -6,6 +6,8 @@ import { getPostsByCategory, getCategoryBySlug } from "@/lib/actions";
 import { formatDate, formatViewCount } from "@/lib/utils";
 import { Prisma } from "@prisma/client";
 
+export const dynamic = "force-dynamic";
+
 type PostWithRelations = Prisma.PostGetPayload<{
   include: {
     category: true;
@@ -18,13 +20,23 @@ export default async function CategoryPage({
   params: Promise<{ slug: string; locale: string }>;
 }) {
   const { slug, locale } = await params;
-  const category = await getCategoryBySlug(slug);
+  
+  let category;
+  let posts: PostWithRelations[] = [];
+  
+  try {
+    category = await getCategoryBySlug(slug);
+    if (category) {
+      posts = (await getPostsByCategory(slug)) as PostWithRelations[];
+    }
+  } catch (error) {
+    console.error("Database error:", error);
+    notFound();
+  }
 
   if (!category) {
     notFound();
   }
-
-  const posts = (await getPostsByCategory(slug)) as PostWithRelations[];
 
   const dateLocale = locale === "id" ? "id-ID" : "en-US";
 

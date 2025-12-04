@@ -49,18 +49,25 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string; locale: string }>;
 }) {
   const { slug, locale } = await params;
-  const t = await getTranslations("blog");
-
-  const post = await prisma.post.findUnique({
-    where: { slug },
-    include: {
-      category: true,
-    },
-  });
+  
+  let post;
+  try {
+    post = await prisma.post.findUnique({
+      where: { slug },
+      include: {
+        category: true,
+      },
+    });
+  } catch (error) {
+    console.error("Database error:", error);
+    notFound();
+  }
 
   if (!post) {
     notFound();
   }
+
+  const t = await getTranslations("blog");
 
   // Increment view count
   await incrementPostViews(slug);

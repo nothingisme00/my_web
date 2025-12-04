@@ -37,9 +37,15 @@ export default async function ProjectPage({
 }) {
   const { slug, locale } = await params;
 
-  const project = await prisma.project.findUnique({
-    where: { slug },
-  });
+  let project;
+  try {
+    project = await prisma.project.findUnique({
+      where: { slug },
+    });
+  } catch (error) {
+    console.error("Database error:", error);
+    notFound();
+  }
 
   if (!project) {
     notFound();
