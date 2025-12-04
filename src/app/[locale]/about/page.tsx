@@ -54,4 +54,3 @@ export default async function AboutPage() {
   // Pass aboutData (can be null) to AboutContent - it handles null case
   return <AboutContent aboutData={aboutData} settings={settings} />;
 }
-}
