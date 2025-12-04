@@ -1,8 +1,6 @@
 import { MetadataRoute } from 'next'
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-
   return {
     rules: [
       {
@@ -11,6 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/admin/', '/login'],
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
+    // Sitemap disabled temporarily - will re-enable after deployment is stable
+    // sitemap: `${process.env.NEXT_PUBLIC_SITE_URL}/sitemap.xml`,
   }
 }
