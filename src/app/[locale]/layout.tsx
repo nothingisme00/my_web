@@ -43,7 +43,7 @@ export default async function LocaleLayout({
   }
 
   const messages = await getMessages();
-  
+
   let settings = {};
   try {
     settings = await getSettings();

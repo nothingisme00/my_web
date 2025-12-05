@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
   // Skip database-dependent pages during build
   // These will be rendered on-demand
   output: undefined,
-  
+
   // Increase body size limit for video uploads
   experimental: {
     serverActions: {

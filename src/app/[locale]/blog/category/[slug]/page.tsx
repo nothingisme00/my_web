@@ -20,10 +20,10 @@ export default async function CategoryPage({
   params: Promise<{ slug: string; locale: string }>;
 }) {
   const { slug, locale } = await params;
-  
+
   let category;
   let posts: PostWithRelations[] = [];
-  
+
   try {
     category = await getCategoryBySlug(slug);
     if (category) {

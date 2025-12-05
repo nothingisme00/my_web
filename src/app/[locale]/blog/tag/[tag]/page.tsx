@@ -39,7 +39,7 @@ export default async function TagPage({
   } catch (error) {
     console.error("Database error:", error);
   }
-  
+
   const dateLocale = locale === "id" ? "id-ID" : "en-US";
 
   return (

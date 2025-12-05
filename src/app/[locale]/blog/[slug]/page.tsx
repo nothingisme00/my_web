@@ -49,7 +49,7 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string; locale: string }>;
 }) {
   const { slug, locale } = await params;
-  
+
   let post;
   try {
     post = await prisma.post.findUnique({

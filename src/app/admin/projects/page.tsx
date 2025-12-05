@@ -1,6 +1,6 @@
-import { getProjects } from '@/lib/actions';
-import { ProjectsTable } from '@/components/admin/ProjectsTable';
-import { Project } from '@prisma/client';
+import { getProjects } from "@/lib/actions";
+import { ProjectsTable } from "@/components/admin/ProjectsTable";
+import { Project } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 

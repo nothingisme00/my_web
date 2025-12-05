@@ -3,102 +3,39 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-}
-
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Post {
-  id              String    @id @default(cuid())
-  // Indonesian fields (primary input)
-  title           String    // Title in Indonesian
-  slug            String    @unique
-  content         String    @db.Text // Content in Indonesian
-  excerpt         String?   @db.Text // Excerpt in Indonesian
-  metaDescription String?   @db.Text // Meta description in Indonesian
-  // English fields (auto-translated)
-  titleEn         String?   // Auto-translated title
-  contentEn       String?   @db.Text // Auto-translated content
-  excerptEn       String?   @db.Text // Auto-translated excerpt
-  metaDescriptionEn String? @db.Text // Auto-translated meta description
-  // Other fields
-  image           String?
-  published       Boolean   @default(false)
-  status          String    @default("draft") // draft, published, archived
-  views           Int       @default(0)
-  reactionsLove   Int       @default(0)
-  reactionsLike   Int       @default(0)
-  reactionsWow    Int       @default(0)
-  reactionsFire   Int       @default(0)
-  readingTime     Int       @default(5) // in minutes
-  author          String    @default("Alfattah")
-  publishedAt     DateTime?
-  archivedAt      DateTime?
-  metaKeywords    String?
-  tags            String?   // Comma-separated tags (e.g., "tech, programming, web")
-  categoryId      String?
-  category        Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  @@index([slug])
-  @@index([published])
-  @@index([status])
-  @@index([createdAt])
-  @@index([publishedAt])
-  @@index([categoryId])
-  @@index([published, publishedAt])
-  @@index([published, views])
-  @@index([status, publishedAt])
-}
-
-model Project {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
-  // Indonesian fields (primary input)
-  description String   @db.Text // Description in Indonesian
-  // English fields (auto-translated)
-  descriptionEn String? @db.Text // Auto-translated description
-  // Other fields
-  content     String?  @db.Text
-  image       String?
-  demoUrl     String?
-  githubUrl   String?
-  techStack   String?
-  status      String   @default("Completed")
-  views       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([slug])
-  @@index([createdAt])
-  @@index([views])
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 model Category {
-  id          String   @id @default(cuid())
+  id          String   @id
   name        String   @unique
   slug        String   @unique
   description String?
-  posts       Post[]
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime
+  Post        Post[]
 
   @@index([slug])
 }
 
+model LoginActivity {
+  id        String   @id
+  email     String
+  ipAddress String
+  userAgent String?
+  success   Boolean  @default(false)
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([email])
+  @@index([ipAddress])
+  @@index([success])
+}
+
 model Media {
-  id           String   @id @default(cuid())
+  id           String   @id
   filename     String
   originalName String
   mimeType     String
@@ -109,46 +46,102 @@ model Media {
   @@index([createdAt])
 }
 
+model Post {
+  id                String    @id
+  title             String
+  slug              String    @unique
+  content           String
+  excerpt           String?
+  metaDescription   String?
+  titleEn           String?
+  contentEn         String?
+  excerptEn         String?
+  metaDescriptionEn String?
+  image             String?
+  published         Boolean   @default(false)
+  status            String    @default("draft")
+  views             Int       @default(0)
+  reactionsLove     Int       @default(0)
+  reactionsLike     Int       @default(0)
+  reactionsWow      Int       @default(0)
+  reactionsFire     Int       @default(0)
+  readingTime       Int       @default(5)
+  author            String    @default("Alfattah")
+  publishedAt       DateTime?
+  archivedAt        DateTime?
+  metaKeywords      String?
+  tags              String?
+  categoryId        String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime
+  Category          Category? @relation(fields: [categoryId], references: [id])
+
+  @@index([categoryId])
+  @@index([createdAt])
+  @@index([publishedAt])
+  @@index([published])
+  @@index([published, publishedAt])
+  @@index([published, views])
+  @@index([slug])
+  @@index([status])
+  @@index([status, publishedAt])
+}
+
+model Project {
+  id            String   @id
+  title         String
+  slug          String   @unique
+  description   String
+  descriptionEn String?
+  content       String?
+  image         String?
+  demoUrl       String?
+  githubUrl     String?
+  techStack     String?
+  status        String   @default("Completed")
+  views         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime
+
+  @@index([createdAt])
+  @@index([slug])
+  @@index([views])
+}
+
 model Settings {
-  id        String   @id @default(cuid())
+  id        String   @id
   key       String   @unique
-  value     String   @db.Text
-  updatedAt DateTime @updatedAt
+  value     String
+  updatedAt DateTime
+}
+
+model User {
+  id        String   @id
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime
 }
 
 model Watchlist {
-  id           String    @id @default(cuid())
+  id           String    @id
   title        String
-  type         String    @default("Anime") // Anime, Film, Series, Donghua
+  type         String    @default("Anime")
   genre        String?
   totalEpisode Int?
-  status       String    @default("Completed") // Watching, Completed, Dropped, On Hold, Plan to Watch
-  rating       Float?    // 1-10
-  notesId      String?   @db.Text // Review in Indonesian (primary input)
-  notesEn      String?   @db.Text // Review in English (auto-translated)
+  status       String    @default("Completed")
+  rating       Float?
+  notesId      String?
+  notesEn      String?
   imageUrl     String?
   year         Int?
   completedAt  DateTime?
   createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  updatedAt    DateTime
 
+  @@index([createdAt])
+  @@index([rating])
   @@index([status])
   @@index([type])
-  @@index([rating])
-  @@index([createdAt])
-}
-
-model LoginActivity {
-  id        String   @id @default(cuid())
-  email     String
-  ipAddress String
-  userAgent String?  @db.Text
-  success   Boolean  @default(false)
-  reason    String?  // login-success, invalid-password, user-not-found, rate-limited
-  createdAt DateTime @default(now())
-
-  @@index([email])
-  @@index([ipAddress])
-  @@index([createdAt])
-  @@index([success])
 }

@@ -36,9 +36,10 @@ export default async function AboutPage() {
             About Me
           </h1>
           <p className="text-gray-600 dark:text-gray-400 text-center mb-12">
-            Content is being set up. Please check back later or contact me below.
+            Content is being set up. Please check back later or contact me
+            below.
           </p>
-          
+
           {/* Contact Form Section */}
           <div className="mt-16">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">

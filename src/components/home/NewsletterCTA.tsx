@@ -1,21 +1,21 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Mail } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { useToast } from '@/hooks/useToast';
-import { FadeInWhenVisible } from '@/components/animations';
+import { useState } from "react";
+import { Mail } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { useToast } from "@/hooks/useToast";
+import { FadeInWhenVisible } from "@/components/animations";
 
 export function NewsletterCTA() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { addToast } = useToast();
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!email || !email.includes('@')) {
-      addToast('error', 'Please enter a valid email address');
+    if (!email || !email.includes("@")) {
+      addToast("error", "Please enter a valid email address");
       return;
     }
 
@@ -24,12 +24,15 @@ export function NewsletterCTA() {
     try {
       // TODO: Integrate with newsletter service (Resend/ConvertKit/etc)
       // For now, just show success message
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
 
-      addToast('success', 'Thanks for subscribing! Check your inbox for confirmation.');
-      setEmail('');
+      addToast(
+        "success",
+        "Thanks for subscribing! Check your inbox for confirmation."
+      );
+      setEmail("");
     } catch {
-      addToast('error', 'Something went wrong. Please try again.');
+      addToast("error", "Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -53,10 +56,13 @@ export function NewsletterCTA() {
               </h2>
 
               <p className="text-base text-gray-600 dark:text-gray-400 mb-7 max-w-2xl mx-auto">
-                Get the latest articles about software testing, QA, and tech delivered straight to your inbox.
+                Get the latest articles about software testing, QA, and tech
+                delivered straight to your inbox.
               </p>
 
-              <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-2.5 max-w-md mx-auto">
+              <form
+                onSubmit={handleSubscribe}
+                className="flex flex-col sm:flex-row gap-2.5 max-w-md mx-auto">
                 <input
                   type="email"
                   value={email}
@@ -69,9 +75,8 @@ export function NewsletterCTA() {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 font-medium px-5 py-2.5 rounded-xl transition-all shadow-sm hover:shadow disabled:opacity-50 text-sm"
-                >
-                  {isLoading ? 'Subscribing...' : 'Subscribe'}
+                  className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 font-medium px-5 py-2.5 rounded-xl transition-all shadow-sm hover:shadow disabled:opacity-50 text-sm">
+                  {isLoading ? "Subscribing..." : "Subscribe"}
                 </Button>
               </form>
 
