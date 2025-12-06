@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { Prisma } from "@prisma/client";
 
 type Category = Prisma.CategoryGetPayload<{
-  include: { _count: { select: { posts: true } } };
+  include: { _count: { select: { Post: true } } };
 }>;
 
 type SortOption = "newest" | "oldest" | "most-viewed" | "reading-time";
@@ -108,7 +108,7 @@ export function BlogFilterControls({
       { value: "", label: t("category.all") },
       ...categories.map((cat) => ({
         value: cat.id,
-        label: `${cat.name} (${cat._count?.posts || 0})`,
+        label: `${cat.name} (${cat._count?.Post || 0})`,
       })),
     ],
     [categories, t]

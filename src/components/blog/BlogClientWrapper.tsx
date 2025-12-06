@@ -12,7 +12,7 @@ type PostWithRelations = Prisma.PostGetPayload<{
 }>;
 
 type Category = Prisma.CategoryGetPayload<{
-  include: { _count: { select: { posts: true } } };
+  include: { _count: { select: { Post: true } } };
 }>;
 
 type SortOption = "newest" | "oldest" | "most-viewed" | "reading-time";

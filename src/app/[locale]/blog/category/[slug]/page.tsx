@@ -64,8 +64,8 @@ export default async function CategoryPage({
             </p>
           )}
           <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-            {category._count?.posts || 0}{" "}
-            {category._count?.posts === 1 ? "article" : "articles"}
+            {posts.length}{" "}
+            {posts.length === 1 ? "article" : "articles"}
           </p>
         </div>
       </section>

@@ -14,7 +14,7 @@ type PostWithRelations = Prisma.PostGetPayload<{
 }>;
 
 type CategoryWithCount = Prisma.CategoryGetPayload<{
-  include: { _count: { select: { posts: true } } };
+  include: { _count: { select: { Post: true } } };
 }>;
 
 export default async function BlogPage() {

@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 type CategoryWithCount = Category & {
   _count?: {
-    posts: number;
+    Post: number;
   };
 };
 
@@ -82,7 +82,7 @@ export default async function CategoriesAdminPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="px-2.5 py-1 inline-flex text-xs font-medium rounded-md bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800/50">
-                      {category._count?.posts || 0} posts
+                      {category._count?.Post || 0} posts
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

@@ -8,19 +8,19 @@ datasource db {
 }
 
 model Category {
-  id          String   @id
+  id          String   @id @default(cuid())
   name        String   @unique
   slug        String   @unique
   description String?
   createdAt   DateTime @default(now())
-  updatedAt   DateTime
+  updatedAt   DateTime @updatedAt
   Post        Post[]
 
   @@index([slug])
 }
 
 model LoginActivity {
-  id        String   @id
+  id        String   @id @default(cuid())
   email     String
   ipAddress String
   userAgent String?
@@ -35,7 +35,7 @@ model LoginActivity {
 }
 
 model Media {
-  id           String   @id
+  id           String   @id @default(cuid())
   filename     String
   originalName String
   mimeType     String
@@ -47,7 +47,7 @@ model Media {
 }
 
 model Post {
-  id                String    @id
+  id                String    @id @default(cuid())
   title             String
   slug              String    @unique
   content           String
@@ -73,8 +73,8 @@ model Post {
   tags              String?
   categoryId        String?
   createdAt         DateTime  @default(now())
-  updatedAt         DateTime
-  Category          Category? @relation(fields: [categoryId], references: [id])
+  updatedAt         DateTime  @updatedAt
+  category          Category? @relation(fields: [categoryId], references: [id])
 
   @@index([categoryId])
   @@index([createdAt])
@@ -88,7 +88,7 @@ model Post {
 }
 
 model Project {
-  id            String   @id
+  id            String   @id @default(cuid())
   title         String
   slug          String   @unique
   description   String
@@ -101,7 +101,7 @@ model Project {
   status        String   @default("Completed")
   views         Int      @default(0)
   createdAt     DateTime @default(now())
-  updatedAt     DateTime
+  updatedAt     DateTime @updatedAt
 
   @@index([createdAt])
   @@index([slug])
@@ -109,23 +109,23 @@ model Project {
 }
 
 model Settings {
-  id        String   @id
+  id        String   @id @default(cuid())
   key       String   @unique
   value     String
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
 }
 
 model User {
-  id        String   @id
+  id        String   @id @default(cuid())
   email     String   @unique
   password  String
   name      String?
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
 }
 
 model Watchlist {
-  id           String    @id
+  id           String    @id @default(cuid())
   title        String
   type         String    @default("Anime")
   genre        String?
@@ -138,7 +138,7 @@ model Watchlist {
   year         Int?
   completedAt  DateTime?
   createdAt    DateTime  @default(now())
-  updatedAt    DateTime
+  updatedAt    DateTime  @updatedAt
 
   @@index([createdAt])
   @@index([rating])

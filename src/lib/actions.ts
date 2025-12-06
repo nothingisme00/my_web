@@ -461,7 +461,7 @@ export async function updateProject(id: string, formData: FormData) {
 export async function getCategories() {
   return await prisma.category.findMany({
     orderBy: { name: "asc" },
-    include: { _count: { select: { posts: true } } },
+    include: { _count: { select: { Post: true } } },
   });
 }
 
@@ -925,7 +925,7 @@ export async function getCategoryBySlug(slug: string) {
     where: { slug },
     include: {
       _count: {
-        select: { posts: true },
+        select: { Post: true },
       },
     },
   });
