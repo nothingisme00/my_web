@@ -1,0 +1,336 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "search": "Search",
+    "readMore": "Read More",
+    "learnMore": "Learn More"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "blog": "Blog",
+    "projects": "Projects",
+    "gallery": "Gallery",
+    "watchlist": "Watchlist",
+    "contact": "Contact",
+    "admin": "Admin"
+  },
+  "home": {
+    "hero": {
+      "title": "Latest Articles",
+      "subtitle": "Exploring software testing, development, and technology"
+    },
+    "articles": {
+      "featured": "Featured Article",
+      "recentTitle": "Recent Articles",
+      "viewAll": "View all",
+      "noArticles": "No articles available yet. Check back soon!",
+      "readArticle": "Read Article",
+      "loadMore": "Load More Articles"
+    },
+    "newsletter": {
+      "title": "Stay Updated",
+      "description": "Subscribe to my newsletter for the latest articles, tutorials, and insights delivered straight to your inbox.",
+      "emailPlaceholder": "Enter your email",
+      "subscribe": "Subscribe",
+      "subscribing": "Subscribing...",
+      "success": "Successfully subscribed! Check your email for confirmation.",
+      "error": "Failed to subscribe. Please try again.",
+      "invalidEmail": "Please enter a valid email address"
+    },
+    "aboutMini": {
+      "title": "About Me",
+      "learnMore": "Learn More About Me"
+    },
+    "about": {
+      "title": "About Me",
+      "description": "I'm a passionate developer who loves building amazing web applications."
+    },
+    "skills": {
+      "title": "Skills & Technologies",
+      "description": "Technologies I work with"
+    },
+    "projects": {
+      "title": "Featured Projects",
+      "viewAll": "View All Projects"
+    },
+    "blogSection": {
+      "title": "Latest Blog Posts",
+      "viewAll": "View All Posts"
+    },
+    "contact": {
+      "title": "Get In Touch",
+      "description": "Have a project in mind? Let's work together!"
+    }
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Thoughts, tutorials, and insights",
+    "readMore": "Read More",
+    "readTime": "{minutes} min read",
+    "publishedOn": "Published on",
+    "category": "Category",
+    "tags": "Tags",
+    "relatedPosts": "Related Posts",
+    "noPosts": "No blog posts yet",
+    "backToBlog": "Back to Blog",
+    "search": {
+      "placeholder": "Search articles...",
+      "searching": "Searching..."
+    },
+    "filters": {
+      "category": {
+        "label": "Category",
+        "all": "All Categories",
+        "select": "Select category"
+      },
+      "tags": {
+        "label": "Tags",
+        "select": "Select tags",
+        "none": "No tags selected"
+      },
+      "sort": {
+        "label": "Sort by",
+        "newest": "Newest First",
+        "oldest": "Oldest First",
+        "mostViewed": "Most Viewed",
+        "readingTime": "Reading Time"
+      },
+      "clearAll": "Clear All",
+      "active": "Active Filters"
+    },
+    "results": {
+      "showing": "Showing {count} of {total} articles",
+      "noResults": "No articles found",
+      "noResultsDescription": "Try adjusting your filters to find more articles",
+      "totalArticles": "{count} articles",
+      "clearAll": "Clear All Filters"
+    },
+    "filter": {
+      "all": "All",
+      "category": "Category",
+      "tag": "Tag"
+    }
+  },
+  "about": {
+    "title": "About Me",
+    "subtitle": "Get to know me better",
+    "description": "I'm a full stack developer passionate about creating beautiful and functional web applications.",
+    "bio": "Bio",
+    "education": "Education",
+    "experience": "Work Experience",
+    "techStack": "Tech Stack",
+    "tools": "Tools",
+    "hobbies": "Hobbies & Interests",
+    "downloadCV": "Download CV",
+    "downloadPortfolio": "Download Portfolio",
+    "currentlyWorking": "Currently Working",
+    "present": "Present",
+    "hero": {
+      "cta": "More About Me"
+    },
+    "knowMore": {
+      "title": "Know More About Me",
+      "subtitle": "A glimpse of my journey, skills, and interests",
+      "entries": "{count} entries",
+      "items": "{count} items"
+    },
+    "contact": {
+      "title": "Let's Work Together",
+      "description": "Have a project in mind or want to collaborate? I'd love to hear from you. Send me a message and I'll respond as soon as possible."
+    },
+    "clickToView": "Click to expand",
+    "volunteering": {
+      "title": "Volunteering & Organization",
+      "role": "Role",
+      "organization": "Organization",
+      "period": "Period"
+    }
+  },
+  "contact": {
+    "form": {
+      "title": "Send me a message",
+      "quickSelect": "Quick select subject",
+      "name": {
+        "label": "Name",
+        "placeholder": "Your Name",
+        "required": "Name is required",
+        "minLength": "Name must be at least 2 characters",
+        "maxLength": "Name is too long",
+        "invalid": "Name can only contain letters, spaces, hyphens, and apostrophes"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Input Your Email",
+        "required": "Email is required",
+        "invalid": "Invalid email address",
+        "typo": "Did you mean gmail.com?"
+      },
+      "subject": {
+        "label": "Subject",
+        "placeholder": "Your Subject",
+        "required": "Subject is required",
+        "minLength": "Subject must be at least 5 characters",
+        "maxLength": "Subject is too long"
+      },
+      "message": {
+        "label": "Message",
+        "placeholder": "Your Message",
+        "required": "Message is required",
+        "minLength": "Message must be at least 10 characters",
+        "maxLength": "Message is too long",
+        "spam": "Message contains suspicious repetitive characters"
+      },
+      "subjects": {
+        "collaboration": "Project Collaboration",
+        "inquiry": "General Inquiry",
+        "job": "Job Opportunity",
+        "technical": "Technical Question"
+      },
+      "submit": "Send Message",
+      "submitting": "Sending...",
+      "success": {
+        "title": "Message Sent Successfully!",
+        "message": "Thank you for reaching out! I'll get back to you within 24 hours.",
+        "timeline": {
+          "title": "What happens next?",
+          "step1": {
+            "title": "Message Received",
+            "description": "Your message has been delivered to my inbox"
+          },
+          "step2": {
+            "title": "Review & Respond",
+            "description": "I'll carefully read your message and prepare a thoughtful response"
+          },
+          "step3": {
+            "title": "You'll Hear From Me",
+            "description": "Expect a reply within 24 hours during weekdays"
+          }
+        },
+        "autoClose": "Auto-closing in {seconds} seconds...",
+        "sendAnother": "Send Another Message"
+      },
+      "error": {
+        "general": "Failed to send message. Please try again.",
+        "network": "An error occurred. Please try again later.",
+        "rateLimit": "Too many contact form submissions. Please try again later.",
+        "recaptcha": "reCAPTCHA verification failed. Please try again.",
+        "recaptchaNotReady": "reCAPTCHA not ready. Please try again."
+      },
+      "info": {
+        "responseTime": "I typically respond within ~24 hours during weekdays. Press Ctrl+Enter to submit quickly!",
+        "privacy": "Your information is secure and will never be shared with third parties.",
+        "protected": "Protected by reCAPTCHA"
+      }
+    }
+  },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "Things I've built",
+    "viewDemo": "View Demo",
+    "viewCode": "View Code",
+    "techStack": "Tech Stack",
+    "status": {
+      "completed": "Completed",
+      "inProgress": "In Progress",
+      "planned": "Planned"
+    },
+    "noProjects": "No projects yet"
+  },
+  "portfolio": {
+    "title": "Portfolio | Projects",
+    "description": "A collection of my projects and works",
+    "heading": "My Projects",
+    "subheading": "A collection of projects I've worked on",
+    "noProjects": "No projects yet"
+  },
+  "watchlist": {
+    "title": "Watchlist",
+    "subtitle": "Anime, films, and series I've watched",
+    "stats": {
+      "total": "Total Watched",
+      "completed": "Completed",
+      "averageRating": "Average Rating"
+    },
+    "filters": {
+      "all": "All",
+      "allTypes": "All Types",
+      "allStatus": "All Status",
+      "search": "Search titles...",
+      "type": "Type",
+      "status": "Status"
+    },
+    "table": {
+      "title": "Title",
+      "type": "Type",
+      "genre": "Genre",
+      "episodes": "Episodes",
+      "status": "Status",
+      "rating": "Rating",
+      "year": "Year",
+      "actions": "Actions"
+    },
+    "status": {
+      "watching": "Watching",
+      "completed": "Completed",
+      "dropped": "Dropped",
+      "onHold": "On Hold",
+      "planToWatch": "Plan to Watch"
+    },
+    "noItems": "No items in watchlist yet",
+    "addFirst": "Start adding some anime or movies!"
+  },
+  "footer": {
+    "description": "Full Stack Developer passionate about creating amazing web experiences.",
+    "quickLinks": "Quick Links",
+    "connect": "Connect",
+    "copyright": "All rights reserved.",
+    "builtWith": "Built with Next.js & Tailwind CSS"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "posts": "Posts",
+    "projects": "Projects",
+    "settings": "Settings",
+    "logout": "Logout",
+    "welcome": "Welcome back!",
+    "stats": {
+      "totalPosts": "Total Posts",
+      "totalProjects": "Total Projects",
+      "totalViews": "Total Views"
+    }
+  },
+  "seo": {
+    "home": {
+      "title": "Home",
+      "description": "Welcome to my portfolio website"
+    },
+    "about": {
+      "title": "About",
+      "description": "Learn more about me and my work"
+    },
+    "blog": {
+      "title": "Blog",
+      "description": "Read my latest blog posts and tutorials"
+    },
+    "projects": {
+      "title": "Projects",
+      "description": "Check out my latest projects and work"
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "Get in touch with me for collaborations and opportunities"
+    }
+  }
+}

@@ -1,0 +1,336 @@
+{
+  "common": {
+    "loading": "Memuat...",
+    "error": "Error",
+    "success": "Berhasil",
+    "cancel": "Batal",
+    "save": "Simpan",
+    "delete": "Hapus",
+    "edit": "Edit",
+    "close": "Tutup",
+    "back": "Kembali",
+    "next": "Selanjutnya",
+    "previous": "Sebelumnya",
+    "submit": "Kirim",
+    "search": "Cari",
+    "readMore": "Baca Selengkapnya",
+    "learnMore": "Pelajari Lebih Lanjut"
+  },
+  "nav": {
+    "home": "Beranda",
+    "about": "Tentang",
+    "blog": "Blog",
+    "projects": "Proyek",
+    "gallery": "Galeri",
+    "watchlist": "Watchlist",
+    "contact": "Kontak",
+    "admin": "Admin"
+  },
+  "home": {
+    "hero": {
+      "title": "Artikel Terbaru",
+      "subtitle": "Menjelajahi software testing, pengembangan, dan teknologi"
+    },
+    "articles": {
+      "featured": "Artikel Unggulan",
+      "recentTitle": "Artikel Terbaru",
+      "viewAll": "Lihat semua",
+      "noArticles": "Belum ada artikel tersedia. Segera hadir!",
+      "readArticle": "Baca Artikel",
+      "loadMore": "Muat Artikel Lainnya"
+    },
+    "newsletter": {
+      "title": "Tetap Terhubung",
+      "description": "Berlangganan newsletter saya untuk mendapatkan artikel terbaru, tutorial, dan wawasan langsung ke inbox Anda.",
+      "emailPlaceholder": "Masukkan email Anda",
+      "subscribe": "Berlangganan",
+      "subscribing": "Memproses...",
+      "success": "Berhasil berlangganan! Periksa email Anda untuk konfirmasi.",
+      "error": "Gagal berlangganan. Silakan coba lagi.",
+      "invalidEmail": "Mohon masukkan alamat email yang valid"
+    },
+    "aboutMini": {
+      "title": "Tentang Saya",
+      "learnMore": "Pelajari Lebih Lanjut Tentang Saya"
+    },
+    "about": {
+      "title": "Tentang Saya",
+      "description": "Saya adalah seorang developer yang passionate dalam membangun aplikasi web yang luar biasa."
+    },
+    "skills": {
+      "title": "Kemampuan & Teknologi",
+      "description": "Teknologi yang saya gunakan"
+    },
+    "projects": {
+      "title": "Proyek Unggulan",
+      "viewAll": "Lihat Semua Proyek"
+    },
+    "blogSection": {
+      "title": "Posting Blog Terbaru",
+      "viewAll": "Lihat Semua Posting"
+    },
+    "contact": {
+      "title": "Mari Berkomunikasi",
+      "description": "Punya proyek yang ingin dikerjakan? Mari bekerja sama!"
+    }
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Pemikiran, tutorial, dan wawasan",
+    "readMore": "Baca Selengkapnya",
+    "readTime": "{minutes} menit baca",
+    "publishedOn": "Dipublikasikan pada",
+    "category": "Kategori",
+    "tags": "Tag",
+    "relatedPosts": "Posting Terkait",
+    "noPosts": "Belum ada posting blog",
+    "backToBlog": "Kembali ke Blog",
+    "search": {
+      "placeholder": "Cari artikel...",
+      "searching": "Mencari..."
+    },
+    "filters": {
+      "category": {
+        "label": "Kategori",
+        "all": "Semua Kategori",
+        "select": "Pilih kategori"
+      },
+      "tags": {
+        "label": "Tag",
+        "select": "Pilih tag",
+        "none": "Tidak ada tag dipilih"
+      },
+      "sort": {
+        "label": "Urutkan",
+        "newest": "Terbaru",
+        "oldest": "Terlama",
+        "mostViewed": "Paling Banyak Dilihat",
+        "readingTime": "Waktu Baca"
+      },
+      "clearAll": "Hapus Semua",
+      "active": "Filter Aktif"
+    },
+    "results": {
+      "showing": "Menampilkan {count} dari {total} artikel",
+      "noResults": "Artikel tidak ditemukan",
+      "noResultsDescription": "Coba sesuaikan filter Anda untuk menemukan lebih banyak artikel",
+      "totalArticles": "{count} artikel",
+      "clearAll": "Hapus Semua Filter"
+    },
+    "filter": {
+      "all": "Semua",
+      "category": "Kategori",
+      "tag": "Tag"
+    }
+  },
+  "about": {
+    "title": "Tentang Saya",
+    "subtitle": "Kenali saya lebih dekat",
+    "description": "Saya adalah seorang full stack developer yang passionate dalam menciptakan aplikasi web yang indah dan fungsional.",
+    "bio": "Bio",
+    "education": "Pendidikan",
+    "experience": "Pengalaman Kerja",
+    "techStack": "Tech Stack",
+    "tools": "Alat & Software",
+    "hobbies": "Hobi & Minat",
+    "downloadCV": "Unduh CV",
+    "downloadPortfolio": "Unduh Portfolio",
+    "currentlyWorking": "Sedang Bekerja",
+    "present": "Sekarang",
+    "hero": {
+      "cta": "Lebih Lanjut Tentang Saya"
+    },
+    "knowMore": {
+      "title": "Kenali Saya Lebih Dekat",
+      "subtitle": "Sekilas tentang perjalanan, keahlian, dan minat saya",
+      "entries": "{count} entri",
+      "items": "{count} item"
+    },
+    "contact": {
+      "title": "Mari Bekerja Sama",
+      "description": "Punya proyek yang ingin dikerjakan atau ingin berkolaborasi? Saya ingin mendengar dari Anda. Kirim pesan dan saya akan merespons sesegera mungkin."
+    },
+    "clickToView": "Klik untuk expand",
+    "volunteering": {
+      "title": "Pengalaman Organisasi & Sukarelawan",
+      "role": "Peran",
+      "organization": "Organisasi",
+      "period": "Periode"
+    }
+  },
+  "contact": {
+    "form": {
+      "title": "Kirim pesan kepada saya",
+      "quickSelect": "Pilih subjek cepat",
+      "name": {
+        "label": "Nama",
+        "placeholder": "Nama Anda",
+        "required": "Nama wajib diisi",
+        "minLength": "Nama harus minimal 2 karakter",
+        "maxLength": "Nama terlalu panjang",
+        "invalid": "Nama hanya boleh mengandung huruf, spasi, tanda hubung, dan apostrof"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Masukkan Email Anda",
+        "required": "Email wajib diisi",
+        "invalid": "Alamat email tidak valid",
+        "typo": "Apakah yang Anda maksud gmail.com?"
+      },
+      "subject": {
+        "label": "Subjek",
+        "placeholder": "Subjek Anda",
+        "required": "Subjek wajib diisi",
+        "minLength": "Subjek harus minimal 5 karakter",
+        "maxLength": "Subjek terlalu panjang"
+      },
+      "message": {
+        "label": "Pesan",
+        "placeholder": "Pesan Anda",
+        "required": "Pesan wajib diisi",
+        "minLength": "Pesan harus minimal 10 karakter",
+        "maxLength": "Pesan terlalu panjang",
+        "spam": "Pesan mengandung karakter berulang yang mencurigakan"
+      },
+      "subjects": {
+        "collaboration": "Kolaborasi Proyek",
+        "inquiry": "Pertanyaan Umum",
+        "job": "Peluang Pekerjaan",
+        "technical": "Pertanyaan Teknis"
+      },
+      "submit": "Kirim Pesan",
+      "submitting": "Mengirim...",
+      "success": {
+        "title": "Pesan Berhasil Dikirim!",
+        "message": "Terima kasih telah menghubungi! Saya akan membalas dalam waktu 24 jam.",
+        "timeline": {
+          "title": "Apa yang terjadi selanjutnya?",
+          "step1": {
+            "title": "Pesan Diterima",
+            "description": "Pesan Anda telah terkirim ke inbox saya"
+          },
+          "step2": {
+            "title": "Tinjau & Balas",
+            "description": "Saya akan membaca pesan Anda dengan seksama dan menyiapkan balasan yang thoughtful"
+          },
+          "step3": {
+            "title": "Anda Akan Mendengar dari Saya",
+            "description": "Harapkan balasan dalam 24 jam di hari kerja"
+          }
+        },
+        "autoClose": "Otomatis menutup dalam {seconds} detik...",
+        "sendAnother": "Kirim Pesan Lain"
+      },
+      "error": {
+        "general": "Gagal mengirim pesan. Silakan coba lagi.",
+        "network": "Terjadi kesalahan. Silakan coba lagi nanti.",
+        "rateLimit": "Terlalu banyak pengiriman form kontak. Silakan coba lagi nanti.",
+        "recaptcha": "Verifikasi reCAPTCHA gagal. Silakan coba lagi.",
+        "recaptchaNotReady": "reCAPTCHA belum siap. Silakan coba lagi."
+      },
+      "info": {
+        "responseTime": "Saya biasanya merespons dalam ~24 jam di hari kerja. Tekan Ctrl+Enter untuk kirim dengan cepat!",
+        "privacy": "Informasi Anda aman dan tidak akan pernah dibagikan kepada pihak ketiga.",
+        "protected": "Dilindungi oleh reCAPTCHA"
+      }
+    }
+  },
+  "projects": {
+    "title": "Proyek",
+    "subtitle": "Hal-hal yang telah saya buat",
+    "viewDemo": "Lihat Demo",
+    "viewCode": "Lihat Kode",
+    "techStack": "Tech Stack",
+    "status": {
+      "completed": "Selesai",
+      "inProgress": "Sedang Dikerjakan",
+      "planned": "Direncanakan"
+    },
+    "noProjects": "Belum ada proyek"
+  },
+  "portfolio": {
+    "title": "Portfolio | Proyek",
+    "description": "Koleksi proyek dan karya saya",
+    "heading": "Proyek Saya",
+    "subheading": "Koleksi proyek yang telah saya kerjakan",
+    "noProjects": "Belum ada proyek"
+  },
+  "watchlist": {
+    "title": "Daftar Tontonan",
+    "subtitle": "Anime, film, dan series yang sudah saya tonton",
+    "stats": {
+      "total": "Total Ditonton",
+      "completed": "Selesai",
+      "averageRating": "Rating Rata-rata"
+    },
+    "filters": {
+      "all": "Semua",
+      "allTypes": "Semua Tipe",
+      "allStatus": "Semua Status",
+      "search": "Cari judul...",
+      "type": "Tipe",
+      "status": "Status"
+    },
+    "table": {
+      "title": "Judul",
+      "type": "Tipe",
+      "genre": "Genre",
+      "episodes": "Episode",
+      "status": "Status",
+      "rating": "Rating",
+      "year": "Tahun",
+      "actions": "Aksi"
+    },
+    "status": {
+      "watching": "Sedang Menonton",
+      "completed": "Selesai",
+      "dropped": "Dihentikan",
+      "onHold": "Ditunda",
+      "planToWatch": "Rencana Tonton"
+    },
+    "noItems": "Belum ada item di watchlist",
+    "addFirst": "Mulai tambahkan anime atau film!"
+  },
+  "footer": {
+    "description": "Full Stack Developer yang passionate dalam menciptakan pengalaman web yang luar biasa.",
+    "quickLinks": "Tautan Cepat",
+    "connect": "Hubungi",
+    "copyright": "Hak cipta dilindungi.",
+    "builtWith": "Dibuat dengan Next.js & Tailwind CSS"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "posts": "Posting",
+    "projects": "Proyek",
+    "settings": "Pengaturan",
+    "logout": "Keluar",
+    "welcome": "Selamat datang kembali!",
+    "stats": {
+      "totalPosts": "Total Posting",
+      "totalProjects": "Total Proyek",
+      "totalViews": "Total Tampilan"
+    }
+  },
+  "seo": {
+    "home": {
+      "title": "Beranda",
+      "description": "Selamat datang di website portfolio saya"
+    },
+    "about": {
+      "title": "Tentang",
+      "description": "Pelajari lebih lanjut tentang saya dan pekerjaan saya"
+    },
+    "blog": {
+      "title": "Blog",
+      "description": "Baca posting blog dan tutorial terbaru saya"
+    },
+    "projects": {
+      "title": "Proyek",
+      "description": "Lihat proyek dan pekerjaan terbaru saya"
+    },
+    "contact": {
+      "title": "Kontak",
+      "description": "Hubungi saya untuk kolaborasi dan peluang"
+    }
+  }
+}

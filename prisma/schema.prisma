@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  Post        Post[]
+
+  @@index([slug])
+}
+
+model LoginActivity {
+  id        String   @id @default(cuid())
+  email     String
+  ipAddress String
+  userAgent String?
+  success   Boolean  @default(false)
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([email])
+  @@index([ipAddress])
+  @@index([success])
+}
+
+model Media {
+  id           String   @id @default(cuid())
+  filename     String
+  originalName String
+  mimeType     String
+  size         Int
+  url          String
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model Post {
+  id                String    @id @default(cuid())
+  title             String
+  slug              String    @unique
+  content           String
+  excerpt           String?
+  metaDescription   String?
+  titleEn           String?
+  contentEn         String?
+  excerptEn         String?
+  metaDescriptionEn String?
+  image             String?
+  published         Boolean   @default(false)
+  status            String    @default("draft")
+  views             Int       @default(0)
+  reactionsLove     Int       @default(0)
+  reactionsLike     Int       @default(0)
+  reactionsWow      Int       @default(0)
+  reactionsFire     Int       @default(0)
+  readingTime       Int       @default(5)
+  author            String    @default("Alfattah")
+  publishedAt       DateTime?
+  archivedAt        DateTime?
+  metaKeywords      String?
+  tags              String?
+  categoryId        String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  category          Category? @relation(fields: [categoryId], references: [id])
+
+  @@index([categoryId])
+  @@index([createdAt])
+  @@index([publishedAt])
+  @@index([published])
+  @@index([published, publishedAt])
+  @@index([published, views])
+  @@index([slug])
+  @@index([status])
+  @@index([status, publishedAt])
+}
+
+model Project {
+  id            String   @id @default(cuid())
+  title         String
+  slug          String   @unique
+  description   String
+  descriptionEn String?
+  content       String?
+  image         String?
+  demoUrl       String?
+  githubUrl     String?
+  techStack     String?
+  status        String   @default("Completed")
+  views         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([createdAt])
+  @@index([slug])
+  @@index([views])
+}
+
+model Settings {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Watchlist {
+  id           String    @id @default(cuid())
+  title        String
+  type         String    @default("Anime")
+  genre        String?
+  totalEpisode Int?
+  status       String    @default("Completed")
+  rating       Float?
+  notesId      String?
+  notesEn      String?
+  imageUrl     String?
+  year         Int?
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([createdAt])
+  @@index([rating])
+  @@index([status])
+  @@index([type])
+}
