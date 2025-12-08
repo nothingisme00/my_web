@@ -920,13 +920,13 @@ export function WatchlistTable({ items }: WatchlistTableProps) {
                       <img
                         src={selectedItem.imageUrl}
                         alt={selectedItem.title}
-                        className="w-32 h-48 md:w-28 md:h-40 object-cover rounded-2xl shadow-2xl ring-4 ring-white dark:ring-gray-900"
+                        className="w-24 h-36 md:w-28 md:h-40 object-cover rounded-2xl shadow-2xl ring-4 ring-white dark:ring-gray-900"
                       />
                     ) : (
-                      <div className="w-32 h-48 md:w-28 md:h-40 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-2xl shadow-2xl ring-4 ring-white dark:ring-gray-900 flex items-center justify-center">
+                      <div className="w-24 h-36 md:w-28 md:h-40 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-2xl shadow-2xl ring-4 ring-white dark:ring-gray-900 flex items-center justify-center">
                         <ModalTypeIcon
                           className={clsx(
-                            "h-12 w-12 opacity-50",
+                            "h-10 w-10 md:h-12 md:w-12 opacity-50",
                             modalTypeColor
                           )}
                         />

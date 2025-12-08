@@ -901,12 +901,11 @@ export function AboutContent({ aboutData, settings }: AboutContentProps) {
               </p>
             </motion.div>
 
-            {/* Contact Form */}
-            <motion.div
-              variants={itemVariants}
-              className="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-2xl p-8 md:p-10 border border-gray-200 dark:border-gray-700 shadow-xl">
-              <ContactForm />
-            </motion.div>
+              <motion.div
+                variants={itemVariants}
+                className="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-2xl p-5 md:p-10 border border-gray-200 dark:border-gray-700 shadow-xl">
+                <ContactForm />
+              </motion.div>
           </motion.div>
         </div>
       </section>
