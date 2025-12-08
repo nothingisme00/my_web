@@ -2,7 +2,7 @@ import createMiddleware from "next-intl/middleware";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { locales, defaultLocale } from "@/i18n/config";
-import { jwtVerify } from "jose";
+import { jwtVerify, SignJWT } from "jose";
 
 // JWT Secret for token verification
 const JWT_SECRET = new TextEncoder().encode(
@@ -17,20 +17,25 @@ const intlMiddleware = createMiddleware({
 });
 
 // Verify JWT token and check expiration
-async function verifyToken(token: string): Promise<boolean> {
+async function verifyToken(token: string) {
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
-
-    // Check if token has expired
-    const exp = payload.exp as number;
-    if (exp && Date.now() >= exp * 1000) {
-      return false;
-    }
-
-    return true;
+    return payload; // Return payload if valid
   } catch {
-    return false;
+    return null; // Return null if invalid
   }
+}
+
+// Helper to sign new token (Sliding Expiration)
+async function signToken(payload: any) {
+  return new SignJWT({
+    userId: payload.userId,
+    email: payload.email,
+  })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("30m") // 30 minutes from NOW
+    .sign(JWT_SECRET);
 }
 
 // Add security headers to response
@@ -78,13 +83,25 @@ export default async function middleware(request: NextRequest) {
     }
 
     // Verify token is still valid
-    const isValidToken = await verifyToken(authToken);
-    if (!isValidToken) {
+    const payload = await verifyToken(authToken);
+    if (!payload) {
       // Clear invalid token and redirect to login
       const response = NextResponse.redirect(new URL("/login", request.url));
       response.cookies.delete("auth_token");
       return response;
     }
+
+    // SLIDING EXPIRATION: Refresh token
+    const newToken = await signToken(payload);
+    const response = NextResponse.next();
+    response.cookies.set("auth_token", newToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      // No maxAge determines session cookie (clears on browser close)
+    });
+    return addSecurityHeaders(response);
   }
 
   // 2. Protect admin API routes
@@ -93,19 +110,34 @@ export default async function middleware(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const isValidToken = await verifyToken(authToken);
-    if (!isValidToken) {
+    const payload = await verifyToken(authToken);
+    if (!payload) {
       return NextResponse.json(
         { error: "Token expired. Please login again." },
         { status: 401 }
       );
     }
+    
+    // For API calls, we could refresh the token in headers, but for simplicity
+    // we let normal navigation handle the main sliding.
+    // However, autosave calls WILL hit this.
+    // To refresh cookie on API call:
+    const newToken = await signToken(payload);
+    const response = NextResponse.next();
+    response.cookies.set("auth_token", newToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/"
+    });
+    return addSecurityHeaders(response);
   }
 
   // 3. Redirect to admin if already logged in and trying to access login
+  // 3. Redirect to admin if already logged in and trying to access login
   if (isLoginRoute && authToken) {
-    const isValidToken = await verifyToken(authToken);
-    if (isValidToken) {
+    const payload = await verifyToken(authToken);
+    if (payload) {
       return NextResponse.redirect(new URL("/admin", request.url));
     } else {
       // Clear invalid token
@@ -126,7 +158,10 @@ export default async function middleware(request: NextRequest) {
   */
 
   // Skip i18n middleware for admin, api, and login routes
+  // Skip i18n middleware for admin, api, and login routes
   if (isAdminRoute || isApiRoute || isLoginRoute) {
+    // If we have a token here (e.g. admin route handled above), response is already returned.
+    // This is fallback for unhandled cases.
     const response = NextResponse.next();
     return addSecurityHeaders(response);
   }
