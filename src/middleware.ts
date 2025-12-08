@@ -115,13 +115,15 @@ export default async function middleware(request: NextRequest) {
     }
   }
 
-  // 4. STRICT ISOLATION: If logged in, prevent access to public pages
+  // 4. STRICT ISOLATION: DISABLED (Allow admin to view public site)
+  /*
   if (isPublicRoute && authToken) {
     const isValidToken = await verifyToken(authToken);
     if (isValidToken) {
       return NextResponse.redirect(new URL("/admin", request.url));
     }
   }
+  */
 
   // Skip i18n middleware for admin, api, and login routes
   if (isAdminRoute || isApiRoute || isLoginRoute) {
