@@ -110,7 +110,7 @@ export async function login(
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      // maxAge removed to act as a session cookie (clears on browser close)
     });
 
     console.log("✅ Cookie set, redirecting to /admin");
