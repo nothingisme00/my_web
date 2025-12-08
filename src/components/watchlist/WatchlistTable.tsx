@@ -878,7 +878,7 @@ export function WatchlistTable({ items }: WatchlistTableProps) {
               {/* Modal Card - Modern Glass Design */}
               <div className="relative w-full max-w-lg max-h-[90vh] bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-2xl animate-in fade-in zoom-in-95 duration-300 border border-gray-200/50 dark:border-gray-700/50 overflow-y-auto">
                 {/* Hero Section with Gradient Overlay */}
-                <div className="relative h-52">
+                <div className="relative h-32 md:h-52">
                   {/* Background Image Container */}
                   <div className="absolute inset-0 overflow-hidden rounded-t-3xl">
                     {selectedItem.imageUrl ? (
@@ -912,21 +912,21 @@ export function WatchlistTable({ items }: WatchlistTableProps) {
                   </button>
                 </div>
 
-                {/* Floating Elements - Responsive Layout */}
-                <div className="relative flex flex-col items-center md:block">
-                  {/* Poster - Stacked on Mobile, Floating on Desktop */}
-                  <div className="relative -mt-12 md:absolute md:-top-16 md:left-6 md:mt-0 z-20">
+                {/* Floating Elements - Outside hero for proper visibility */}
+                <div className="relative">
+                  {/* Floating Poster - Scaled down for mobile */}
+                  <div className="absolute -top-12 left-4 md:-top-16 md:left-6">
                     {selectedItem.imageUrl ? (
                       <img
                         src={selectedItem.imageUrl}
                         alt={selectedItem.title}
-                        className="w-24 h-36 md:w-28 md:h-40 object-cover rounded-2xl shadow-2xl ring-4 ring-white dark:ring-gray-900"
+                        className="w-20 h-28 md:w-28 md:h-40 object-cover rounded-xl md:rounded-2xl shadow-2xl ring-2 md:ring-4 ring-white dark:ring-gray-900"
                       />
                     ) : (
-                      <div className="w-24 h-36 md:w-28 md:h-40 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-2xl shadow-2xl ring-4 ring-white dark:ring-gray-900 flex items-center justify-center">
+                      <div className="w-20 h-28 md:w-28 md:h-40 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-xl md:rounded-2xl shadow-2xl ring-2 md:ring-4 ring-white dark:ring-gray-900 flex items-center justify-center">
                         <ModalTypeIcon
                           className={clsx(
-                            "h-10 w-10 md:h-12 md:w-12 opacity-50",
+                            "h-8 w-8 md:h-12 md:w-12 opacity-50",
                             modalTypeColor
                           )}
                         />
@@ -956,14 +956,14 @@ export function WatchlistTable({ items }: WatchlistTableProps) {
                 </div>
 
                 {/* Content */}
-                <div className="pt-6 pb-6 px-6">
-                  {/* Title & Meta - Responsive layout */}
-                  <div className="mb-5 px-0 text-center md:text-left md:pl-36">
-                    <h2 className="text-2xl md:text-xl font-bold text-gray-900 dark:text-white mb-3 leading-tight">
+                <div className="pt-4 md:pt-6 pb-6 px-4 md:px-6">
+                  {/* Title & Meta - Indented to clear poster */}
+                  <div className="mb-4 pl-24 md:pl-36">
+                    <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2 leading-tight line-clamp-2 md:line-clamp-none">
                       {selectedItem.title}
                     </h2>
                     
-                    <div className="flex items-center justify-center md:justify-start flex-wrap gap-2">
+                    <div className="flex items-center flex-wrap gap-2">
                       {/* Mobile Rating Badge (Inline) */}
                       {selectedItem.rating && (
                         <span className="md:hidden inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
