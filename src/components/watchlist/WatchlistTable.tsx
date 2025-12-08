@@ -912,18 +912,18 @@ export function WatchlistTable({ items }: WatchlistTableProps) {
                   </button>
                 </div>
 
-                {/* Floating Elements - Outside hero for proper visibility */}
-                <div className="relative">
-                  {/* Floating Poster */}
-                  <div className="absolute -top-16 left-6">
+                {/* Floating Elements - Responsive Layout */}
+                <div className="relative flex flex-col items-center md:block">
+                  {/* Poster - Stacked on Mobile, Floating on Desktop */}
+                  <div className="relative -mt-12 md:absolute md:-top-16 md:left-6 md:mt-0 z-20">
                     {selectedItem.imageUrl ? (
                       <img
                         src={selectedItem.imageUrl}
                         alt={selectedItem.title}
-                        className="w-28 h-40 object-cover rounded-2xl shadow-2xl ring-4 ring-white dark:ring-gray-900"
+                        className="w-32 h-48 md:w-28 md:h-40 object-cover rounded-2xl shadow-2xl ring-4 ring-white dark:ring-gray-900"
                       />
                     ) : (
-                      <div className="w-28 h-40 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-2xl shadow-2xl ring-4 ring-white dark:ring-gray-900 flex items-center justify-center">
+                      <div className="w-32 h-48 md:w-28 md:h-40 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-2xl shadow-2xl ring-4 ring-white dark:ring-gray-900 flex items-center justify-center">
                         <ModalTypeIcon
                           className={clsx(
                             "h-12 w-12 opacity-50",
@@ -934,9 +934,9 @@ export function WatchlistTable({ items }: WatchlistTableProps) {
                     )}
                   </div>
 
-                  {/* Rating Badge - Compact */}
+                  {/* Rating Badge - Hidden on mobile (moved to meta), Floating on Desktop */}
                   {selectedItem.rating && (
-                    <div className="absolute -top-4 right-6 flex flex-col items-center">
+                    <div className="hidden md:flex absolute -top-4 right-6 flex-col items-center z-20">
                       <div className="flex items-center gap-1.5 bg-amber-500 rounded-full shadow-lg px-3 py-1.5">
                         <Star className="h-4 w-4 fill-white text-white" />
                         <span className="text-sm font-bold text-white">
@@ -957,12 +957,21 @@ export function WatchlistTable({ items }: WatchlistTableProps) {
 
                 {/* Content */}
                 <div className="pt-6 pb-6 px-6">
-                  {/* Title & Meta - with left padding to avoid poster overlap */}
-                  <div className="mb-5 pl-36">
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 leading-tight">
+                  {/* Title & Meta - Responsive layout */}
+                  <div className="mb-5 px-0 text-center md:text-left md:pl-36">
+                    <h2 className="text-2xl md:text-xl font-bold text-gray-900 dark:text-white mb-3 leading-tight">
                       {selectedItem.title}
                     </h2>
-                    <div className="flex items-center flex-wrap gap-2">
+                    
+                    <div className="flex items-center justify-center md:justify-start flex-wrap gap-2">
+                      {/* Mobile Rating Badge (Inline) */}
+                      {selectedItem.rating && (
+                        <span className="md:hidden inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                          <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
+                          {selectedItem.rating.toFixed(1)}
+                        </span>
+                      )}
+
                       {/* Type Badge */}
                       <span
                         className={clsx(

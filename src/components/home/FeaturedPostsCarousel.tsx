@@ -193,7 +193,7 @@ export function FeaturedPostsCarousel({ posts }: FeaturedPostsCarouselProps) {
                   e.preventDefault();
                   handlePrev();
                 }}
-                className="absolute -left-3 md:-left-14 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 shadow-xl opacity-0 group-hover:opacity-100 hover:bg-gray-900 dark:hover:bg-white hover:border-gray-900 dark:hover:border-white transition-all duration-300 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-white dark:hover:text-gray-900 hover:scale-110 active:scale-95"
+                className="absolute -left-3 md:-left-14 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 shadow-xl opacity-0 group-hover:opacity-100 hover:bg-gray-900 dark:hover:bg-white hover:border-gray-900 dark:hover:border-white transition-all duration-300 hidden md:flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-white dark:hover:text-gray-900 hover:scale-110 active:scale-95"
                 aria-label="Previous slide">
                 <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
               </button>
@@ -204,7 +204,7 @@ export function FeaturedPostsCarousel({ posts }: FeaturedPostsCarouselProps) {
                   e.preventDefault();
                   handleNext();
                 }}
-                className="absolute -right-3 md:-right-14 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 shadow-xl opacity-0 group-hover:opacity-100 hover:bg-gray-900 dark:hover:bg-white hover:border-gray-900 dark:hover:border-white transition-all duration-300 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-white dark:hover:text-gray-900 hover:scale-110 active:scale-95"
+                className="absolute -right-3 md:-right-14 top-1/2 -translate-y-1/2 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border border-gray-200/50 dark:border-gray-700/50 shadow-xl opacity-0 group-hover:opacity-100 hover:bg-gray-900 dark:hover:bg-white hover:border-gray-900 dark:hover:border-white transition-all duration-300 hidden md:flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-white dark:hover:text-gray-900 hover:scale-110 active:scale-95"
                 aria-label="Next slide">
                 <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
               </button>
