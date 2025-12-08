@@ -16,7 +16,7 @@ if (!JWT_SECRET) {
 const secret = new TextEncoder().encode(JWT_SECRET);
 
 // JWT Token expiration time (7 days)
-const TOKEN_EXPIRATION = '7d';
+const TOKEN_EXPIRATION = '1h';
 
 // Password hashing salt rounds
 const SALT_ROUNDS = 10;
