@@ -27,7 +27,7 @@ async function verifyToken(token: string) {
 }
 
 // Helper to sign new token (Sliding Expiration)
-async function signToken(payload: any) {
+async function signToken(payload: Record<string, unknown>) {
   return new SignJWT({
     userId: payload.userId,
     email: payload.email,
@@ -69,7 +69,6 @@ export default async function middleware(request: NextRequest) {
   const isAdminRoute = pathname.startsWith("/admin");
   const isLoginRoute = pathname === "/login";
   const isApiRoute = pathname.startsWith("/api");
-  const isPublicRoute = !isAdminRoute && !isLoginRoute && !isApiRoute;
 
   // Check if it's a protected admin API route
   const isProtectedApiRoute = pathname.startsWith("/api/admin");
